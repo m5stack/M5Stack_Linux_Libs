@@ -1,0 +1,66 @@
+# component/SConscript
+Import("env")
+import os
+
+with open(env["PROJECT_TOOL_S"]) as f:
+    exec(f.read())
+
+
+if "CONFIG_NANOMSG_ENABLED" in os.environ:
+    SRCS = [AFile("test.c")]
+    INCLUDE = [ADir("include")]
+    PRIVATE_INCLUDE = []
+    REQUIREMENTS = []
+    STATIC_LIB = []
+    DYNAMIC_LIB = []
+    DEFINITIONS = []
+    DEFINITIONS_PRIVATE = []
+    LDFLAGS = []
+    LINK_SEARCH_PATH = []
+    SRCS += append_srcs_dir(ADir("../../github_source/nanomsg/src"))
+    DEFINITIONS_PRIVATE += [
+        "-DNN_HAVE_ACCEPT4=1",
+        "-DNN_HAVE_BACKTRACE=1",
+        "-DNN_HAVE_CLOCK_GETTIME=1",
+        "-DNN_HAVE_CLOCK_MONOTONIC=1",
+        "-DNN_HAVE_EPOLL=1",
+        "-DNN_HAVE_EVENTFD=1",
+        "-DNN_HAVE_GCC_ATOMIC_BUILTINS",
+        "-DNN_HAVE_GETADDRINFO_A=1",
+        "-DNN_HAVE_LIBNSL=1",
+        "-DNN_HAVE_LINUX",
+        "-DNN_HAVE_MSG_CONTROL=1",
+        "-DNN_HAVE_PIPE2=1",
+        "-DNN_HAVE_PIPE=1",
+        "-DNN_HAVE_POLL=1",
+        "-DNN_HAVE_SEMAPHORE",
+        "-DNN_HAVE_SEMAPHORE_PTHREAD=1",
+        "-DNN_HAVE_SEMAPHORE_RT=1",
+        "-DNN_HAVE_SOCKETPAIR=1",
+        "-DNN_HAVE_UNIX_SOCKETS=1",
+        "-DNN_MAX_SOCKETS=512",
+        "-DNN_SHARED_LIB",
+        "-DNN_USE_EPOLL",
+        "-DNN_USE_EVENTFD",
+        "-D_GNU_SOURCE",
+        "-D_POSIX_PTHREAD_SEMANTICS",
+        "-D_REENTRANT",
+        "-D_THREAD_SAFE",
+    ]
+
+    env["COMPONENTS"].append(
+        {
+            "target": os.path.basename(env["component_dir"]),
+            "SRCS": SRCS,
+            "INCLUDE": INCLUDE,
+            "PRIVATE_INCLUDE": PRIVATE_INCLUDE,
+            "REQUIREMENTS": REQUIREMENTS,
+            "STATIC_LIB": STATIC_LIB,
+            "DYNAMIC_LIB": DYNAMIC_LIB,
+            "DEFINITIONS": DEFINITIONS,
+            "DEFINITIONS_PRIVATE": DEFINITIONS_PRIVATE,
+            "LDFLAGS": LDFLAGS,
+            "LINK_SEARCH_PATH": LINK_SEARCH_PATH,
+            "REGISTER": "static",
+        }
+    )

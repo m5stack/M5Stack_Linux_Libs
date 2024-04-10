@@ -1,0 +1,4 @@
+from pathlib import Path
+import os
+with open(str(Path(os.getcwd())/'..'/'..'/'tools'/'scons'/'project.py')) as f:
+    exec(f.read())

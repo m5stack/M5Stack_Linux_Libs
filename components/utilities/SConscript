@@ -1,0 +1,52 @@
+# component/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+
+if 'CONFIG_UTILITIES_ENABLED' in os.environ:
+    SRCS=[]
+    INCLUDE=[]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=[]
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=['-w']
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+
+    if 'CONFIG_UTILITIES_FMT_ENABLED' in os.environ:
+        INCLUDE.append(ADir('party/fmt/include'))
+
+    if 'CONFIG_UTILITIES_EASYMSGCPP_ENABLED' in os.environ:
+        INCLUDE.append(ADir('party/easymsgcpp/src/include'))  
+        SRCS += AGlob('party/easymsgcpp/src/*.c*')
+
+    if 'CONFIG_UTILITIES_INI_ENABLED' in os.environ:
+        INCLUDE.append(ADir('party/ini'))  
+        SRCS += AGlob('party/ini/*.c*')
+
+    if 'CONFIG_UTILITIES_BASE64_ENABLED' in os.environ:
+        INCLUDE.append(ADir('party/base64'))  
+        SRCS += AGlob('party/base64/*.c*')
+    
+    INCLUDE.append(ADir('include'))  
+
+    SRCS.append(AFile('test.c'))
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'static'
+                            })

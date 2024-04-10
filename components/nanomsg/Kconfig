@@ -1,0 +1,10 @@
+
+menuconfig NANOMSG_ENABLED
+    bool "Enable nanomsg"
+    default n
+
+    config NANOMSG_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on NANOMSG_ENABLED
+

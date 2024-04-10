@@ -1,0 +1,22 @@
+
+menuconfig AXERA_SUPPORT_ENABLED
+    bool "Enable axera_boad_support"
+    default n
+
+    config AX620U_SUPPORT_ENABLED
+        bool "Enable ax620u bsp"
+        default n
+        depends on AXERA_SUPPORT_ENABLED
+
+    config AX620Q_SUPPORT_ENABLED
+        bool "Enable ax620q bsp"
+        default n
+        depends on AXERA_SUPPORT_ENABLED
+
+
+    config AXERA_AI_COMMON_ENABLED
+        bool "Enable ai_common"
+        default n
+        depends on AXERA_SUPPORT_ENABLED
+
+

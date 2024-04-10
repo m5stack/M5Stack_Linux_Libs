@@ -1,0 +1,10 @@
+menuconfig FFMPEG_VCODE_ENABLED
+    bool "ffmpeg_vcode configuration"
+    default n
+
+    config FFMPEG_VCODE_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on FFMPEG_VCODE_ENABLED
+        help
+            Enable include static lib(from gcc)

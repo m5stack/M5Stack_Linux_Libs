@@ -1,0 +1,10 @@
+
+menuconfig TOOLKIT_ENABLED
+    bool "Enable toolkit"
+    default n
+
+    config TOOLKIT_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on TOOLKIT_ENABLED
+

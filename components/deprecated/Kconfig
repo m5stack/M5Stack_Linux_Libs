@@ -1,0 +1,4 @@
+menu "Deprecated Components configuration"
+    osource "${SDK_PATH}/components/deprecated/*/Kconfig"
+    osource "${PROJECT_PATH}/../components/deprecated/*/Kconfig"
+endmenu

@@ -1,0 +1,21 @@
+
+menuconfig U8G2_COMPONENT_ENABLED
+    bool "Enable u8g2"
+    default n
+
+	config U8G2_COMPONENT_CXX
+		bool "compile u8g2 with c"
+		default y
+		depends on U8G2_COMPONENT_ENABLED
+
+	config U8G2_COMPONENT_CPP
+		bool "compile u8g2 with cpp"
+		default n
+		depends on U8G2_COMPONENT_ENABLED
+
+
+    config U8G2_COMPONENT_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on U8G2_COMPONENT_ENABLED
+

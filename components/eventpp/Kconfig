@@ -1,0 +1,6 @@
+
+menuconfig EVENTPP_ENABLED
+    bool "Enable eventpp"
+    default n
+
+

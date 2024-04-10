@@ -1,0 +1,36 @@
+# component2/SConscript
+Import('env')
+import os
+# import subprocess
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+
+if 'CONFIG_FFMPEG_VCODE_ENABLED' in os.environ:
+    SRCS=[]
+    INCLUDE=[ADir('include')]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=['avcodec', 'avutil', 'swscale', 'x264', 'x265']
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=[]
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+    # ffmpeg_lib_link = result = subprocess.run(['ls', '-l'], capture_output=True, text=True) 
+    # os.system("pkg-config opencv4 --cflags --libs")
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'static'
+                            })

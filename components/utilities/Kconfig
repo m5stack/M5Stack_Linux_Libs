@@ -1,0 +1,31 @@
+
+menuconfig UTILITIES_ENABLED
+    bool "Enable threerDparty utilities"
+    default n
+
+    config UTILITIES_FMT_ENABLED
+        bool "compile fmt lib"
+        default n
+        depends on UTILITIES_ENABLED
+
+    config UTILITIES_EASYMSGCPP_ENABLED
+        bool "compile easy-msg-cpp lib"
+        default n
+        depends on UTILITIES_ENABLED
+
+    config UTILITIES_BASE64_ENABLED
+        bool "compile base64 lib"
+        default n
+        depends on UTILITIES_ENABLED
+
+    config UTILITIES_INI_ENABLED
+        bool "compile ini lib"
+        default n
+        depends on UTILITIES_ENABLED
+
+    config UTILITIES_DYNAMIC
+        bool "compile threerDparty as dynamic(shared) lib"
+        default n
+        depends on UTILITIES_ENABLED
+
+

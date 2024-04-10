@@ -1,0 +1,14 @@
+
+menuconfig UNITV2_SUPPORT_ENABLED
+    bool "Enable unitv2_boad_support"
+    default n
+
+    config UNITV2_NCNN_ENABLED
+        bool "Enable unitv2 ncnn"
+        default n
+        depends on UNITV2_SUPPORT_ENABLED
+
+
+
+
+

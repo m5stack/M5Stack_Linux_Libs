@@ -1,0 +1,50 @@
+
+menuconfig LHV_ENABLED
+    bool "Enable lhv"
+    default n
+
+	config LHV_WITH_KCP
+		bool "with kcp"
+		default n
+		depends on LHV_ENABLED
+
+	config LHV_WITH_PROTOCOL
+		bool "compile protocol"
+		default n
+		depends on LHV_ENABLED
+
+	config LHV_WITH_EVPP
+		bool "compile evpp"
+		default n
+		depends on LHV_ENABLED
+
+		config LHV_WITH_HTTP
+			bool "compile http"
+			default n
+			depends on LHV_WITH_EVPP
+
+			config LHV_WITH_WITH_HTTP_CLIENT
+				bool "compile http/client"
+				default n
+				depends on LHV_WITH_HTTP
+
+			config LHV_WITH_HTTP_SERVER
+				bool "compile http/server"
+				default n
+				depends on LHV_WITH_HTTP
+
+	config LHV_WITH_MQTT
+		bool "compile mqtt"
+		default n
+		depends on LHV_ENABLED
+
+	config LHV_WITH_OPENSSL
+		bool "with openssl library"
+		default n
+		depends on LHV_ENABLED
+
+    config LHV_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on LHV_ENABLED
+

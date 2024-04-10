@@ -1,0 +1,10 @@
+
+menuconfig NNG_ENABLED
+    bool "Enable nng"
+    default n
+
+    config NNG_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on NNG_ENABLED
+

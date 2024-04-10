@@ -1,0 +1,13 @@
+
+menuconfig ANYANY_ENABLED
+    bool "Enable anyany"
+    default n
+    config ANYANY_SRC_ENABLED
+        bool "Enable any src"
+        default n
+		depends on ANYANY_ENABLED
+
+    config ANYANY_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on ANYANY_ENABLED

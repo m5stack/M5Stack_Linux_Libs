@@ -1,0 +1,10 @@
+menuconfig COMPONENT1_ENABLED
+    bool "Component1 configuration"
+    default n
+
+    config COMPONENT1_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on COMPONENT1_ENABLED
+        help
+            Enable include static lib(from gcc)

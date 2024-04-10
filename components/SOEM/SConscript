@@ -1,0 +1,41 @@
+# component/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+
+if 'CONFIG_SOEM_ENABLED' in os.environ:
+    SRCS=[]
+    INCLUDE=[]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=['pthread']
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=['-w']
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+    INCLUDE.append(ADir('../../github_source/SOEM/soem'))
+    INCLUDE.append(ADir('../../github_source/SOEM/osal'))
+    INCLUDE.append(ADir('../../github_source/SOEM/soem'))
+    INCLUDE.append(ADir('../../github_source/SOEM/osal/linux'))
+    INCLUDE.append(ADir('../../github_source/SOEM/oshw/linux'))
+    SRCS += AGlob('../../github_source/SOEM/soem/*.c*')
+    SRCS += AGlob('../../github_source/SOEM/osal/linux/*.c*')
+    SRCS += AGlob('../../github_source/SOEM/oshw/linux/*.c*')
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'static'
+                            })

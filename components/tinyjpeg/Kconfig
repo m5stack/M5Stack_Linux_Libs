@@ -1,0 +1,10 @@
+
+menuconfig TINY_JPEG_ENABLED
+    bool "Enable tiny_jpeg"
+    default n
+
+    config TINY_JPEG_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on TINY_JPEG_ENABLED
+

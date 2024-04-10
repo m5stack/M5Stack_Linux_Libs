@@ -1,0 +1,2 @@
+
+CONFIG_NNG_ENABLED=y

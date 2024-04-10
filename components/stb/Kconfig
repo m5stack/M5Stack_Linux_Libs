@@ -1,0 +1,6 @@
+
+menuconfig STB_ENABLED
+    bool "Enable stb"
+    default n
+
+

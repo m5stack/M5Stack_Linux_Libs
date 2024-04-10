@@ -1,0 +1,47 @@
+# component2/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+
+if 'CONFIG_DEVICE_DRIVER_ENABLED' in os.environ:
+    SRCS=[]
+    INCLUDE=[ADir('party')]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=[]
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=['-w']
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+    if 'CONFIG_M5DEVICE_SH1107' in os.environ:
+        SRCS += AGlob('party/m5_sh1107/*.c')
+    if 'CONFIG_DEVICE_UART_ENABLED' in os.environ:
+        SRCS += AGlob('party/linux_uart/*.c')
+    if 'CONFIG_DEVICE_I2C_ENABLED' in os.environ:
+        SRCS += AGlob('party/linux_i2c/*.c')
+    if 'CONFIG_DEVICE_SPI_ENABLED' in os.environ:
+        SRCS += AGlob('party/linux_spi/*.c')
+    if 'CONFIG_DEVICE_FRAMEBUFFER_ENABLED' in os.environ:
+        SRCS += AGlob('party/framebuffer/*.c')
+    if 'CONFIG_DEVICE_PTMX_ENABLED' in os.environ:
+        SRCS += AGlob('party/ptmx/*.c')
+
+
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'static'
+                            })

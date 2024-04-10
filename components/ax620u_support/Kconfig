@@ -1,0 +1,63 @@
+
+menuconfig UNITV3_SUPPORT_ENABLED
+    bool "Enable unitv3_boad_support"
+    default n
+
+    config UNITV3_OPENCV_ENABLED
+        bool "compile opencv lib"
+        default y
+        depends on UNITV3_SUPPORT_ENABLED
+
+
+    config UNITV3_BSP_SUPPORT_ENABLED
+        bool "Enable unitv3 bsp"
+        default n
+        depends on UNITV3_SUPPORT_ENABLED
+
+    menuconfig UNITV3_AX_SAMPLES_LIB_ENABLED
+        bool "Enable ax-samples-libs"
+        default n
+        depends on UNITV3_SUPPORT_ENABLED
+
+        config UNITV3_AX_SAMPLES_LIB_DYNAMIC
+            bool "compile as dynamic(shared) lib"
+            default n
+            depends on UNITV3_AX_SAMPLES_LIB_ENABLED
+
+    
+    menuconfig UNITV3_AX_PIPELINE_LIB_ENABLED
+        bool "Enable ax-pipeline"
+        default n
+        depends on UNITV3_SUPPORT_ENABLED
+
+
+        config UNITV3_AX_PIPELINE_LIB_BYTETRACK_ENABLED
+            bool "compile ByteTrack lib"
+            default n
+            depends on UNITV3_AX_PIPELINE_LIB_ENABLED
+
+        config UNITV3_AX_PIPELINE_LIB_LIBV4L2CPP_ENABLED
+            bool "compile libv4l2cpp lib"
+            default n
+            depends on UNITV3_AX_PIPELINE_LIB_ENABLED
+        config UNITV3_AX_PIPELINE_LIB_LIBYUV_ENABLED
+            bool "compile as libyuv lib"
+            default n
+            depends on UNITV3_AX_PIPELINE_LIB_ENABLED
+        config UNITV3_AX_PIPELINE_LIB_MP4DEMUX_ENABLED
+            bool "compile mp4demux lib"
+            default n
+            depends on UNITV3_AX_PIPELINE_LIB_ENABLED
+        config UNITV3_AX_PIPELINE_LIB_RTSP_ENABLED
+            bool "compile RTSP lib"
+            default n
+            depends on UNITV3_AX_PIPELINE_LIB_ENABLED
+        config UNITV3_AX_PIPELINE_LIB_RTSPSERVER_ENABLED
+            bool "compile RtspServer lib"
+            default n
+            depends on UNITV3_AX_PIPELINE_LIB_ENABLED
+
+    config UNITV3_AI_COMMON_ENABLED
+        bool "Enable ai_common"
+        default n
+        depends on UNITV3_SUPPORT_ENABLED

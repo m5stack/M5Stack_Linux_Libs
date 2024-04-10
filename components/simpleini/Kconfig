@@ -1,0 +1,11 @@
+
+menuconfig SIMPLEINI_ENABLED
+    bool "Enable simpleini"
+    default n
+
+    config SIMPLEINI_DYNAMIC
+        bool "compile simpleini as dynamic(shared) lib"
+        default n
+        depends on SIMPLEINI_ENABLED
+
+

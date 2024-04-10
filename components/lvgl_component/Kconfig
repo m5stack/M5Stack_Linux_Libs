@@ -1,0 +1,20 @@
+
+menuconfig LVGL_COMPONENT_ENABLED
+    bool "Enable lvgl"
+    default n
+
+	config LVGL_COMPONENT_LVGL
+		bool "compile lvgl"
+		default n
+		depends on LVGL_COMPONENT_ENABLED
+
+	config LVGL_COMPONENT_LV_DRIVERS
+		bool "compile lv_drivers"
+		default n
+		depends on LVGL_COMPONENT_ENABLED
+
+    config LVGL_COMPONENT_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on LVGL_COMPONENT_ENABLED
+

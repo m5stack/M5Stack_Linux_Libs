@@ -1,0 +1,10 @@
+
+menuconfig NANOJPEG_ENABLED
+    bool "Enable nanojpeg"
+    default n
+
+    config NANOJPEG_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on NANOJPEG_ENABLED
+

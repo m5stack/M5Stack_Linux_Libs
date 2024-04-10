@@ -1,0 +1,10 @@
+
+menuconfig SOEM_ENABLED
+    bool "Enable soem"
+    default n
+
+    config SOEM_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on SOEM_ENABLED
+

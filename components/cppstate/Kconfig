@@ -1,0 +1,6 @@
+
+menuconfig CPPSTATE_ENABLED
+    bool "Enable cppstate"
+    default n
+
+

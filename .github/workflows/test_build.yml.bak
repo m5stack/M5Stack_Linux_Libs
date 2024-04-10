@@ -1,0 +1,38 @@
+name: test build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 7
+      matrix:
+        python-version: ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
+        cmake-version: ["3.7.2"]
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Get submodules
+      run: |
+        git submodule update --init --recursive
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+    - name: Test build
+      run: |
+        cd examples/demo1
+        python project.py build
+        python project.py rebuild
+        ls -al build/demo1 | awk '{print "program file size: " $5 "B"}'
+        python project.py run
+        python project.py clean
+        python project.py distclean
+        python project.py build --release
+        ls -al build/demo1 | awk '{print "program file size: " $5 "B"}'
+        python project.py distclean

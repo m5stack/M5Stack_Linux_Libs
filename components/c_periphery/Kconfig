@@ -1,0 +1,10 @@
+
+menuconfig C_PERIPHERY_COMPONENT_ENABLED
+    bool "Enable c_periphery"
+    default n
+
+    config C_PERIPHERY_COMPONENT_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on C_PERIPHERY_COMPONENT_ENABLED
+

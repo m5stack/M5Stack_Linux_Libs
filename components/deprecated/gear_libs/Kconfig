@@ -1,0 +1,30 @@
+
+menuconfig GEAR_LIBS_ENABLED
+    bool "Enable gear-lib"
+    default n
+
+
+    config GEAR_LIBS_POSIX_ENABLED
+        bool "compile gear-lib posix lib"
+        default n
+        depends on GEAR_LIBS_ENABLED
+
+
+    config GEAR_LIBS_LOG_ENABLED
+        bool "compile gear-lib log lib"
+        default n
+        depends on GEAR_LIBS_ENABLED && GEAR_LIBS_POSIX_ENABLED
+
+    config GEAR_LIBS_COLLECTIONS_ENABLED
+        bool "Enable libcollections"
+        default n
+        depends on GEAR_LIBS_ENABLED && GEAR_LIBS_POSIX_ENABLED
+
+
+
+
+    config GEAR_LIBS_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on GEAR_LIBS_ENABLED
+

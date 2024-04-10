@@ -1,0 +1,259 @@
+# component/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+
+
+
+
+
+
+
+
+
+
+# if 'CONFIG_UNITV3_OPENCV_ENABLED' in os.environ:
+#     SRCS = []
+#     INCLUDE = []
+#     PRIVATE_INCLUDE = []
+#     REQUIREMENTS = []
+#     STATIC_LIB = []
+#     DYNAMIC_LIB = []
+#     DEFINITIONS = []
+#     DEFINITIONS_PRIVATE = []
+#     LDFLAGS = []
+#     LINK_SEARCH_PATH = []
+    
+#     INCLUDE.append(ADir("../../github_source/opencv-arm-linux/include/opencv4"))
+#     STATIC_LIB += [
+#         AFile("../../github_source/opencv-arm-linux/lib/libopencv_highgui.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/libopencv_videoio.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/libopencv_imgcodecs.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/opencv4/3rdparty/liblibjpeg-turbo.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/opencv4/3rdparty/liblibwebp.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/opencv4/3rdparty/liblibpng.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/opencv4/3rdparty/liblibtiff.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/opencv4/3rdparty/liblibopenjp2.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/libopencv_imgproc.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/libopencv_core.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/opencv4/3rdparty/libzlib.a")
+#         ,AFile("../../github_source/opencv-arm-linux/lib/opencv4/3rdparty/libittnotify.a")
+#     ]
+
+#     env['COMPONENTS'].append({'target':'UNITV3_OPENCV',
+#                             'SRCS':SRCS,
+#                             'INCLUDE':INCLUDE,
+#                             'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+#                             'REQUIREMENTS':REQUIREMENTS,
+#                             'STATIC_LIB':STATIC_LIB,
+#                             'DYNAMIC_LIB':DYNAMIC_LIB,
+#                             'DEFINITIONS':DEFINITIONS,
+#                             'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+#                             'LDFLAGS':LDFLAGS,
+#                             'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+#                             'REGISTER':'shared' if 'CONFIG_UNITV3_OPENCV_DYNAMIC' in os.environ else 'static'
+#                             })
+
+
+
+
+# if 'CONFIG_UNITV3_BSP_SUPPORT_ENABLED' in os.environ:
+#     SRCS = []
+#     INCLUDE = []
+#     PRIVATE_INCLUDE = []
+#     REQUIREMENTS = []
+#     STATIC_LIB = []
+#     DYNAMIC_LIB = []
+#     DEFINITIONS = []
+#     DEFINITIONS_PRIVATE = []
+#     LDFLAGS = []
+#     LINK_SEARCH_PATH = []
+    
+#     # INCLUDE.append(ADir("../../github_source/msp"))
+#     INCLUDE.append(ADir("../../github_source/msp/out/include"))
+#     # SRCS += append_srcs_dir(ADir('../../github_source/toolkit/src'))
+
+#     LINK_SEARCH_PATH.append(ADir("../../github_source/msp/out/lib"))
+
+#     REQUIREMENTS += [
+#         "dl"
+#         , "ax_proton"
+#         , "axsyslog"
+#         , "ax_sys"
+#         , "ax_3a"
+#         , "ax_mipi"
+#         , "ax_interpreter_external"
+#         , "ax_interpreter"
+#         , "m"
+#         , "pthread"
+#         , "ax_npu_cv_kit"
+#         , "ax_nt_stream"
+#         , "ax_run_joint"
+#         , "ax_venc"
+#         , "ax_ivps"
+#         , "ax_vdec"
+#         , "ax_nt_stream"
+#         , "ax_nt_ctrl"
+#         , "ax_ive"
+#         , "ai_kit_release"
+#         ]
+    
+
+#     env['COMPONENTS'].append({'target':'UNITV3_BSP_SUPPORT',
+#                             'SRCS':SRCS,
+#                             'INCLUDE':INCLUDE,
+#                             'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+#                             'REQUIREMENTS':REQUIREMENTS,
+#                             'STATIC_LIB':STATIC_LIB,
+#                             'DYNAMIC_LIB':DYNAMIC_LIB,
+#                             'DEFINITIONS':DEFINITIONS,
+#                             'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+#                             'LDFLAGS':LDFLAGS,
+#                             'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+#                             'REGISTER':'shared' if 'CONFIG_UNITV3_AX_SAMPLES_LIB_DYNAMIC' in os.environ else 'static'
+#                             })
+
+# if 'CONFIG_UNITV3_AX_SAMPLES_LIB_ENABLED' in os.environ:
+#     SRCS = []
+#     INCLUDE = []
+#     PRIVATE_INCLUDE = []
+#     REQUIREMENTS = ['UNITV3_OPENCV']
+#     STATIC_LIB = []
+#     DYNAMIC_LIB = []
+#     DEFINITIONS = []
+#     DEFINITIONS_PRIVATE = []
+#     LDFLAGS = []
+#     LINK_SEARCH_PATH = []
+
+#     INCLUDE.append(ADir("../../github_source/ax-samples/include"))
+#     INCLUDE.append(ADir("../../github_source/ax-samples/examples/utilities"))
+#     INCLUDE.append(ADir("../../github_source/ax-samples/examples"))
+#     INCLUDE.append(ADir("../../github_source/ax-samples/examples/ax620"))
+    
+#     env['COMPONENTS'].append({'target':'UNITV3_AX_SAMPLES_LIB',
+#                             'SRCS':SRCS,
+#                             'INCLUDE':INCLUDE,
+#                             'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+#                             'REQUIREMENTS':REQUIREMENTS,
+#                             'STATIC_LIB':STATIC_LIB,
+#                             'DYNAMIC_LIB':DYNAMIC_LIB,
+#                             'DEFINITIONS':DEFINITIONS,
+#                             'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+#                             'LDFLAGS':LDFLAGS,
+#                             'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+#                             'REGISTER':'shared' if 'CONFIG_UNITV3_AX_SAMPLES_LIB_DYNAMIC' in os.environ else 'static'
+#                             })
+
+
+
+
+
+
+
+
+
+
+
+# if 'CONFIG_UNITV3_AX_PIPELINE_LIB_BYTETRACK_ENABLED' in os.environ:
+#     SRCS = []
+#     INCLUDE = []
+#     PRIVATE_INCLUDE = []
+#     REQUIREMENTS = []
+#     STATIC_LIB = []
+#     DYNAMIC_LIB = []
+#     DEFINITIONS = []
+#     DEFINITIONS_PRIVATE = []
+#     LDFLAGS = []
+#     LINK_SEARCH_PATH = []
+
+#     # SRCS.append(AFile("test1.c"))
+#     INCLUDE.append(ADir("../../github_source/ax-pipeline/third-party/ByteTrack/include"))
+#     SRCS += append_srcs_dir(ADir('../../github_source/ax-pipeline/third-party/ByteTrack/src'))
+
+#     env['COMPONENTS'].append({'target':'UNITV3_AX_PIPELINE_LIB_BYTETRACK',
+#                             'SRCS':SRCS,
+#                             'INCLUDE':INCLUDE,
+#                             'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+#                             'REQUIREMENTS':REQUIREMENTS,
+#                             'STATIC_LIB':STATIC_LIB,
+#                             'DYNAMIC_LIB':DYNAMIC_LIB,
+#                             'DEFINITIONS':DEFINITIONS,
+#                             'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+#                             'LDFLAGS':LDFLAGS,
+#                             'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+#                             'REGISTER':'shared' if 'CONFIG_UNITV3_AX_PIPELINE_LIB_DYNAMIC' in os.environ else 'static'
+#                             })
+
+# if 'CONFIG_UNITV3_AX_PIPELINE_LIB_ENABLED' in os.environ:
+#     SRCS = []
+#     INCLUDE = []
+#     PRIVATE_INCLUDE = []
+#     REQUIREMENTS = ['UNITV3_OPENCV', 'UNITV3_BSP_SUPPORT', 'UNITV3_AX_PIPELINE_LIB_BYTETRACK']
+#     STATIC_LIB = []
+#     DYNAMIC_LIB = []
+#     DEFINITIONS = ['-DAXERA_TARGET_CHIP_AX620','-DAXERA_BSP_VERSION=\\\\\\"\\\\\\"']
+#     DEFINITIONS_PRIVATE = []
+#     LDFLAGS = []
+#     LINK_SEARCH_PATH = []
+
+#     # SRCS.append(AFile("test1.c"))
+#     INCLUDE.append(ADir("../../github_source/ax-pipeline/examples/libaxdl/include"))
+#     SRCS += append_srcs_dir(ADir('../../github_source/ax-pipeline/examples/libaxdl/src'))
+
+#     INCLUDE.append(ADir("../../github_source/ax-pipeline/examples/utilities"))
+#     SRCS += append_srcs_dir(ADir('../../github_source/ax-pipeline/examples/utilities'))
+
+#     env['COMPONENTS'].append({'target':'UNITV3_AX_PIPELINE_LIB',
+#                             'SRCS':SRCS,
+#                             'INCLUDE':INCLUDE,
+#                             'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+#                             'REQUIREMENTS':REQUIREMENTS,
+#                             'STATIC_LIB':STATIC_LIB,
+#                             'DYNAMIC_LIB':DYNAMIC_LIB,
+#                             'DEFINITIONS':DEFINITIONS,
+#                             'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+#                             'LDFLAGS':LDFLAGS,
+#                             'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+#                             'REGISTER':'shared' if 'CONFIG_UNITV3_AX_PIPELINE_LIB_DYNAMIC' in os.environ else 'static'
+#                             })
+
+
+
+
+
+# if 'CONFIG_UNITV3_AI_COMMON_ENABLED' in os.environ:
+#     SRCS = []
+#     INCLUDE = []
+#     PRIVATE_INCLUDE = []
+#     REQUIREMENTS = ['UNITV3_OPENCV']
+#     STATIC_LIB = []
+#     DYNAMIC_LIB = []
+#     DEFINITIONS = []
+#     DEFINITIONS_PRIVATE = []
+#     LDFLAGS = []
+#     LINK_SEARCH_PATH = []
+
+
+#     INCLUDE.append(ADir("ai_common"))
+#     # print(Dir("../"))
+#     SRCS += append_srcs_dir(ADir("ai_common"))
+    
+#     # print(Dir(os.path.join(env['component_dir'], 'ai_common')))
+#     # print(os.path.join(env['component_dir'], 'ai_common'))
+
+#     env['COMPONENTS'].append({'target':'UNITV3_AI_COMMON',
+#                             'SRCS':SRCS,
+#                             'INCLUDE':INCLUDE,
+#                             'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+#                             'REQUIREMENTS':REQUIREMENTS,
+#                             'STATIC_LIB':STATIC_LIB,
+#                             'DYNAMIC_LIB':DYNAMIC_LIB,
+#                             'DEFINITIONS':DEFINITIONS,
+#                             'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+#                             'LDFLAGS':LDFLAGS,
+#                             'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+#                             'REGISTER':'shared' if 'CONFIG_UNITV3_AI_COMMON_DYNAMIC' in os.environ else 'static'
+#                             })

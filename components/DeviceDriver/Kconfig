@@ -1,0 +1,40 @@
+
+menuconfig DEVICE_DRIVER_ENABLED
+    bool "Enable DeviceDriver"
+    default n
+
+	config M5DEVICE_SH1107
+		bool "compile sh1107 driver"
+		default n
+		depends on DEVICE_DRIVER_ENABLED
+
+    config DEVICE_UART_ENABLED
+        bool "compile uart lib"
+        default n
+        depends on DEVICE_DRIVER_ENABLED
+
+    config DEVICE_I2C_ENABLED
+        bool "compile i2c lib"
+        default n
+        depends on DEVICE_DRIVER_ENABLED
+
+    config DEVICE_SPI_ENABLED
+        bool "compile spi lib"
+        default n
+        depends on DEVICE_DRIVER_ENABLED
+
+    config DEVICE_FRAMEBUFFER_ENABLED
+        bool "compile framebuffer lib"
+        default n
+        depends on DEVICE_DRIVER_ENABLED
+
+    config DEVICE_PTMX_ENABLED
+        bool "compile ptmx lib"
+        default n
+        depends on DEVICE_DRIVER_ENABLED
+
+    config DEVICE_DRIVER_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on DEVICE_DRIVER_ENABLED
+

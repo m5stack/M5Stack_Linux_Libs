@@ -1,0 +1,10 @@
+
+menuconfig M5GFX_ENABLED
+    bool "Enable M5GFX"
+    default n
+
+    config M5GFX_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on U8G2_COMPONENT_ENABLED
+

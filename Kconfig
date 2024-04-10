@@ -1,0 +1,40 @@
+
+mainmenu "C/CPP CMake project framework Kconfig configuration"
+
+menu "Toolchain configuration"
+	config TOOLCHAIN_PATH
+		string "toolchain path"
+		default ""
+
+	config TOOLCHAIN_PREFIX
+		string "toolchain prefix"
+		default ""
+
+	config TOOLCHAIN_FLAGS
+		string "toolchain FLAGS"
+		default ""
+
+	config LIB_LINK_SEARCH_PATH
+		string "lib link search patch"
+		default ""
+	
+	config TOOLCHAIN_SYSTEM
+		string "toolchain system"
+		default "linux"
+		help
+			linux or win
+
+	config COMMPILE_DEBUG
+		bool 'commpile debug msg!'
+		default n
+endmenu
+
+menu "Components configuration"
+	osource "${SDK_PATH}/components/*/Kconfig"
+	osource "${PROJECT_PATH}/../components/*/Kconfig"
+	osource "${PROJECT_PATH}/*/Kconfig"
+endmenu
+
+config USE_STRIP_REDUCE_SIZE_ENABLED
+	bool "strip reduce size"
+	default n
