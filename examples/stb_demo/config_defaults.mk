@@ -1,2 +1,0 @@
-
-CONFIG_STB_ENABLED=y

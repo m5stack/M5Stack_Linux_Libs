@@ -1,8 +1,0 @@
-
-dist
-build
-.config.mk
-.flash.conf.json
-.config
-.config.lod
-.sconsign.dblite

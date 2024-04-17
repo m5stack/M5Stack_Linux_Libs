@@ -203,16 +203,16 @@ def build_task_init():
 
     for component in env['COMPONENTS_PATH']:
         for component_name in os.listdir(component):
-            if os.path.exists(str(Path(component)/component_name/'SConscript')):
+            if os.path.exists(str(Path(component)/component_name/'SConstruct')):
                 env['component_dir'] = str(Path(component)/component_name)
-                SConscript(str(Path(component)/component_name/'SConscript'), exports='env')
+                SConscript(str(Path(component)/component_name/'SConstruct'), exports='env')
 
 
 
     for project_dir in os.listdir(PROJECT_PATH):
         if project_dir.startswith("main"):
             env['component_dir'] = str(Path(PROJECT_PATH)/project_dir)
-            SConscript(str(Path(PROJECT_PATH)/project_dir/'SConscript'), exports='env')
+            SConscript(str(Path(PROJECT_PATH)/project_dir/'SConstruct'), exports='env')
 
     
     for iteam in env['COMPONENTS']:

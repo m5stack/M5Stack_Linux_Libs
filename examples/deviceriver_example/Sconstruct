@@ -1,2 +1,0 @@
-with open('../../tools/scons/compile.py') as f:
-    exec(f.read())
