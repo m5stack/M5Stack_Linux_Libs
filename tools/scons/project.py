@@ -7,6 +7,10 @@ import subprocess
 import parse
 from collections.abc import Iterable
 import configparser
+
+import subprocess
+import uuid
+
 # from parse import compile as parse_compile
 SDK_PATH = os.environ.get('SDK_PATH', str(Path(os.getcwd())/'..'/'..'))
 PROJECT_NAME = os.environ.get('PROJECT_NAME', os.path.basename(sys.path[0]))
@@ -19,6 +23,36 @@ KCONFIG_FILE = os.environ.get('KCONFIG_FILE', str(Path(SDK_PATH)/'Kconfig'))
 GLOBAL_CONFIG_MK_FILE = os.environ.get('GLOBAL_CONFIG_MK_FILE', str(Path(PROJECT_PATH)/'build'/'config'/'global_config.mk'))
 GLOBAL_CONFIG_H_FILE = os.environ.get('GLOBAL_CONFIG_H_FILE', str(Path(PROJECT_PATH)/'build'/'config'/'global_config.h'))
 TOOL_FILE = os.environ.get('TOOL_FILE', str(Path(SDK_PATH)/'tools'))
+
+
+def ourspawn(sh, escape, cmd, args, e):
+    filename = str(uuid.uuid4())
+    newargs = ' '.join(args[1:])
+    cmdline = cmd + " " + newargs
+    if (len(cmdline) > 16 * 1024):
+        f = open(filename, 'w')
+        f.write(' '.join(args[1:]).replace('\\', '/'))
+        f.close()
+        # exec
+        cmdline = cmd + " @" + filename
+    proc = subprocess.Popen(cmdline, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, shell = False, env = e)
+    data, err = proc.communicate()
+    rv = proc.wait()
+    def res_output(_output, _s):
+        if len(_s):
+            if isinstance(_s, str):
+                _output(_s)
+            elif isinstance(_s, bytes):
+                _output(str(_s, 'UTF-8'))
+            else:
+                _output(str(_s))
+    res_output(sys.stderr.write, err)
+    res_output(sys.stdout.write, data)
+    if os.path.isfile(filename):
+        os.remove(filename)
+    return rv
+
 
 def menuconfig_fun():
     os.makedirs(BUILD_CONFIG_PATH, exist_ok=True)
@@ -132,6 +166,8 @@ def build_task_init():
 
     if sys.platform.startswith('win'):
         env = Environment(tools=['gcc', 'g++', 'gnulink', 'ar', 'gas', 'as'])
+        
+        env['SPAWN'] = ourspawn
         
         if os.environ['CONFIG_TOOLCHAIN_PATH']:
             env['ENV']['PATH'] = os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"') + ';' + env['ENV']['PATH']
