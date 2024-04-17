@@ -289,9 +289,9 @@ def creat_commpile_Program():
             # component['_target'] = _BUILD_ENV.SharedLibrary(target = _TARGET, source = _OBJS + _LIBO)
             component['_target'] = _BUILD_ENV.SharedLibrary(target = _TARGET, source = _OBJS)
             component['_target_build_env'] = _BUILD_ENV
-            if os.environ['CONFIG_TOOLCHAIN_SYSTEM'] == 'linux':
+            if 'CONFIG_TOOLCHAIN_SYSTEM_UNIX' in os.environ:
                 _BUILD_ENV.Command(os.path.join('dist', f'lib{component["target"]}.so'), str(Path('build')/component['target']/f'lib{component["target"]}.so'), action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
-            elif os.environ['CONFIG_TOOLCHAIN_SYSTEM'] == 'win':
+            elif 'CONFIG_TOOLCHAIN_SYSTEM_WIN' in os.environ:
                 _BUILD_ENV.Command(os.path.join('dist', f'lib{component["target"]}.dll'), str(Path('build')/component['target']/f'lib{component["target"]}.dll'), action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
             else:
                 pass
@@ -306,9 +306,9 @@ def creat_commpile_Program():
             # _BUILD_ENV['LIBS'] = [component['target']] + _BUILD_ENV['LIBS']
             # _BUILD_ENV.Append(LIBPATH=[component_build_dir])
             component['_target_build_env'] = _BUILD_ENV
-            if os.environ['CONFIG_TOOLCHAIN_SYSTEM'] == 'linux':
+            if 'CONFIG_TOOLCHAIN_SYSTEM_UNIX' in os.environ:
                  _BUILD_ENV.Command(os.path.join('dist', component['target']), str(Path('build')/component['target']/component['target']), action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
-            elif os.environ['CONFIG_TOOLCHAIN_SYSTEM'] == 'win':
+            elif 'CONFIG_TOOLCHAIN_SYSTEM_WIN' in os.environ:
                  _BUILD_ENV.Command(os.path.join('dist', component['target']) + '.exe', str(Path('build')/component['target']/component['target']) + '.exe', action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
             else:
                 pass

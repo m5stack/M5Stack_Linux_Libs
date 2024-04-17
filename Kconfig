@@ -17,12 +17,15 @@ menu "Toolchain configuration"
 	config LIB_LINK_SEARCH_PATH
 		string "lib link search patch"
 		default ""
-	
-	config TOOLCHAIN_SYSTEM
-		string "toolchain system"
-		default "linux"
-		help
-			linux or win
+
+	choice
+		prompt "host system type"
+		default TOOLCHAIN_SYSTEM_UNIX
+	config TOOLCHAIN_SYSTEM_UNIX
+		bool "unix"
+	config TOOLCHAIN_SYSTEM_WIN
+		bool "win"
+	endchoice
 
 	config COMMPILE_DEBUG
 		bool 'commpile debug msg!'
