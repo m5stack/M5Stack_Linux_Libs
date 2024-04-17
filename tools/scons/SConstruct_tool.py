@@ -11,8 +11,7 @@ def append_srcs_dir(directories):
     import os
     from collections.abc import Iterable
 
-    # 支持的源码文件扩展名
-    supported_extensions = ['.c', '.cc', '.cpp', '.S']  # 可根据需要添加其他扩展名
+    supported_extensions = ['.c', '.cc', '.cpp', '.S']
     # if isinstance(sfile, list):
     def _find_file(path):
         directory = str(path)
@@ -67,8 +66,3 @@ def compare_and_copy(file1, file2):
         with open(file1, "rb") as f1, open(file2, "wb") as f2:
             f2.write(f1.read())
 
-# # 使用示例
-# file1_path = "path/to/your/first/file"  # 第一个文件的路径
-# file2_path = "path/to/your/second/file" # 第二个文件的路径
-
-# compare_and_copy(file1_path, file2_path)
