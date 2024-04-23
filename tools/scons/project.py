@@ -304,6 +304,7 @@ def creat_commpile_Program():
                 _BUILD_ENV.Append(LIBS=[requirement])
                 _BUILD_ENV.Append(LIBPATH=str(Path('build')/requirement))
                 _BUILD_ENV.Append(LIBPATH=task_lists[requirement]['LINK_SEARCH_PATH'])
+                _BUILD_ENV.MergeFlags(task_lists[requirement]['DEFINITIONS'])
                 _LIBO += list(map(lambda o: str(o), task_lists[requirement]['DYNAMIC_LIB'] + task_lists[requirement]['STATIC_LIB']))
                 for c_requirement in task_lists[requirement]['REQUIREMENTS']: 
                     if c_requirement not in task_lists:

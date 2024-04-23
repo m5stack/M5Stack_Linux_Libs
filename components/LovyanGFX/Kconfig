@@ -1,0 +1,10 @@
+
+menuconfig LOVYANGFX_ENABLED
+    bool "Enable LovyanGFX"
+    default n
+
+    config LOVYANGFX_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on LOVYANGFX_ENABLED
+

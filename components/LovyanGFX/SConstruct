@@ -1,0 +1,45 @@
+# component/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+
+if 'CONFIG_LOVYANGFX_ENABLED' in os.environ:
+    SRCS=[]
+    INCLUDE=[]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=['pthread']
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=['-DLGFX_LINUX_FB']
+    DEFINITIONS_PRIVATE=[]
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+    SRCS += AGlob('../../github_source/LovyanGFX/src/lgfx/Fonts/efont/*.c')
+    SRCS += AGlob('../../github_source/LovyanGFX/src/lgfx/Fonts/IPA/*.c')
+    SRCS += AGlob('../../github_source/LovyanGFX/src/lgfx/utility/*.c')
+    SRCS += AGlob('../../github_source/LovyanGFX/src/lgfx/v1/*.cpp')
+    SRCS += AGlob('../../github_source/LovyanGFX/src/lgfx/v1/misc/*.cpp')
+    SRCS += AGlob('../../github_source/LovyanGFX/src/lgfx/v1/panel/Panel_Device.cpp')
+    SRCS += AGlob('../../github_source/LovyanGFX/src/lgfx/v1/platforms/framebuffer/*.cpp')
+    
+    INCLUDE += [ADir('../../github_source/LovyanGFX/src/')]
+
+    
+    
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'static'
+                            })

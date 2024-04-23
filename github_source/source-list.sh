@@ -32,7 +32,7 @@ git_clone_and_checkout_commit https://github.com/bombela/backward-cpp.git   65a7
 git_clone_and_checkout_commit https://github.com/OpenEtherCATsociety/SOEM.git a901500618405760a564e64a6816705e29f50f9f
 git_clone_and_checkout_commit https://github.com/dianjixz/c-periphery.git   8e69e684e7b04b36cb7ab795d01453df7b4a9c65
 
-
+git clone https://github.com/lovyan03/LovyanGFX.git
 # git clone -b dd5118cab0813078dbbfd116f1489c6a03a42cae --single-branch --branch master https://github.com/dianjixz/mongoose.git
 # git clone -b 1ab8a8e551a5ab668988549779578553e3c3aa1e --single-branch --branch master https://github.com/dianjixz/libhv.git
 # git clone -b 905357880a73b5e03fb2adb17b7df10eadcd5e4a --single-branch --branch master https://github.com/dianjixz/RtspServer.git
