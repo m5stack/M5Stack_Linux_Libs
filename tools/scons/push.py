@@ -49,7 +49,7 @@ if __name__ == '__main__':
     file_group = []
     for root, dirs, files in os.walk(local_file_path):
         for file in files:
-            file_group.append([str(Path(root)/file), str(Path(remote_file_path)/file)])
+            file_group.append([str(Path(root)/file), (Path(remote_file_path)/file).as_posix()])
     if file_group:
         ssh_push_file(file_group, remote_host, remote_port, username, password)
 
