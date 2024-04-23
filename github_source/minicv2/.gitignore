@@ -50,21 +50,13 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+.vscode-ctags
+*tempCodeRunnerFile.c
+examples/*/build
+test/tmp.*
+.vscode/settings.json
+test/tmp_img_big.bmp
+test/imlib_base_test
 
-build
-.vscode
-.config
-.config.old
-.config.mk
-
-# python
-*.pyc
-__pycache__
-
-github_source
-
-examples_private*
-*.sconsign.dblite
-
-github_source/*
-**setup.ini
+Kconfig
+CMakeLists.txt
