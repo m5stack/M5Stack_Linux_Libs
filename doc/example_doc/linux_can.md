@@ -130,10 +130,8 @@ git clone https://github.com/M5STACK/M5Stack_Linux_Libs.git
 cd M5Stack_Linux_Libs/examples/linux_can
 
 # 编译
-make 
+scons 
 
-# 运行
-make run
 
 推荐：
     https://zhuanlan.zhihu.com/p/470681140?utm_id=0

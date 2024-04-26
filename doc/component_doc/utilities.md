@@ -4,7 +4,7 @@ This is a diverse component library that provides some c/ C ++ base libraries.
 
 ```bash
 .
-├── CMakeLists.txt
+├── SConstruct
 ├── include
 │   ├── any.hpp             // c++ 11 implementation of any class
 │   ├── json.hpp            // c ++ json lib

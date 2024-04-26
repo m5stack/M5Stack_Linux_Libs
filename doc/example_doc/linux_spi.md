@@ -72,7 +72,7 @@ git clone https://github.com/M5STACK/M5Stack_Linux_Libs.git
 cd M5Stack_Linux_Libs/examples/linux_spi
 
 # 编译
-make 
+scons 
 
 #在 dist 目录下生成 linux_spi 可执行程序.
 ```

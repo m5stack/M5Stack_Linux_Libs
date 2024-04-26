@@ -2,7 +2,7 @@
 Device driver for Linux platform, including various small sensors and actuators, along with application-level programs.
 ```bash
 .
-├── CMakeLists.txt
+├── SConstruct
 ├── include
 ├── Kconfig
 ├── party

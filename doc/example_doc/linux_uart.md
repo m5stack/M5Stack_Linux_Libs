@@ -101,7 +101,7 @@ git clone https://github.com/M5STACK/M5Stack_Linux_Libs.git
 cd M5Stack_Linux_Libs/examples/linux_uart
 
 # 编译
-make 
+scons 
 
 #在 dist 目录下生成 linux_uart 可执行程序.
 ```

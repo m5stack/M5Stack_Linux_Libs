@@ -5,30 +5,22 @@ The 'examples/demo1' folder is a 'Hello, World!' project that can be used as a t
 ## File tree
 ``` bash
 demo1
-├── build_after.sh
-├── CMakeLists.txt
+├── SConstruct
 ├── config_defaults.mk
 ├── main
-│   ├── CMakeLists.txt
 │   ├── include
 │   │   └── main.h
 │   ├── Kconfig
+|   ├── SConstruct
 │   └── src
 │       └── main.c
-├── Makefile
-└── project.py
-
-4 directories, 10 files
 ```
 
 
 - **main** Main code directory
-- **main/CMakeLists.txt** CMake files for the main code, requiring manual addition of dependency folders.
+- **main/SConstruct** CMake files for the main code, requiring manual addition of dependency folders.
 - **config_defaults.mk** Default configuration files, storing default component configurations.
-- **build_after.sh** Bash script file that is automatically executed after compilation is completed. It runs when present and is ignored if absent.
-- project.py Project's startup entry point, no need for modifications.
-- CMakeLists.txt Main CMake file, project definitions start from here, no modifications needed.
-- Makefile Convenient operation Makefile script that allows adding custom commands and redefining existing ones.
+- **SConstruct** Project's startup entry point, no need for modifications.
 
 
 ## Creating a project example
@@ -114,7 +106,7 @@ int main(int argc, char *argv[])
 
 Execute in the 'mongoose_tcp_echo' directory.
 ```bash
-make menuconfig
+scons menuconfig
 ```
 Select 'Components configuration' to enter.
 
@@ -132,7 +124,7 @@ Press 'y' to save.
 
 Then execute the compilation.
 ``` bash
-make
+scons
 ```
 
 After successful compilation, the 'mongoose_tcp_echo' executable file will be generated in the 'examples/mongoose_tcp_echo/dist' folder.
@@ -156,72 +148,21 @@ nc 127.0.0.1 1234
 ![](../assets/image/555555.png)
 
 
-
-## Explanation of parameters in the Makefile.
-```makefile
-CROSS_DIR := /usr/bin           # Cross-compiler directory, set for use during cross-compilation.
-CROSS := arm-linux-gnueabihf-   # Cross-compiler prefix, set for use during cross-compilation.
-PUSH_FILE:=dist                 # Output directory for compiled files.
-PUSH_DIR:=/root                 # Directory for pushing to the embedded device.
-HOST_IP:=192.168.12.1          # IP address of the embedded device.
-MSSHF:=-o StrictHostKeychecking=no  # SSH prefix configuration.
-SSH_USER:=m5stack               # Username of the embedded device.
-SSH_PASSWORLD:=123456           # Password of the embedded device.
-
-# Template for the push command used. Please refer to its usage.
-# scp ${MSSHF} -r ${PUSH_FILE} ${SSH_USER}@${HOST_IP}:${PUSH_DIR}
-```
-
 ## Cross-compilation
 ``` bash
 # Complete clean
-make distclean
+scons distclean
 
-# Set the cross-compiler according to the Makefile preset
-make set_arm
-
-# Enable components
-make menuconfig
+# Set the cross-compiler according
+scons menuconfig
 
 # Compile
-make
+scons
 
 # Push files according to the Makefile preset
-make push
+scons push
 
 # Simply enter the development environment and execute
-
-```
-## Cross-optimized compilation
-```bash
-# Complete cleanup
-make distclean
-
-# Set the cross-compiler according to the Makefile preset
-make set_arm
-
-# Enable components
-make menuconfig
-
-# Compile
-make release
-
-# Push files according to the Makefile preset
-make push
-
-# Simply enter the development environment and execute
-
-```
-## More commands
-```bash
-# Access the embedded device shell according to the Makefile preset
-make shell
-
-# Run directly on the local machine
-make run
-
-# Push and execute according to the Makefile preset
-make push_run
 
 ```
 
