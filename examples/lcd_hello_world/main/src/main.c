@@ -25,6 +25,8 @@ int main(int argc, char **argv)
     imlib_draw_string(img, 75, 110, strs,     COLOR_R8_G8_B8_TO_RGB565(0xff, 0xff, 0xff), 2, 0, 0, 1, 0, 0, 0, 0, 0, 0);
 
     imlib_image_destroy(&img);
+
+    usleep(60 * 1000);
     fb_close(&fbdev);
     return 0;
 }
