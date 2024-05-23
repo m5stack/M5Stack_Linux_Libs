@@ -77,7 +77,7 @@ void linuxi2c_init_device(LINUXI2CDevice *device)
     device->delay = 0;
 
     /* 8 bytes per page */
-    device->page_bytes = 8;
+    device->page_bytes = 32;
 
     /* 1 byte internal(word) address */
     device->iaddr_bytes = 1;

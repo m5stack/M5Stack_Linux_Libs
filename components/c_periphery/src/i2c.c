@@ -76,7 +76,7 @@ void _i2c_init_args(i2c_t *i2c) {
     i2c->delay = 0;
 
     /* 8 bytes per page */
-    i2c->page_bytes = 8;
+    i2c->page_bytes = 32;
 
     /* 1 byte internal(word) address */
     i2c->iaddr_bytes = 1;

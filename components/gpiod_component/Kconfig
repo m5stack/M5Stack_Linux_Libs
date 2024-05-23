@@ -1,0 +1,10 @@
+
+menuconfig GPIOD_ENABLED
+    bool "Enable libgpiod"
+    default n
+
+    config GPIOD_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on GPIOD_ENABLED
+
