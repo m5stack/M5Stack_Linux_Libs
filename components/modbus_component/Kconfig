@@ -1,0 +1,10 @@
+
+menuconfig MODBUS_ENABLED
+    bool "Enable libmodbus"
+    default n
+
+    config MODBUS_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on MODBUS_ENABLED
+

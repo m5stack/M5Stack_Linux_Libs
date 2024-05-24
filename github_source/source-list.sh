@@ -34,6 +34,10 @@ git_clone_and_checkout_commit https://github.com/dianjixz/c-periphery.git   8e69
 
 git_clone_and_checkout_commit https://github.com/brgl/libgpiod.git   27fe10150f6d5fa78d1a1ef1e922dc8395d1154d
 
+git_clone_and_checkout_commit https://github.com/stephane/libmodbus.git   5c14f13944ec7394a61a7680dcb462056c4321e3
+
+
+
 git clone https://github.com/lovyan03/LovyanGFX.git
 # git clone -b dd5118cab0813078dbbfd116f1489c6a03a42cae --single-branch --branch master https://github.com/dianjixz/mongoose.git
 # git clone -b 1ab8a8e551a5ab668988549779578553e3c3aa1e --single-branch --branch master https://github.com/dianjixz/libhv.git
