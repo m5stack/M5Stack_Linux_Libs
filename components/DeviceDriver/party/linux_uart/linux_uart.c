@@ -175,7 +175,7 @@ int linux_uart_init(char* dev, void* param)
 void linux_uart_deinit(int fd)
 {
     int res;
-
+    if(fd <= 0) return;
     res = close(fd);
     if (res < 0)
         fprintf(stderr, "uart close fd(%d) err:%s\n", fd, strerror(errno));
