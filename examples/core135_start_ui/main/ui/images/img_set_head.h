@@ -1,0 +1,55 @@
+#ifndef LV_IMAGE_HEAD_SET_H
+#define LV_IMAGE_HEAD_SET_H
+LV_IMG_DECLARE(tesT_ETH);    // Cheaders/tesT_ETH.c
+LV_IMG_DECLARE(swipe);    // Cheaders/swipe.c
+LV_IMG_DECLARE(Touch_Test);    // Cheaders/Touch_Test.c
+LV_IMG_DECLARE(Frame_swipe);    // Cheaders/Frame_swipe.c
+LV_IMG_DECLARE(mingcute_time_line);    // Cheaders/mingcute_time_line.c
+LV_IMG_DECLARE(tesT_RS485);    // Cheaders/tesT_RS485.c
+LV_IMG_DECLARE(battery2);    // Cheaders/battery2.c
+LV_IMG_DECLARE(Click__SPEAKER_TEST__button);    // Cheaders/Click__SPEAKER_TEST__button.c
+LV_IMG_DECLARE(tesT_bus);    // Cheaders/tesT_bus.c
+LV_IMG_DECLARE(tesT_RTC);    // Cheaders/tesT_RTC.c
+LV_IMG_DECLARE(Connect_UAR0_and_USB_TTL_then_click__UART0_Test__button_to_start_test);    // Cheaders/Connect_UAR0_and_USB_TTL_then_click__UART0_Test__button_to_start_test.c
+LV_IMG_DECLARE(Speaker_Test);    // Cheaders/Speaker_Test.c
+LV_IMG_DECLARE(push_button_device_will_be_restart);    // Cheaders/push_button_device_will_be_restart.c
+LV_IMG_DECLARE(Connect_the_2_CAN_interfacesthen_click_CAN_TEST_button_to_start_test);    // Cheaders/Connect_the_2_CAN_interfacesthen_click_CAN_TEST_button_to_start_test.c
+LV_IMG_DECLARE(C_to_select_checkbox);    // Cheaders/C_to_select_checkbox.c
+LV_IMG_DECLARE(Click__SPEAKER_TEST__button_to_play_audio_and_test_the_speaker);    // Cheaders/Click__SPEAKER_TEST__button_to_play_audio_and_test_the_speaker.c
+LV_IMG_DECLARE(Frame_1);    // Cheaders/Frame_1.c
+LV_IMG_DECLARE(test_com);    // Cheaders/test_com.c
+LV_IMG_DECLARE(tesT_speaker);    // Cheaders/tesT_speaker.c
+LV_IMG_DECLARE(CPU_LOAD_Test);    // Cheaders/CPU_LOAD_Test.c
+LV_IMG_DECLARE(RS485_Test);    // Cheaders/RS485_Test.c
+LV_IMG_DECLARE(CAN1_Recv);    // Cheaders/CAN1_Recv.c
+LV_IMG_DECLARE(I2C_Test);    // Cheaders/I2C_Test.c
+LV_IMG_DECLARE(UART_Recv);    // Cheaders/UART_Recv.c
+LV_IMG_DECLARE(CAN_Test);    // Cheaders/CAN_Test.c
+LV_IMG_DECLARE(Vector);    // Cheaders/Vector.c
+LV_IMG_DECLARE(battery3);    // Cheaders/battery3.c
+LV_IMG_DECLARE(tesT_USB);    // Cheaders/tesT_USB.c
+LV_IMG_DECLARE(tesT_I2C);    // Cheaders/tesT_I2C.c
+LV_IMG_DECLARE(tesT_CAN);    // Cheaders/tesT_CAN.c
+LV_IMG_DECLARE(CAN0_Recv);    // Cheaders/CAN0_Recv.c
+LV_IMG_DECLARE(RS485_Recv);    // Cheaders/RS485_Recv.c
+LV_IMG_DECLARE(Click_USB_TEST_button_to_list_all_USB_devices);    // Cheaders/Click_USB_TEST_button_to_list_all_USB_devices.c
+LV_IMG_DECLARE(Click_LCD_TEST_button_to_start_screen_test_Red____Green____Blue____White);    // Cheaders/Click_LCD_TEST_button_to_start_screen_test_Red____Green____Blue____White.c
+LV_IMG_DECLARE(Connect_network_cable_then_click_Ethernet_TEST_to_start_test);    // Cheaders/Connect_network_cable_then_click_Ethernet_TEST_to_start_test.c
+LV_IMG_DECLARE(Connect_RS485_and_UARTthen_click_RS485_TEST_button_to_start_test);    // Cheaders/Connect_RS485_and_UARTthen_click_RS485_TEST_button_to_start_test.c
+LV_IMG_DECLARE(O_Test);    // Cheaders/O_Test.c
+LV_IMG_DECLARE(USB_Test);    // Cheaders/USB_Test.c
+LV_IMG_DECLARE(Frame_2);    // Cheaders/Frame_2.c
+LV_IMG_DECLARE(Click_RTC_button_to_power_off_the_device_it_will_restart_within_30_seconds);    // Cheaders/Click_RTC_button_to_power_off_the_device_it_will_restart_within_30_seconds.c
+LV_IMG_DECLARE(Ethernet_Test);    // Cheaders/Ethernet_Test.c
+LV_IMG_DECLARE(push_button_check_bus_IO_bus_IO_will_be_blink_must_with_test_tool);    // Cheaders/push_button_check_bus_IO_bus_IO_will_be_blink_must_with_test_tool.c
+LV_IMG_DECLARE(RTC_Test);    // Cheaders/RTC_Test.c
+LV_IMG_DECLARE(Click_I2C_TEST_button_and_scan_port_I2C_devices);    // Cheaders/Click_I2C_TEST_button_and_scan_port_I2C_devices.c
+LV_IMG_DECLARE(LCD_Test);    // Cheaders/LCD_Test.c
+LV_IMG_DECLARE(tesT_OTG);    // Cheaders/tesT_OTG.c
+LV_IMG_DECLARE(UART0_Test);    // Cheaders/UART0_Test.c
+LV_IMG_DECLARE(Click__CPU_LOAD_Test__button_to_CPU_load_maximization_test);    // Cheaders/Click__CPU_LOAD_Test__button_to_CPU_load_maximization_test.c
+LV_IMG_DECLARE(battery1);    // Cheaders/battery1.c
+LV_IMG_DECLARE(O_test_IO_on_the_MBus_will_toggle_between_high_and_low_states_every_1_second);    // Cheaders/O_test_IO_on_the_MBus_will_toggle_between_high_and_low_states_every_1_second.c
+LV_IMG_DECLARE(push_button_check_rs485_rs485_will_be_communication_must_with_test_tool);    // Cheaders/push_button_check_rs485_rs485_will_be_communication_must_with_test_tool.c
+
+#endif

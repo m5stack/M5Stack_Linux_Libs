@@ -1,0 +1,49 @@
+
+# project_root/src/SConscript
+import os
+from shutil import copy2
+# Import the environment from the SConstruct file
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+compare_and_copy('include/lv_drv_conf.h', '../../../github_source/lvgl/lv_drv_conf.h')
+compare_and_copy('include/lv_conf.h', '../../../github_source/lvgl/lv_conf.h')
+
+
+
+SRCS = AGlob('src/*.c*')
+INCLUDE = [ADir('include'), ADir('.')]
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread', 'lvgl_component', 'm', 'hv', 'DeviceDriver']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = []
+DEFINITIONS_PRIVATE = ['-Dlv_mem_free=lv_free', '-Dlv_mem_alloc=lv_malloc']
+LDFLAGS = []
+LINK_SEARCH_PATH = []
+
+
+
+
+#ui code
+SRCS += append_srcs_dir(ADir('ui'))
+INCLUDE += [ADir('ui')]
+
+
+
+
+
+env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
+                          'SRCS':SRCS,
+                          'INCLUDE':INCLUDE,
+                          'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                          'REQUIREMENTS':REQUIREMENTS,
+                          'STATIC_LIB':STATIC_LIB,
+                          'DYNAMIC_LIB':DYNAMIC_LIB,
+                          'DEFINITIONS':DEFINITIONS,
+                          'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                          'LDFLAGS':LDFLAGS,
+                          'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                          'REGISTER':'project'
+                          })
