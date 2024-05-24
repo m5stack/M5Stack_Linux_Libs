@@ -18,7 +18,7 @@ if 'CONFIG_MODBUS_ENABLED' in os.environ:
     LDFLAGS=[]
     LINK_SEARCH_PATH=[]
 
-    PRIVATE_INCLUDE.append(ADir('include'))
+    INCLUDE.append(ADir('include'))
     INCLUDE.append(ADir('../../github_source/libmodbus/src'))
     SRCS += AGlob('../../github_source/libmodbus/src/*.c*')
 
