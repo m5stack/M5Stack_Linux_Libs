@@ -1,43 +1,43 @@
 # CAN
-CAN（Controller Area Network），这是一种常见的实时通信协议，用于在汽车、工业自动化、机器人和其他领域中进行高速、可靠的数据通信。
+CAN (Controller Area Network) is a common real-time communication protocol used for high-speed, reliable data communication in automotive, industrial automation, robotics, and other fields.
 
-关于CAN的重要概念：
+Key concepts regarding CAN:
 
-1. **多主多从架构：** CAN通信是多主多从的通信架构，多个设备可以同时传输和接收数据，从而实现高效的分布式通信。
+1. **Multi-master, Multi-slave Architecture:** CAN communication follows a multi-master, multi-slave architecture where multiple devices can simultaneously transmit and receive data, enabling efficient distributed communication.
 
-2. **帧格式：** CAN通信使用帧格式来传输数据。基本帧由标识符、数据、控制位和CRC（循环冗余校验）组成。
+2. **Frame Format:** CAN communication uses a frame format to transmit data. A basic frame consists of an identifier, data, control bits, and CRC (Cyclic Redundancy Check).
 
-3. **标识符：** 每个CAN帧都有一个唯一的标识符，用于标识消息的类型和优先级。标识符由11位或29位组成，决定了消息的优先级。
+3. **Identifier:** Each CAN frame has a unique identifier used to specify the type and priority of the message. The identifier is either 11 bits or 29 bits in length, which determines the message priority.
 
-4. **数据率：** CAN支持多种数据传输率，例如125 Kbps、500 Kbps、1 Mbps等，您可以根据需要进行选择。
+4. **Data Rate:** CAN supports various data transmission rates, such as 125 Kbps, 500 Kbps, and 1 Mbps. You can choose the rate according to your needs.
 
-5. **冲突检测：** CAN使用CSMA/CR（Carrier Sense Multiple Access / Collision Resolution）机制来检测和解决数据冲突。
+5. **Collision Detection:** CAN uses the CSMA/CR (Carrier Sense Multiple Access / Collision Resolution) mechanism to detect and resolve data collisions.
 
-6. **错误检测和纠正：** CAN使用CRC来检测错误，并且具有一些错误纠正的能力，确保可靠的数据传输。
+6. **Error Detection and Correction:** CAN employs CRC to detect errors and has some error correction capabilities to ensure reliable data transmission.
 
-7. **广播和单播：** CAN支持广播消息，使得所有设备都能收到消息。同时，也支持通过标识符进行单播，只有特定设备会接收消息。
+7. **Broadcast and Unicast:** CAN supports broadcast messages, allowing all devices to receive the message. It also supports unicast through identifiers, where only specific devices will receive the message.
 
-8. **应用领域：** CAN通信广泛应用于汽车内部网络、工业自动化、航空航天、机器人和医疗设备等领域。
+8. **Application Areas:** CAN communication is widely used in automotive internal networks, industrial automation, aerospace, robotics, and medical devices, among other fields.
 
-CAN 在 linux 被抽象成了一个网络设备,所以对 CAN 总线的编程被称为[SocketCAN](https://en.wikipedia.org/wiki/SocketCAN).
+CAN has been abstracted as a network device in Linux, so programming for the CAN bus is referred to as [SocketCAN](https://en.wikipedia.org/wiki/SocketCAN).
 
-在linux 中使用can 首先要设置can的通信速率,然后开启can总线
+In Linux, to use CAN, you first need to set the communication baud rate for CAN, and then enable the CAN bus.
 ```bash
-# 查看 CAN 接口
+# View CAN interface.
 sudo ip link list
 
-# 设置 CAN 接口速率为 500000
+# Set the CAN interface speed to 500000.
 sudo ip link set can0 type can bitrate 500000
 
-# 开启 CAN 接口
+# Activate the CAN interface.
 sudo ip link set up can0
 
-# 关闭 CAN 接口
+# Disable the CAN interface.
 sudo ip link set down can0
 ```
 
 
-为了展示 CAN 编程,创建一个虚拟的 CAN 总线.
+To demonstrate CAN programming, create a virtual CAN bus.
 ```bash
 sudo modprobe can
 sudo modprobe can_raw
@@ -48,7 +48,7 @@ sudo ip link show vcan0
 
 ```
 
-然后在 C 程序中读写 CAN 总线.
+Then read and write the CAN bus in a C program.
 ``` C
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,33 +106,33 @@ int main(void)
 }
 
 ```
-可以使用 candump 实用程序在 vcan0 接口上分析数据包，该实用程序是 SocketCAN can-utils 包的一部分。
-如果没有安装 can-utils,可以使用下面的命令安装.
+You can analyze packets on the vcan0 interface using the candump utility, which is part of the SocketCAN can-utils package.
+If can-utils is not installed, you can use the following command to install it.
 ``` bsah
 sudo apt install can-utils
 ```
-首先在一个终端中运行命令:
+First, run the command in a terminal:
 ``` bash
 candump vcan0
 ```
-然后另起一个终端编译运行上述程序,然后就能在 运行 candump 命令的终端看到:
+Then, start another terminal to compile and run the above program, and you will be able to see in the terminal where the candump command is running:
 ``` bash
   vcan0  123   [2]  11 22
 ```
-看完信息可以按 `ctrl + c` 结束 candump 程序的运行.
+After viewing the information, you can press `ctrl + c` to terminate the candump program.
 
-在编译上述程序时可以在 [M5Stack_Linux_Libs]() 的 examples/linux_can 目录下编译并运行.
+When compiling the above program, you can compile and run it in the examples/linux_can directory of [M5Stack_Linux_Libs]().
 ``` bash
-# 克隆仓库
+# Clone repository
 git clone https://github.com/M5STACK/M5Stack_Linux_Libs.git
 
-# 进入目录
+# Enter directory
 cd M5Stack_Linux_Libs/examples/linux_can
 
-# 编译
+# Compile
 scons 
 
 
-推荐：
-    https://zhuanlan.zhihu.com/p/470681140?utm_id=0
+#Quote：
+#    https://zhuanlan.zhihu.com/p/470681140?utm_id=0
 ```

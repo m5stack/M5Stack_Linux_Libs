@@ -1,28 +1,28 @@
 ## UART
 
-UART（Universal Asynchronous Receiver-Transmitter）是一种通信协议和硬件接口，用于在计算机和外部设备之间传输数据。它是一种串行通信协议，用于在设备之间进行数据传输，如在计算机和微控制器、传感器、调制解调器、GPS模块等外部设备之间。
+UART (Universal Asynchronous Receiver-Transmitter) is a communication protocol and hardware interface used for data transfer between computers and external devices. It is a serial communication protocol used for data transmission between devices, such as computers and external devices like microcontrollers, sensors, modems, GPS modules, etc.
 
-关于UART的重要概念：
+Key concepts about UART:
 
-1. **串行通信：** UART使用串行方式传输数据，这意味着数据位逐个传输，而不是并行传输，从而节省了数据线的数量。
+1. **Serial Communication:** UART transmits data in a serial manner, meaning data bits are sent one by one rather than in parallel, which saves the number of data lines.
 
-2. **异步通信：** UART是异步通信协议，这意味着发送和接收的时钟不同步。数据位之间没有固定的时钟信号，而是使用起始位和停止位来标识每个数据帧的开始和结束。
+2. **Asynchronous Communication:** UART is an asynchronous communication protocol, meaning the timing of transmission and reception is not synchronized. There is no fixed clock signal between data bits; instead, start and stop bits are used to indicate the beginning and end of each data frame.
 
-3. **数据帧：** UART数据传输被划分为数据帧，其中每个帧由一个起始位、数据位、可选的校验位和一个或多个停止位组成。
+3. **Data Frame:** UART data transmission is divided into data frames, each consisting of a start bit, data bits, optional parity bit, and one or more stop bits.
 
-4. **波特率：** 波特率是指每秒钟传输的比特数。在UART通信中，发送和接收设备必须使用相同的波特率才能正确地解释数据。常见的波特率包括9600、115200等。
+4. **Baud Rate:** Baud rate refers to the number of bits transmitted per second. In UART communication, both the sending and receiving devices must use the same baud rate to interpret the data correctly. Common baud rates include 9600, 115200, etc.
 
-5. **起始位和停止位：** 每个数据帧都以一个起始位开始，用于指示数据帧的开始。之后是数据位，然后是一个或多个停止位，用于标识数据帧的结束。
+5. **Start and Stop Bits:** Each data frame starts with a start bit to indicate the beginning of the frame. Following the data bits are one or more stop bits used to mark the end of the data frame.
 
-6. **校验位（可选）：** 校验位用于检测数据传输中的错误。常见的校验方式包括奇偶校验和校验和。
+6. **Parity Bit (Optional):** The parity bit is used to detect errors in data transmission. Common parity methods include parity check and checksum.
 
-7. **UART硬件：** 在硬件层面，UART通常由一个称为UART芯片、UART控制器或串口控制器的集成电路来实现。它包括用于发送和接收数据的电路、FIFO缓冲区、波特率发生器等。
+7. **UART Hardware:** At the hardware level, UART is typically implemented by an integrated circuit called a UART chip, UART controller, or serial port controller. It includes circuits for sending and receiving data, FIFO buffers, baud rate generator, etc.
 
-8. **RS-232：** 通常情况下，UART通信使用RS-232串行通信标准。RS-232定义了物理连接、电平以及数据格式等细节。
+8. **RS-232:** Typically, UART communication uses the RS-232 serial communication standard. RS-232 defines details such as physical connections, voltage levels, and data formats.
 
-9. **串口：** UART通常通过计算机的串口（也称为COM端口）与外部设备连接。然而，在现代计算机中，串口连接变得不太常见，更常见的是使用USB和其他接口。
+9. **Serial Port:** UART is usually connected to external devices through a computer's serial port (also known as a COM port). However, serial port connections have become less common in modern computers, with USB and other interfaces being more prevalent.
 
-linux 相关例程
+examples:
 
 ```c
 #include "linux_uart/linux_uart.h"
@@ -91,17 +91,16 @@ void main_clint()
 
 ```
 
-在编译上述程序时可以在 [M5Stack_Linux_Libs]() 的 examples/linux_uart 目录下编译并运行.  
-进入 linux 设备
+When compiling the above program, you can compile and run it in the examples/linux_uart directory of [M5Stack_Linux_Libs]().  
+Enter the Linux device:
 ``` bash
-# 克隆仓库
+# Clone repository
 git clone https://github.com/M5STACK/M5Stack_Linux_Libs.git
 
-# 进入目录
+# Enter directory
 cd M5Stack_Linux_Libs/examples/linux_uart
 
-# 编译
+# Compile
 scons 
 
-#在 dist 目录下生成 linux_uart 可执行程序.
 ```
