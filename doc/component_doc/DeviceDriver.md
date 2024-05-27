@@ -18,9 +18,6 @@ Device driver for Linux platform, including various small sensors and actuators,
 │   ├── linux_uart
 │   │   ├── linux_uart.c
 │   │   └── linux_uart.h
-│   ├── m5_sh1107
-│   │   ├── m5_sh1107.c
-│   │   └── m5_sh1107.h
 │   └── ptmx
 │       ├── ptmx_creat.c
 │       └── ptmx_creat.h
