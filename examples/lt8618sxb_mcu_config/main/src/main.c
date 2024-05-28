@@ -1,3 +1,8 @@
+/*
+* SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+*
+* SPDX-License-Identifier: MIT
+*/
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>

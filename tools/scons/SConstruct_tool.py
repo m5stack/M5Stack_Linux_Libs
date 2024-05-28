@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+#
+# SPDX-License-Identifier: MIT
 def ADir(path):
     return Dir(os.path.join(env['component_dir'], path))
 def AFile(file):

@@ -1,3 +1,8 @@
+/*
+* SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+*
+* SPDX-License-Identifier: MIT
+*/
 // #include "hv/ifconfig.h"
 #include <sys/types.h>
 #include <unistd.h>

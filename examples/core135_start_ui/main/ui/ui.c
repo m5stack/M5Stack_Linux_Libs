@@ -2,7 +2,11 @@
 // SquareLine Studio version: SquareLine Studio 1.4.0
 // LVGL version: 8.3.11
 // Project name: core135_start_ui
-
+/*
+* SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+*
+* SPDX-License-Identifier: MIT
+*/
 #include "ui.h"
 
 #include "ui_helpers.h"

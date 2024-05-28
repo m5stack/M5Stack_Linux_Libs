@@ -1,7 +1,7 @@
 // Copyright (c) Sandeep Mistry. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full
 // license information.
-
+// Copyright (c) 2024 M5Stack Technology CO LTD
 #ifndef _M5_SX127X_H_
 #define _M5_SX127X_H_
 

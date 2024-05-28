@@ -4,6 +4,7 @@
   * @author: zll
   * @company: LONTIUM COPYRIGHT and CONFIDENTIAL
   * @date: 2018.5.30
+  * Copyright (c) 2024 M5Stack Technology CO LTD
 /******************************************************************************/
 
 #include "lt8618sx.h"

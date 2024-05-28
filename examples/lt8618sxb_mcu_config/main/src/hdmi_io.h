@@ -1,3 +1,8 @@
+/*
+* SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+*
+* SPDX-License-Identifier: MIT
+*/
 #ifndef _LT8618SX_IO_H
 #define _LT8618SX_IO_H
 

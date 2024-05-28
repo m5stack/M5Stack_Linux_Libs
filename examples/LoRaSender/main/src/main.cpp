@@ -1,3 +1,8 @@
+/*
+* SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+*
+* SPDX-License-Identifier: MIT
+*/
 #include "M5_SX127X.h"
 #include <assert.h>
 #include <stdint.h>

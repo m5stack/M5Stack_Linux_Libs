@@ -1,4 +1,9 @@
 /*
+* SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+*
+* SPDX-License-Identifier: MIT
+*/
+/*
 sudo ip link list
 
 # Set the CAN interface speed to 250,000.
