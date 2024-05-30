@@ -182,7 +182,7 @@ void LT8618SX_TTL_Input_Digital(hdmi_lt8618sx_t *lt86x)
 	{
 		log_info("Video_Input_Mode=Input_RGB888");
 		HDMI_WriteI2C_Byte(0xff, 0x82);
-		HDMI_WriteI2C_Byte(0x45, 0x00); // RGB channel swap
+		HDMI_WriteI2C_Byte(0x45, 0x70); // RGB channel swap
 		if (lt86x->ddrclk)
 		{
 			HDMI_WriteI2C_Byte(0x4f, 0xc0); // 0x80;  0xc0: invert dclk
