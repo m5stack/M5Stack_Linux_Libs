@@ -245,10 +245,10 @@ def build_task_init():
     # env['LINKCOM'] = '$LINK -o $TARGET $SOURCES $LINKFLAGS $__RPATH  $_LIBDIRFLAGS '
 
     if 'CONFIG_COMMPILE_DEBUG' not in os.environ:
-        env['CCCOMSTR'] = "CC $TARGET"
-        env['CXXCOMSTR'] = "CXX $TARGET"
-        env['SHCCCOMSTR'] = "CC -fPIC $TARGET"
-        env['SHCXXCOMSTR'] = "CXX -fPIC $TARGET"
+        env['CCCOMSTR'] = "CC $SOURCES"
+        env['CXXCOMSTR'] = "CXX $SOURCES"
+        env['SHCCCOMSTR'] = "CC -fPIC $SOURCES"
+        env['SHCXXCOMSTR'] = "CXX -fPIC $SOURCES"
         env['ARCOMSTR'] = "LD $TARGET"
         env['SHLINKCOMSTR'] = "Linking $TARGET"
         env['LINKCOMSTR'] = 'Linking $TARGET'
