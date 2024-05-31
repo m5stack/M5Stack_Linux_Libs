@@ -1,0 +1,15 @@
+
+menuconfig NCNN_ENABLED
+    bool "Enable libncnn"
+    default n
+
+    config NCNN_ARM_LINUX_GNUEABIHF
+        bool "build on arm-linux-gnueabihf"
+        default y
+        depends on NCNN_ENABLED
+
+    config NCNN_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on NCNN_ENABLED
+

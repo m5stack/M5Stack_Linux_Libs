@@ -1,0 +1,39 @@
+# project_root/src/SConscript
+import os
+# Import the environment from the SConstruct file
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+SRCS = Glob('src/*.c*')
+INCLUDE = [ADir('include'), ADir('.')]
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread', 'ncnn', 'dl', 'gomp']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = []
+DEFINITIONS_PRIVATE = []
+LDFLAGS = []
+LINK_SEARCH_PATH = []
+
+INCLUDE.append(ADir('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/include'))
+STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_core.a'))
+STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_highgui.a'))
+STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_imgproc.a'))
+STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_photo.a'))
+STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_video.a'))
+
+env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
+                          'SRCS':SRCS,
+                          'INCLUDE':INCLUDE,
+                          'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                          'REQUIREMENTS':REQUIREMENTS,
+                          'STATIC_LIB':STATIC_LIB,
+                          'DYNAMIC_LIB':DYNAMIC_LIB,
+                          'DEFINITIONS':DEFINITIONS,
+                          'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                          'LDFLAGS':LDFLAGS,
+                          'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                          'REGISTER':'project'
+                          })
