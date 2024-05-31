@@ -75,12 +75,33 @@ def check_component(component_name):
             down = input('libhv does not exist. Please choose whether to download it automatically? Y/N :')
             down = down.lower()
             if down == 'y':
-                from git import Repo
+                # from git import Repo
+                import requests
+                import parse
+                import zipfile
+                import shutil
                 try:
-                    Repo.clone_from(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path'])
-                    repo = Repo(env['GIT_REPO_LISTS'][component_name]['path'])
-                    repo.git.checkout(env['GIT_REPO_LISTS'][component_name]['commit'])
-                    print("The warehouse clone was successful.")
+                    # Downloading via HTTP (more common)
+                    repo = parse.parse("{}://{}/{}/{}.git", env['GIT_REPO_LISTS'][component_name]['url'])
+                    zip_file = "{}-{}.zip".format(env['GIT_REPO_LISTS'][component_name]['path'], env['GIT_REPO_LISTS'][component_name]['commit'])
+                    zip_file_extrpath = "{}-{}".format(env['GIT_REPO_LISTS'][component_name]['path'], env['GIT_REPO_LISTS'][component_name]['commit'])
+                    zip_file_next_path = os.path.join(zip_file_extrpath, "{}-{}".format(repo[3], env['GIT_REPO_LISTS'][component_name]['commit']))
+                    down_url = "https://github.com/{}/{}/archive/{}.zip".format(repo[2], repo[3], env['GIT_REPO_LISTS'][component_name]['commit'])
+                    response = requests.get(down_url)
+                    if response.status_code == 200:
+                        with open(zip_file, 'wb') as file:
+                            file.write(response.content)
+                        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                            zip_ref.extractall(zip_file_extrpath)
+                        shutil.move(zip_file_next_path, env['GIT_REPO_LISTS'][component_name]['path'])
+                        shutil.rmtree(zip_file_extrpath)
+                    else:
+                        env.Fatal("{} down failed".format(down_url))
+                    # The way to download Git is to download the Git software package.
+                    # Repo.clone_from(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path'])
+                    # repo = Repo(env['GIT_REPO_LISTS'][component_name]['path'])
+                    # repo.git.checkout(env['GIT_REPO_LISTS'][component_name]['commit'])
+                    print("The {} download successful.".format(down_url))
                 except Exception as e:
                     print('Please manually download {} to {}.'.format(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path']))
                     env.Fatal("Cloning failed.: {}".format(e))

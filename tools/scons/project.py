@@ -229,7 +229,7 @@ def build_task_init():
                     Pobj = pattern.parse(line)
                     if Pobj and '#' not in Pobj.named['start']:
                         git_repo_url = Pobj.named['url'].replace(" ", "")
-                        git_repo_commit = Pobj.named['commit'].replace(" ", "").replace("\n", "").replace("\r", "").replace("\M", "")
+                        git_repo_commit = Pobj.named['commit'].replace(" ", "").replace("\n", "").replace("\r", "")
                         git_repo_name = pattern_name.parse(git_repo_url)[3]
                         env['GIT_REPO_LISTS'][git_repo_name] = {'url':git_repo_url, 'commit':git_repo_commit, "path":str(Path(SDK_PATH)/'github_source'/git_repo_name)}
                 except:

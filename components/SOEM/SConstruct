@@ -7,6 +7,7 @@ with open(env['PROJECT_TOOL_S']) as f:
 
 
 if 'CONFIG_SOEM_ENABLED' in os.environ:
+    check_component('SOEM')
     SRCS=[]
     INCLUDE=[]
     PRIVATE_INCLUDE=[]
