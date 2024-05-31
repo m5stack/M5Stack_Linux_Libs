@@ -72,7 +72,7 @@ def compare_and_copy(file1, file2):
 def check_component(component_name):
     if component_name in env['GIT_REPO_LISTS']:
         if not os.path.exists(env['GIT_REPO_LISTS'][component_name]['path']):
-            down = input('libhv does not exist. Please choose whether to download it automatically? Y/N :')
+            down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(component_name))
             down = down.lower()
             if down == 'y':
                 # from git import Repo
@@ -87,16 +87,17 @@ def check_component(component_name):
                     zip_file_extrpath = "{}-{}".format(env['GIT_REPO_LISTS'][component_name]['path'], env['GIT_REPO_LISTS'][component_name]['commit'])
                     zip_file_next_path = os.path.join(zip_file_extrpath, "{}-{}".format(repo[3], env['GIT_REPO_LISTS'][component_name]['commit']))
                     down_url = "https://github.com/{}/{}/archive/{}.zip".format(repo[2], repo[3], env['GIT_REPO_LISTS'][component_name]['commit'])
-                    response = requests.get(down_url)
-                    if response.status_code == 200:
-                        with open(zip_file, 'wb') as file:
-                            file.write(response.content)
-                        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-                            zip_ref.extractall(zip_file_extrpath)
-                        shutil.move(zip_file_next_path, env['GIT_REPO_LISTS'][component_name]['path'])
-                        shutil.rmtree(zip_file_extrpath)
-                    else:
-                        env.Fatal("{} down failed".format(down_url))
+                    if not os.path.exists(zip_file):
+                        response = requests.get(down_url)
+                        if response.status_code == 200:
+                            with open(zip_file, 'wb') as file:
+                                file.write(response.content)
+                        else:
+                            env.Fatal("{} down failed".format(down_url))
+                    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                        zip_ref.extractall(zip_file_extrpath)
+                    shutil.move(zip_file_next_path, env['GIT_REPO_LISTS'][component_name]['path'])
+                    shutil.rmtree(zip_file_extrpath)
                     # The way to download Git is to download the Git software package.
                     # Repo.clone_from(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path'])
                     # repo = Repo(env['GIT_REPO_LISTS'][component_name]['path'])
