@@ -27,7 +27,7 @@ git_clone_and_checkout_commit https://github.com/dianjixz/toolkit.git       6412
 git_clone_and_checkout_commit https://github.com/dianjixz/tbox.git          2e0cac8bae7a8bc921114b1e482fefd8f8a5d55e
 git_clone_and_checkout_commit https://github.com/wuhanstudio/u8g2-arm-linux.git 31a02e6e22ece76fe9bca45d472ed28c4dea720b
 # git_clone_and_checkout_commit https://github.com/dianjixz/M5GFX.git         7370acbb2379b54f21ffeba70d72da9dbd5ec801
-git_clone_and_checkout_commit https://github.com:dianjixz/minicv2.git       e265532942671c34b4d502bfe47fadfca73b7730
+git_clone_and_checkout_commit https://github.com/dianjixz/minicv2.git       e265532942671c34b4d502bfe47fadfca73b7730
 git_clone_and_checkout_commit https://github.com/bombela/backward-cpp.git   65a769ffe77cf9d759d801bc792ac56af8e911a3
 git_clone_and_checkout_commit https://github.com/OpenEtherCATsociety/SOEM.git a901500618405760a564e64a6816705e29f50f9f
 git_clone_and_checkout_commit https://github.com/dianjixz/c-periphery.git   8e69e684e7b04b36cb7ab795d01453df7b4a9c65
@@ -35,10 +35,9 @@ git_clone_and_checkout_commit https://github.com/dianjixz/c-periphery.git   8e69
 git_clone_and_checkout_commit https://github.com/brgl/libgpiod.git   27fe10150f6d5fa78d1a1ef1e922dc8395d1154d
 
 git_clone_and_checkout_commit https://github.com/stephane/libmodbus.git   5c14f13944ec7394a61a7680dcb462056c4321e3
+git_clone_and_checkout_commit https://github.com/lovyan03/LovyanGFX.git   4fd713ebd3019d17c6c89c6e2f7171d2cafeff23
 
 
-
-git clone https://github.com/lovyan03/LovyanGFX.git
 # git clone -b dd5118cab0813078dbbfd116f1489c6a03a42cae --single-branch --branch master https://github.com/dianjixz/mongoose.git
 # git clone -b 1ab8a8e551a5ab668988549779578553e3c3aa1e --single-branch --branch master https://github.com/dianjixz/libhv.git
 # git clone -b 905357880a73b5e03fb2adb17b7df10eadcd5e4a --single-branch --branch master https://github.com/dianjixz/RtspServer.git

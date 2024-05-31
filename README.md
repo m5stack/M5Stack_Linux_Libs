@@ -37,7 +37,8 @@ Framework relies on the following software packages: make, cmake, python3, and e
 # Assuming your current terminal is in the "dianjixz-lib" directory.
 # Install Dependencies (Only Needs to be Done Once)
 sudo apt update
-sudo apt install make cmake python3 expect
+sudo apt install make cmake python3 expect python3-pip
+pip3 install gitpython scons
 
 # Navigate to the "examples/demo1" directory.
 cd examples/demo1

@@ -69,3 +69,20 @@ def compare_and_copy(file1, file2):
         with open(file1, "rb") as f1, open(file2, "wb") as f2:
             f2.write(f1.read())
 
+def check_component(component_name):
+    if component_name in env['GIT_REPO_LISTS']:
+        if not os.path.exists(env['GIT_REPO_LISTS'][component_name]['path']):
+            down = input('libhv does not exist. Please choose whether to download it automatically? Y/N :')
+            down = down.lower()
+            if down == 'y':
+                from git import Repo
+                try:
+                    Repo.clone_from(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path'])
+                    repo = Repo(env['GIT_REPO_LISTS'][component_name]['path'])
+                    repo.git.checkout(env['GIT_REPO_LISTS'][component_name]['commit'])
+                    print("The warehouse clone was successful.")
+                except Exception as e:
+                    print('Please manually download {} to {}.'.format(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path']))
+                    env.Fatal("Cloning failed.: {}".format(e))
+            else:
+                env.Fatal('Please manually download {} to {}.'.format(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path']))

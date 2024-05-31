@@ -27,7 +27,7 @@ KCONFIG_FILE = os.environ.get('KCONFIG_FILE', str(Path(SDK_PATH)/'Kconfig'))
 GLOBAL_CONFIG_MK_FILE = os.environ.get('GLOBAL_CONFIG_MK_FILE', str(Path(PROJECT_PATH)/'build'/'config'/'global_config.mk'))
 GLOBAL_CONFIG_H_FILE = os.environ.get('GLOBAL_CONFIG_H_FILE', str(Path(PROJECT_PATH)/'build'/'config'/'global_config.h'))
 TOOL_FILE = os.environ.get('TOOL_FILE', str(Path(SDK_PATH)/'tools'))
-
+GIT_REPO_FILE = os.environ.get('GIT_REPO_FILE', str(Path(SDK_PATH)/'github_source'/'source-list.sh'))
 
 def ourspawn(sh, escape, cmd, args, e):
     filename = str(uuid.uuid4())
@@ -158,13 +158,16 @@ def build_task_init():
         subprocess.call(cmd)
 
 
-    with open(GLOBAL_CONFIG_MK_FILE, 'r') as f:
-        pattern = parse.compile("CONFIG_{}={}\n")
-        for line in f.readlines():
-            Pobj = pattern.parse(line)
-            if Pobj:
-                key, value = Pobj.fixed
-                os.environ['CONFIG_' + key] = value.strip('"')
+    try:
+        with open(GLOBAL_CONFIG_MK_FILE, 'r') as f:
+            pattern = parse.compile("CONFIG_{}={}\n")
+            for line in f.readlines():
+                Pobj = pattern.parse(line)
+                if Pobj:
+                    key, value = Pobj.fixed
+                    os.environ['CONFIG_' + key] = value.strip('"')
+    except:
+        pass
 
 
 
@@ -214,6 +217,25 @@ def build_task_init():
             env['LINK'] = CONFIG_TOOLCHAIN_PATH + 'g++'
     else:
         print('unknow os!')
+
+
+    env['GIT_REPO_LISTS'] = {}
+    try:
+        with open(GIT_REPO_FILE, 'r') as f:
+            pattern = parse.compile("{start}_clone_and_checkout_commit {url} {commit}")
+            pattern_name = parse.compile("{}://{}/{}/{}.git")
+            for line in f.readlines():
+                try:
+                    Pobj = pattern.parse(line)
+                    if Pobj and '#' not in Pobj.named['start']:
+                        git_repo_url = Pobj.named['url'].replace(" ", "")
+                        git_repo_commit = Pobj.named['commit'].replace(" ", "").replace("\n", "").replace("\r", "").replace("\M", "")
+                        git_repo_name = pattern_name.parse(git_repo_url)[3]
+                        env['GIT_REPO_LISTS'][git_repo_name] = {'url':git_repo_url, 'commit':git_repo_commit, "path":str(Path(SDK_PATH)/'github_source'/git_repo_name)}
+                except:
+                    pass       
+    except:
+        pass
 
     if os.environ['CONFIG_TOOLCHAIN_FLAGS']:
         env.MergeFlags(os.environ['CONFIG_TOOLCHAIN_FLAGS'])
