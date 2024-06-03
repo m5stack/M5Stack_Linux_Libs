@@ -1,0 +1,81 @@
+# project_root/src/SConscript
+import os
+import subprocess
+# Import the environment from the SConstruct file
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+opencv_path = str(ADir('../../../github_source/opencv-mobile-2.4.13.7-armlinux'))
+
+if not os.path.exists(opencv_path):
+    zip_file = opencv_path + '.zip'
+    zip_file_extrpath = opencv_path + '_tmp'
+    down_url = "https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip"
+    
+    if 'CONFIG_REPO_AUTOMATION' in os.environ:
+        down = 'y'
+    else:
+        down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format('opencv-mobile-2.4.13.7-armlinux'))
+        down = down.lower()
+    if down == 'y':
+        # from git import Repo
+        import requests
+        import parse
+        import zipfile
+        import shutil
+        try:
+            # Downloading via HTTP (more common)
+            if not os.path.exists(zip_file):
+                response = requests.get(down_url)
+                if response.status_code == 200:
+                    with open(zip_file, 'wb') as file:
+                        file.write(response.content)
+                else:
+                    env.Fatal("{} down failed".format(down_url))
+            with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                zip_ref.extractall(zip_file_extrpath)
+            shutil.move(os.path.join(zip_file_extrpath, 'opencv-mobile-2.4.13.7-armlinux'), opencv_path)
+            shutil.rmtree(zip_file_extrpath)
+            print("The {} download successful.".format(down_url))
+        except Exception as e:
+            print('Please manually download {} to {} .'.format(down_url, zip_file))
+            env.Fatal("Cloning failed.: {}".format(e))
+    else:
+        env.Fatal('Please manually download {} to {} .'.format(down_url, zip_file))
+
+
+libgomp = CC_cmd_execute(['-print-file-name=libgomp.so.1'])
+
+SRCS = Glob('src/*.c*')
+INCLUDE = [ADir('include'), ADir('.')]
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread', 'dl']
+STATIC_LIB = []
+DYNAMIC_LIB = [libgomp]
+DEFINITIONS = []
+DEFINITIONS_PRIVATE = []
+LDFLAGS = []
+LINK_SEARCH_PATH = []
+
+INCLUDE += [ADir('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/include')]
+STATIC_LIB += Glob('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/*.a')
+STATIC_LIB += Glob('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/*.a')
+
+STATIC_FILES = [AFile('../img/06b.jpg')]
+
+env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
+                          'SRCS':SRCS,
+                          'INCLUDE':INCLUDE,
+                          'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                          'REQUIREMENTS':REQUIREMENTS,
+                          'STATIC_LIB':STATIC_LIB,
+                          'STATIC_FILES':STATIC_FILES,
+                          'DYNAMIC_LIB':DYNAMIC_LIB,
+                          'DEFINITIONS':DEFINITIONS,
+                          'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                          'LDFLAGS':LDFLAGS,
+                          'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                          'REGISTER':'project'
+                          })
