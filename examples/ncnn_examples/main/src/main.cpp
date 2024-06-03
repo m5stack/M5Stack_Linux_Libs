@@ -1,7 +1,6 @@
-// Tencent is pleased to support the open source community by making ncnn available.
-//
-// Copyright (C) 2018 THL A29 Limited, a Tencent company. All rights reserved.
-//
+// This file is wirtten base on the following file:
+// https://github.com/Tencent/ncnn/blob/master/examples/yolov5.cpp
+// Copyright (C) 2020 THL A29 Limited, a Tencent company. All rights reserved.
 // Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
 //
@@ -11,10 +10,12 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
+// ------------------------------------------------------------------------------
+// Copyright (C) 2020-2021, Megvii Inc. All rights reserved.
 
+#include "layer.h"
 #include "net.h"
 
-#include <math.h>
 #if defined(USE_NCNN_SIMPLEOCV)
 #include "simpleocv.h"
 #else
@@ -22,7 +23,62 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #endif
+#include <float.h>
 #include <stdio.h>
+#include <vector>
+
+#define YOLOX_NMS_THRESH  0.45 // nms threshold
+#define YOLOX_CONF_THRESH 0.25 // threshold of bounding box prob
+#define YOLOX_TARGET_SIZE 640  // target image size after resize, might use 416 for small model
+
+// YOLOX use the same focus in yolov5
+class YoloV5Focus : public ncnn::Layer
+{
+public:
+    YoloV5Focus()
+    {
+        one_blob_only = true;
+    }
+
+    virtual int forward(const ncnn::Mat& bottom_blob, ncnn::Mat& top_blob, const ncnn::Option& opt) const
+    {
+        int w = bottom_blob.w;
+        int h = bottom_blob.h;
+        int channels = bottom_blob.c;
+
+        int outw = w / 2;
+        int outh = h / 2;
+        int outc = channels * 4;
+
+        top_blob.create(outw, outh, outc, 4u, 1, opt.blob_allocator);
+        if (top_blob.empty())
+            return -100;
+
+        #pragma omp parallel for num_threads(opt.num_threads)
+        for (int p = 0; p < outc; p++)
+        {
+            const float* ptr = bottom_blob.channel(p % channels).row((p / channels) % 2) + ((p / channels) / 2);
+            float* outptr = top_blob.channel(p);
+
+            for (int i = 0; i < outh; i++)
+            {
+                for (int j = 0; j < outw; j++)
+                {
+                    *outptr = *ptr;
+
+                    outptr += 1;
+                    ptr += 2;
+                }
+
+                ptr += w;
+            }
+        }
+
+        return 0;
+    }
+};
+
+DEFINE_LAYER_CREATOR(YoloV5Focus)
 
 struct Object
 {
@@ -31,30 +87,37 @@ struct Object
     float prob;
 };
 
+struct GridAndStride
+{
+    int grid0;
+    int grid1;
+    int stride;
+};
+
 static inline float intersection_area(const Object& a, const Object& b)
 {
     cv::Rect_<float> inter = a.rect & b.rect;
     return inter.area();
 }
 
-static void qsort_descent_inplace(std::vector<Object>& objects, int left, int right)
+static void qsort_descent_inplace(std::vector<Object>& faceobjects, int left, int right)
 {
     int i = left;
     int j = right;
-    float p = objects[(left + right) / 2].prob;
+    float p = faceobjects[(left + right) / 2].prob;
 
     while (i <= j)
     {
-        while (objects[i].prob > p)
+        while (faceobjects[i].prob > p)
             i++;
 
-        while (objects[j].prob < p)
+        while (faceobjects[j].prob < p)
             j--;
 
         if (i <= j)
         {
             // swap
-            std::swap(objects[i], objects[j]);
+            std::swap(faceobjects[i], faceobjects[j]);
 
             i++;
             j--;
@@ -65,11 +128,11 @@ static void qsort_descent_inplace(std::vector<Object>& objects, int left, int ri
     {
         #pragma omp section
         {
-            if (left < j) qsort_descent_inplace(objects, left, j);
+            if (left < j) qsort_descent_inplace(faceobjects, left, j);
         }
         #pragma omp section
         {
-            if (i < right) qsort_descent_inplace(objects, i, right);
+            if (i < right) qsort_descent_inplace(faceobjects, i, right);
         }
     }
 }
@@ -119,174 +182,168 @@ static void nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vecto
     }
 }
 
-static int detect_fasterrcnn(const cv::Mat& bgr, std::vector<Object>& objects)
+static void generate_grids_and_stride(const int target_w, const int target_h, std::vector<int>& strides, std::vector<GridAndStride>& grid_strides)
 {
-    ncnn::Net fasterrcnn;
-
-    fasterrcnn.opt.use_vulkan_compute = true;
-
-    // original pretrained model from https://github.com/rbgirshick/py-faster-rcnn
-    // py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/faster_rcnn_test.pt
-    // https://dl.dropboxusercontent.com/s/o6ii098bu51d139/faster_rcnn_models.tgz?dl=0
-    // ZF_faster_rcnn_final.caffemodel
-    // the ncnn model https://github.com/nihui/ncnn-assets/tree/master/models
-    if (fasterrcnn.load_param("ZF_faster_rcnn_final.param"))
-        exit(-1);
-    if (fasterrcnn.load_model("ZF_faster_rcnn_final.bin"))
-        exit(-1);
-
-    // hyper parameters taken from
-    // py-faster-rcnn/lib/fast_rcnn/config.py
-    // py-faster-rcnn/lib/fast_rcnn/test.py
-    const int target_size = 600; // __C.TEST.SCALES
-
-    const int max_per_image = 100;
-    const float confidence_thresh = 0.05f;
-
-    const float nms_threshold = 0.3f; // __C.TEST.NMS
-
-    // scale to target detect size
-    int w = bgr.cols;
-    int h = bgr.rows;
-    float scale = 1.f;
-    if (w < h)
+    for (int i = 0; i < (int)strides.size(); i++)
     {
-        scale = (float)target_size / w;
-        w = target_size;
+        int stride = strides[i];
+        int num_grid_w = target_w / stride;
+        int num_grid_h = target_h / stride;
+        for (int g1 = 0; g1 < num_grid_h; g1++)
+        {
+            for (int g0 = 0; g0 < num_grid_w; g0++)
+            {
+                GridAndStride gs;
+                gs.grid0 = g0;
+                gs.grid1 = g1;
+                gs.stride = stride;
+                grid_strides.push_back(gs);
+            }
+        }
+    }
+}
+
+static void generate_yolox_proposals(std::vector<GridAndStride> grid_strides, const ncnn::Mat& feat_blob, float prob_threshold, std::vector<Object>& objects)
+{
+    const int num_grid = feat_blob.h;
+    const int num_class = feat_blob.w - 5;
+    const int num_anchors = grid_strides.size();
+
+    const float* feat_ptr = feat_blob.channel(0);
+    for (int anchor_idx = 0; anchor_idx < num_anchors; anchor_idx++)
+    {
+        const int grid0 = grid_strides[anchor_idx].grid0;
+        const int grid1 = grid_strides[anchor_idx].grid1;
+        const int stride = grid_strides[anchor_idx].stride;
+
+        // yolox/models/yolo_head.py decode logic
+        //  outputs[..., :2] = (outputs[..., :2] + grids) * strides
+        //  outputs[..., 2:4] = torch.exp(outputs[..., 2:4]) * strides
+        float x_center = (feat_ptr[0] + grid0) * stride;
+        float y_center = (feat_ptr[1] + grid1) * stride;
+        float w = exp(feat_ptr[2]) * stride;
+        float h = exp(feat_ptr[3]) * stride;
+        float x0 = x_center - w * 0.5f;
+        float y0 = y_center - h * 0.5f;
+
+        float box_objectness = feat_ptr[4];
+        for (int class_idx = 0; class_idx < num_class; class_idx++)
+        {
+            float box_cls_score = feat_ptr[5 + class_idx];
+            float box_prob = box_objectness * box_cls_score;
+            if (box_prob > prob_threshold)
+            {
+                Object obj;
+                obj.rect.x = x0;
+                obj.rect.y = y0;
+                obj.rect.width = w;
+                obj.rect.height = h;
+                obj.label = class_idx;
+                obj.prob = box_prob;
+
+                objects.push_back(obj);
+            }
+
+        } // class loop
+        feat_ptr += feat_blob.w;
+
+    } // point anchor loop
+}
+
+static int detect_yolox(const cv::Mat& bgr, std::vector<Object>& objects)
+{
+    ncnn::Net yolox;
+
+    yolox.opt.use_vulkan_compute = true;
+    // yolox.opt.use_bf16_storage = true;
+
+    // Focus in yolov5
+    yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
+
+    // original pretrained model from https://github.com/Megvii-BaseDetection/YOLOX
+    // ncnn model param: https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s_ncnn.tar.gz
+    // NOTE that newest version YOLOX remove normalization of model (minus mean and then div by std),
+    // which might cause your model outputs becoming a total mess, plz check carefully.
+    if (yolox.load_param("yolox.param"))
+        exit(-1);
+    if (yolox.load_model("yolox.bin"))
+        exit(-1);
+
+    int img_w = bgr.cols;
+    int img_h = bgr.rows;
+
+    int w = img_w;
+    int h = img_h;
+    float scale = 1.f;
+    if (w > h)
+    {
+        scale = (float)YOLOX_TARGET_SIZE / w;
+        w = YOLOX_TARGET_SIZE;
         h = h * scale;
     }
     else
     {
-        scale = (float)target_size / h;
-        h = target_size;
+        scale = (float)YOLOX_TARGET_SIZE / h;
+        h = YOLOX_TARGET_SIZE;
         w = w * scale;
     }
+    ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_h, w, h);
 
-    ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, bgr.cols, bgr.rows, w, h);
+    // pad to YOLOX_TARGET_SIZE rectangle
+    int wpad = (w + 31) / 32 * 32 - w;
+    int hpad = (h + 31) / 32 * 32 - h;
+    ncnn::Mat in_pad;
+    // different from yolov5, yolox only pad on bottom and right side,
+    // which means users don't need to extra padding info to decode boxes coordinate.
+    ncnn::copy_make_border(in, in_pad, 0, hpad, 0, wpad, ncnn::BORDER_CONSTANT, 114.f);
 
-    const float mean_vals[3] = {102.9801f, 115.9465f, 122.7717f};
-    in.substract_mean_normalize(mean_vals, 0);
+    ncnn::Extractor ex = yolox.create_extractor();
 
-    ncnn::Mat im_info(3);
-    im_info[0] = h;
-    im_info[1] = w;
-    im_info[2] = scale;
+    ex.input("images", in_pad);
 
-    // step1, extract feature and all rois
-    ncnn::Extractor ex1 = fasterrcnn.create_extractor();
+    std::vector<Object> proposals;
 
-    ex1.input("data", in);
-    ex1.input("im_info", im_info);
-
-    ncnn::Mat conv5_relu5; // feature
-    ncnn::Mat rois;        // all rois
-    ex1.extract("conv5_relu5", conv5_relu5);
-    ex1.extract("rois", rois);
-
-    // step2, extract bbox and score for each roi
-    std::vector<std::vector<Object> > class_candidates;
-    for (int i = 0; i < rois.c; i++)
     {
-        ncnn::Extractor ex2 = fasterrcnn.create_extractor();
+        ncnn::Mat out;
+        ex.extract("output", out);
 
-        ncnn::Mat roi = rois.channel(i); // get single roi
-        ex2.input("conv5_relu5", conv5_relu5);
-        ex2.input("rois", roi);
+        static const int stride_arr[] = {8, 16, 32}; // might have stride=64 in YOLOX
+        std::vector<int> strides(stride_arr, stride_arr + sizeof(stride_arr) / sizeof(stride_arr[0]));
+        std::vector<GridAndStride> grid_strides;
+        generate_grids_and_stride(in_pad.w, in_pad.h, strides, grid_strides);
+        generate_yolox_proposals(grid_strides, out, YOLOX_CONF_THRESH, proposals);
+    }
 
-        ncnn::Mat bbox_pred;
-        ncnn::Mat cls_prob;
-        ex2.extract("bbox_pred", bbox_pred);
-        ex2.extract("cls_prob", cls_prob);
+    // sort all proposals by score from highest to lowest
+    qsort_descent_inplace(proposals);
 
-        int num_class = cls_prob.w;
-        class_candidates.resize(num_class);
+    // apply nms with nms_threshold
+    std::vector<int> picked;
+    nms_sorted_bboxes(proposals, picked, YOLOX_NMS_THRESH);
 
-        // find class id with highest score
-        int label = 0;
-        float score = 0.f;
-        for (int i = 0; i < num_class; i++)
-        {
-            float class_score = cls_prob[i];
-            if (class_score > score)
-            {
-                label = i;
-                score = class_score;
-            }
-        }
+    int count = picked.size();
 
-        // ignore background or low score
-        if (label == 0 || score <= confidence_thresh)
-            continue;
+    objects.resize(count);
+    for (int i = 0; i < count; i++)
+    {
+        objects[i] = proposals[picked[i]];
 
-        //         fprintf(stderr, "%d = %f\n", label, score);
-
-        // unscale to image size
-        float x1 = roi[0] / scale;
-        float y1 = roi[1] / scale;
-        float x2 = roi[2] / scale;
-        float y2 = roi[3] / scale;
-
-        float pb_w = x2 - x1 + 1;
-        float pb_h = y2 - y1 + 1;
-
-        // apply bbox regression
-        float dx = bbox_pred[label * 4];
-        float dy = bbox_pred[label * 4 + 1];
-        float dw = bbox_pred[label * 4 + 2];
-        float dh = bbox_pred[label * 4 + 3];
-
-        float cx = x1 + pb_w * 0.5f;
-        float cy = y1 + pb_h * 0.5f;
-
-        float obj_cx = cx + pb_w * dx;
-        float obj_cy = cy + pb_h * dy;
-
-        float obj_w = pb_w * exp(dw);
-        float obj_h = pb_h * exp(dh);
-
-        float obj_x1 = obj_cx - obj_w * 0.5f;
-        float obj_y1 = obj_cy - obj_h * 0.5f;
-        float obj_x2 = obj_cx + obj_w * 0.5f;
-        float obj_y2 = obj_cy + obj_h * 0.5f;
+        // adjust offset to original unpadded
+        float x0 = (objects[i].rect.x) / scale;
+        float y0 = (objects[i].rect.y) / scale;
+        float x1 = (objects[i].rect.x + objects[i].rect.width) / scale;
+        float y1 = (objects[i].rect.y + objects[i].rect.height) / scale;
 
         // clip
-        obj_x1 = std::max(std::min(obj_x1, (float)(bgr.cols - 1)), 0.f);
-        obj_y1 = std::max(std::min(obj_y1, (float)(bgr.rows - 1)), 0.f);
-        obj_x2 = std::max(std::min(obj_x2, (float)(bgr.cols - 1)), 0.f);
-        obj_y2 = std::max(std::min(obj_y2, (float)(bgr.rows - 1)), 0.f);
+        x0 = std::max(std::min(x0, (float)(img_w - 1)), 0.f);
+        y0 = std::max(std::min(y0, (float)(img_h - 1)), 0.f);
+        x1 = std::max(std::min(x1, (float)(img_w - 1)), 0.f);
+        y1 = std::max(std::min(y1, (float)(img_h - 1)), 0.f);
 
-        // append object
-        Object obj;
-        obj.rect = cv::Rect_<float>(obj_x1, obj_y1, obj_x2 - obj_x1 + 1, obj_y2 - obj_y1 + 1);
-        obj.label = label;
-        obj.prob = score;
-
-        class_candidates[label].push_back(obj);
-    }
-
-    // post process
-    objects.clear();
-    for (int i = 0; i < (int)class_candidates.size(); i++)
-    {
-        std::vector<Object>& candidates = class_candidates[i];
-
-        qsort_descent_inplace(candidates);
-
-        std::vector<int> picked;
-        nms_sorted_bboxes(candidates, picked, nms_threshold);
-
-        for (int j = 0; j < (int)picked.size(); j++)
-        {
-            int z = picked[j];
-            objects.push_back(candidates[z]);
-        }
-    }
-
-    qsort_descent_inplace(objects);
-
-    if (max_per_image > 0 && max_per_image < objects.size())
-    {
-        objects.resize(max_per_image);
+        objects[i].rect.x = x0;
+        objects[i].rect.y = y0;
+        objects[i].rect.width = x1 - x0;
+        objects[i].rect.height = y1 - y0;
     }
 
     return 0;
@@ -294,13 +351,17 @@ static int detect_fasterrcnn(const cv::Mat& bgr, std::vector<Object>& objects)
 
 static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects)
 {
-    static const char* class_names[] = {"background",
-                                        "aeroplane", "bicycle", "bird", "boat",
-                                        "bottle", "bus", "car", "cat", "chair",
-                                        "cow", "diningtable", "dog", "horse",
-                                        "motorbike", "person", "pottedplant",
-                                        "sheep", "sofa", "train", "tvmonitor"
-                                       };
+    static const char* class_names[] = {
+        "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
+        "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
+        "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
+        "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
+        "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
+        "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
+        "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone",
+        "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
+        "hair drier", "toothbrush"
+    };
 
     cv::Mat image = bgr.clone();
 
@@ -355,7 +416,7 @@ int main(int argc, char** argv)
     }
 
     std::vector<Object> objects;
-    detect_fasterrcnn(m, objects);
+    detect_yolox(m, objects);
 
     draw_objects(m, objects);
 
