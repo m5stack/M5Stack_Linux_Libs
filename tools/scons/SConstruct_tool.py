@@ -111,3 +111,15 @@ def check_component(component_name):
                     env.Fatal("Cloning failed.: {}".format(e))
             else:
                 env.Fatal('Please manually download {} to {}.'.format(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path']))
+
+def CC_cmd_execute(cmd):
+    import os
+    import subprocess
+    try:
+        new_env = os.environ.copy()
+        new_env['PATH'] += env['ENV']['PATH']
+        result = subprocess.run([env['CC']] + cmd, env=new_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
+        out = result.stdout.strip()
+    except:
+        out = None
+    return out

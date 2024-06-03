@@ -131,6 +131,16 @@ def push_fun():
 env = None
 task_lists = {}
 
+def Fatal(env, message):
+    print("Fatal error: " + message)
+    env.Exit(1)
+
+def copy_file(target, source, env):
+    source_path = str(source[0])
+    target_path = str(target[0])
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    shutil.copy2(source_path, target_path)
+
 def build_task_init():
     global env
     global task_lists
@@ -218,6 +228,8 @@ def build_task_init():
     else:
         print('unknow os!')
 
+    env.AddMethod(Fatal, "Fatal")
+    
     try:
         new_env = os.environ.copy()
         new_env['PATH'] += env['ENV']['PATH']
@@ -346,7 +358,7 @@ def creat_commpile_Program():
                 _BUILD_ENV.Append(LIBPATH=str(Path('build')/requirement))
                 _BUILD_ENV.Append(LIBPATH=task_lists[requirement]['LINK_SEARCH_PATH'])
                 _BUILD_ENV.MergeFlags(task_lists[requirement]['DEFINITIONS'])
-                _LIBO += list(map(lambda o: str(o), task_lists[requirement]['DYNAMIC_LIB'] + task_lists[requirement]['STATIC_LIB']))
+                _LIBO += list(map(lambda o: str(o), task_lists[requirement]['STATIC_LIB'] + task_lists[requirement]['DYNAMIC_LIB']))
                 for c_requirement in task_lists[requirement]['REQUIREMENTS']: 
                     if c_requirement not in task_lists:
                         _BUILD_ENV.Append(LIBS=[c_requirement])
@@ -372,9 +384,9 @@ def creat_commpile_Program():
             component['_target'] = _BUILD_ENV.SharedLibrary(target = _TARGET, source = _OBJS)
             component['_target_build_env'] = _BUILD_ENV
             if 'CONFIG_TOOLCHAIN_SYSTEM_UNIX' in os.environ:
-                _BUILD_ENV.Command(os.path.join('dist', f'lib{component["target"]}.so'), str(Path('build')/component['target']/f'lib{component["target"]}.so'), action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
+                _BUILD_ENV.Command(os.path.join('dist', f'lib{component["target"]}.so'), str(Path('build')/component['target']/f'lib{component["target"]}.so'), action=copy_file)
             elif 'CONFIG_TOOLCHAIN_SYSTEM_WIN' in os.environ:
-                _BUILD_ENV.Command(os.path.join('dist', f'lib{component["target"]}.dll'), str(Path('build')/component['target']/f'lib{component["target"]}.dll'), action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
+                _BUILD_ENV.Command(os.path.join('dist', f'lib{component["target"]}.dll'), str(Path('build')/component['target']/f'lib{component["target"]}.dll'), action=copy_file)
             else:
                 pass
             
@@ -382,21 +394,28 @@ def creat_commpile_Program():
             _OBJS = list(map(lambda file: _BUILD_ENV.Object(target = file[0], source = file[1]), list(zip(_srco, _srcs))))
             for src_file in _srcs_custom:
                 _OBJS += _BUILD_ENV.Object(target = _srcs_custom[src_file]['SRCO'], source = str(src_file), CPPFLAGS=_srcs_custom[src_file]['CPPFLAGS'], CCFLAGS=_srcs_custom[src_file]['CCFLAGS'])
-            _LIBO += list(map(lambda o: str(o), component['DYNAMIC_LIB'] + component['STATIC_LIB']))
+            _LIBO += list(map(lambda o: str(o), component['STATIC_LIB'] + component['DYNAMIC_LIB']))
             _BUILD_ENV.Library(target = _TARGET, source = _OBJS)
             empty_src_file = str(Path(component_build_dir)/'empty_src_file.cpp')
             open(empty_src_file, 'w').close()
+            if component['DYNAMIC_LIB']:
+                _BUILD_ENV.Append(LINKFLAGS=['-Wl,-rpath=./'])
             component['_target'] = _BUILD_ENV.Program(target = _TARGET, source = [empty_src_file, component_build_dir + '/lib' + component['target'] + '.a'] + _LIBO)
             # _BUILD_ENV['LIBS'] = [component['target']] + _BUILD_ENV['LIBS']
             # _BUILD_ENV.Append(LIBPATH=[component_build_dir])
             component['_target_build_env'] = _BUILD_ENV
             if 'CONFIG_TOOLCHAIN_SYSTEM_UNIX' in os.environ:
-                 _BUILD_ENV.Command(os.path.join('dist', component['target']), str(Path('build')/component['target']/component['target']), action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
+                _BUILD_ENV.Command(os.path.join('dist', component['target']), str(Path('build')/component['target']/component['target']), action=copy_file)
             elif 'CONFIG_TOOLCHAIN_SYSTEM_WIN' in os.environ:
-                 _BUILD_ENV.Command(os.path.join('dist', component['target']) + '.exe', str(Path('build')/component['target']/component['target']) + '.exe', action=[Mkdir("dist"), Copy("$TARGET", "$SOURCE")])
+                _BUILD_ENV.Command(os.path.join('dist', component['target']) + '.exe', [str(Path('build')/component['target']/component['target']) + '.exe', 'dist'], action=copy_file)
             else:
                 pass
-           
+            for lib_file in component['DYNAMIC_LIB']:
+                _BUILD_ENV.Command(os.path.join('dist', os.path.basename(str(lib_file))), str(lib_file), action=copy_file)
+            if 'STATIC_FILES' in component:
+                for file in component['STATIC_FILES']:
+                    _BUILD_ENV.Command(os.path.join('dist', os.path.basename(str(file))), str(file), action=copy_file)
+
 
 def add_commpile_Program_requirements():
     for task in task_lists:
