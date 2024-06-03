@@ -72,8 +72,11 @@ def compare_and_copy(file1, file2):
 def check_component(component_name):
     if component_name in env['GIT_REPO_LISTS']:
         if not os.path.exists(env['GIT_REPO_LISTS'][component_name]['path']):
-            down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(component_name))
-            down = down.lower()
+            if 'CONFIG_REPO_AUTOMATION' in os.environ:
+                down = 'y'
+            else:
+                down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(component_name))
+                down = down.lower()
             if down == 'y':
                 # from git import Repo
                 import requests

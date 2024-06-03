@@ -27,6 +27,10 @@ menu "Toolchain configuration"
 		bool "win"
 	endchoice
 
+	config REPO_AUTOMATION
+		bool 'Download automation for the repo.'
+		default n
+
 	config COMMPILE_DEBUG
 		bool 'commpile debug msg!'
 		default n

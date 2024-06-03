@@ -218,6 +218,13 @@ def build_task_init():
     else:
         print('unknow os!')
 
+    try:
+        new_env = os.environ.copy()
+        new_env['PATH'] += env['ENV']['PATH']
+        result = subprocess.run([env['CC'], '-dumpmachine'], env=new_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
+        env['GCC_DUMPMACHINE'] = result.stdout.strip()
+    except:
+        pass
 
     env['GIT_REPO_LISTS'] = {}
     try:
@@ -308,6 +315,14 @@ def creat_commpile_Program():
             return ofile
         _srcs = [str(o) for o in deep_iter_or_return(component['SRCS'])]
         _srco = list(map(get_srcs, _srcs))
+        _srcs_custom = {}
+        if 'SRCS_CUSTOM' in component:
+            _srcs_custom = component['SRCS_CUSTOM']
+            _srcs_list = list(_srcs_custom.keys())
+            _srco_custom = list(map(get_srcs, _srcs_list))
+            for index, obj in enumerate(_srcs_list):
+                _srcs_custom[obj]['SRCO'] = _srco_custom[index]
+
         if len(_srcs) == 0:
             empty_src_file = str(Path(component_build_dir)/'empty_src_file.cpp')
             open(empty_src_file, 'w').close()
@@ -342,12 +357,16 @@ def creat_commpile_Program():
         
         if component['REGISTER'] == 'static':
             _OBJS = list(map(lambda file: _BUILD_ENV.Object(target = file[0], source = file[1]), list(zip(_srco, _srcs))))
+            for src_file in _srcs_custom:
+                _OBJS += _BUILD_ENV.Object(target = _srcs_custom[src_file]['SRCO'], source = str(src_file), CPPFLAGS=_srcs_custom[src_file]['CPPFLAGS'], CCFLAGS=_srcs_custom[src_file]['CCFLAGS'])
             # _LIBO = list(map(lambda o: str(o), component['STATIC_LIB']))
             # component['_target'] = _BUILD_ENV.Library(target = _TARGET, source = _OBJS + _LIBO)
             component['_target'] = _BUILD_ENV.Library(target = _TARGET, source = _OBJS)
             component['_target_build_env'] = _BUILD_ENV
         elif component['REGISTER'] == 'shared':
             _OBJS = list(map(lambda file: _BUILD_ENV.SharedObject(target = file[0], source = file[1]), list(zip(_srco, _srcs))))
+            for src_file in _srcs_custom:
+                _OBJS += _BUILD_ENV.SharedObject(target = _srcs_custom[src_file]['SRCO'], source = str(src_file), CPPFLAGS=_srcs_custom[src_file]['CPPFLAGS'], CCFLAGS=_srcs_custom[src_file]['CCFLAGS'])
             # _LIBO = list(map(lambda o: str(o), component['DYNAMIC_LIB']))
             # component['_target'] = _BUILD_ENV.SharedLibrary(target = _TARGET, source = _OBJS + _LIBO)
             component['_target'] = _BUILD_ENV.SharedLibrary(target = _TARGET, source = _OBJS)
@@ -361,6 +380,8 @@ def creat_commpile_Program():
             
         elif component['REGISTER'] == 'project':
             _OBJS = list(map(lambda file: _BUILD_ENV.Object(target = file[0], source = file[1]), list(zip(_srco, _srcs))))
+            for src_file in _srcs_custom:
+                _OBJS += _BUILD_ENV.Object(target = _srcs_custom[src_file]['SRCO'], source = str(src_file), CPPFLAGS=_srcs_custom[src_file]['CPPFLAGS'], CCFLAGS=_srcs_custom[src_file]['CCFLAGS'])
             _LIBO += list(map(lambda o: str(o), component['DYNAMIC_LIB'] + component['STATIC_LIB']))
             _BUILD_ENV.Library(target = _TARGET, source = _OBJS)
             empty_src_file = str(Path(component_build_dir)/'empty_src_file.cpp')
