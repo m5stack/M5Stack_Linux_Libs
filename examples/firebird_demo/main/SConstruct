@@ -1,0 +1,84 @@
+# project_root/src/SConscript
+import os
+import shutil
+# Import the environment from the SConstruct file
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+SRCS = Glob('src/*.c*')
+INCLUDE = [ADir('include'), ADir('.')]
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread','tommath']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = []
+DEFINITIONS_PRIVATE = []
+LDFLAGS = []
+LINK_SEARCH_PATH = []
+
+gcc_dumpmachine = env['GCC_DUMPMACHINE'].split('-')
+
+if 'arm' in gcc_dumpmachine and 'gnueabihf' in gcc_dumpmachine:
+    package_name = 'Firebird-5.0.0.1306-0-linux-arm32'
+    Firebird_path = str(ADir('../../../github_source/Firebird-5.0.0.1306-0-linux-arm32'))
+    down_url = "https://github.com/FirebirdSQL/firebird/releases/download/v5.0.0/Firebird-5.0.0.1306-0-linux-arm32.tar.gz"
+    INCLUDE.append(ADir('../../../github_source/Firebird-5.0.0.1306-0-linux-arm32/Firebird-5.0.0.1306-0-linux-arm32/buildroot/opt/firebird/include'))
+    DYNAMIC_LIB.append(AFile('../../../github_source/Firebird-5.0.0.1306-0-linux-arm32/Firebird-5.0.0.1306-0-linux-arm32/buildroot/opt/firebird/lib/libfbclient.so.2'))
+elif 'x86_64' in gcc_dumpmachine and 'linux' in gcc_dumpmachine:
+    Firebird_path = str(ADir('../../../github_source/Firebird-5.0.0.1306-0-linux-x64'))
+    down_url = "https://github.com/FirebirdSQL/firebird/releases/download/v5.0.0/Firebird-5.0.0.1306-0-linux-x64.tar.gz"
+    package_name = 'Firebird-5.0.0.1306-0-linux-x64'
+    INCLUDE.append(os.path.join(str(Firebird_path),package_name, 'buildroot/opt/firebird/include'))
+    DYNAMIC_LIB.append(os.path.join(str(Firebird_path),package_name, 'buildroot/opt/firebird/lib/libfbclient.so.2'))
+
+
+if not os.path.exists(Firebird_path):
+    zip_file = Firebird_path + '.tar.gz'
+    zip_file_extrpath = Firebird_path
+    
+    if 'CONFIG_REPO_AUTOMATION' in os.environ:
+        down = 'y'
+    else:
+        down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(package_name))
+        down = down.lower()
+    if down == 'y':
+        # from git import Repo
+        import requests
+        import parse
+        import tarfile
+        import shutil
+        try:
+            # Downloading via HTTP (more common)
+            if not os.path.exists(zip_file):
+                response = requests.get(down_url)
+                if response.status_code == 200:
+                    with open(zip_file, 'wb') as file:
+                        file.write(response.content)
+                else:
+                    env.Fatal("{} down failed".format(down_url))
+            with tarfile.open(zip_file, 'r:gz') as tar:
+                tar.extractall(zip_file_extrpath)
+            with tarfile.open(os.path.join(zip_file_extrpath, package_name, 'buildroot.tar.gz'), 'r:gz') as tar:
+                tar.extractall(os.path.join(zip_file_extrpath, package_name, 'buildroot'))
+            print("The {} download successful.".format(down_url))
+        except Exception as e:
+            print('Please manually download {} to {} .'.format(down_url, zip_file))
+            env.Fatal("Cloning failed.: {}".format(e))
+    else:
+        env.Fatal('Please manually download {} to {} .'.format(down_url, zip_file))
+
+
+env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
+                        'SRCS':SRCS,
+                        'INCLUDE':INCLUDE,
+                        'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                        'REQUIREMENTS':REQUIREMENTS,
+                        'STATIC_LIB':STATIC_LIB,
+                        'DYNAMIC_LIB':DYNAMIC_LIB,
+                        'DEFINITIONS':DEFINITIONS,
+                        'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                        'LDFLAGS':LDFLAGS,
+                        'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                        'REGISTER':'project'
+                        })
