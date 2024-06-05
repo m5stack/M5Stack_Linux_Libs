@@ -1,0 +1,35 @@
+# component2/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+if 'CONFIG_TOMMATH_ENABLED' in os.environ:
+    check_component('libtommath')
+    SRCS=[]
+    INCLUDE=[]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=[]
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=['-Wall -Wsign-compare -Wextra -Wshadow -Wdeclaration-after-statement -Wbad-function-cast -Wcast-align -Wstrict-prototypes -Wpointer-arith -Wsystem-headers -O3 -funroll-loops -fomit-frame-pointer']
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+    
+    INCLUDE.append(ADir('../../github_source/libtommath'))
+    SRCS += AGlob('../../github_source/libtommath/*.c*')
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'shared' if 'CONFIG_TOMMATH_DYNAMIC' in os.environ else 'static'
+                            })
