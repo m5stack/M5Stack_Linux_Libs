@@ -63,7 +63,7 @@ INCLUDE += [ADir('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-lin
 STATIC_LIB += Glob('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/*.a')
 STATIC_LIB += Glob('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/*.a')
 
-STATIC_FILES = [AFile('../img/06b.jpg')]
+#STATIC_FILES = [AFile('../img/06b.jpg')]
 
 env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
                           'SRCS':SRCS,
@@ -71,7 +71,7 @@ env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
                           'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
                           'REQUIREMENTS':REQUIREMENTS,
                           'STATIC_LIB':STATIC_LIB,
-                          'STATIC_FILES':STATIC_FILES,
+#                          'STATIC_FILES':STATIC_FILES,
                           'DYNAMIC_LIB':DYNAMIC_LIB,
                           'DEFINITIONS':DEFINITIONS,
                           'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
