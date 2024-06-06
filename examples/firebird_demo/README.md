@@ -14,12 +14,14 @@ Features:
 8. Highly portable, capable of running on Linux, Unix, MacOS, Windows, Solaris systems with the same database format, requiring no modifications.  
 9. Excellent development environment support, where applications can be developed based on Firebird directly using native development interfaces without the need for ODBC connections, such as in Delphi and C++Builder.  
 
+This engineering demo allows your CoreMP135 device to transform into a simple IoT database server!
 
 ## Installation
 The official website of Firebird provides precompiled binary files of the Firebird database, which are available for each platform. You just need to go to [firebird](https://www.firebirdsql.org/) to get the installation package of the corresponding platform.
 
 Installation on ARM:
 ```bash
+sudo apt install libtommath1
 wget https://github.com/FirebirdSQL/firebird/releases/download/v5.0.0/Firebird-5.0.0.1306-0-linux-arm32.tar.gz
 tar zxvf Firebird-5.0.0.1306-0-linux-arm32.tar.gz
 cd Firebird-5.0.0.1306-0-linux-arm32
@@ -150,10 +152,42 @@ con.close()
 ```
 
 
+## To use ODBC (Open Database Connectivity) on Ubuntu, you need to install the following software and configure certain files:
+
+1. **Install Necessary Software**:
+ - **unixODBC**: This is the driver manager for ODBC on Unix systems. You can install it using the following command:
+ ```
+ sudo apt-get install unixODBC unixODBC-dev 
+ ```
+ - **ODBC Driver**: Depending on the database you want to connect to, you might need to install the specific ODBC driver. For example, for MySQL, you can install `libmyodbc` or `myodbc-installer`. For Firebird， you need down [Firebird odbc Driver](https://firebirdsql.org/en/odbc-driver/), and create a symbolic link from firebird libfbclient.so.5.0.0 to /lib/libgds.so.
 
 
+2. **Configure ODBC**:
+ - **odbcinst.ini**: This file is used to configure the ODBC drivers. It typically resides in `/etc/odbcinst.ini`. Here is an example configuration for a Firebird driver:
+ ```
+[Firebird]
+Description = Firebird ODBC driver
+Driver = /usr/lib/x86_64-linux-gnu/odbc/libOdbcFb.so
+Setup = /usr/lib/x86_64-linux-gnu/odbc/libOdbcFb.so
+ ```
+ - **odbc.ini**: This file is used to configure the data sources. It typically resides in `/etc/odbc.ini`. Here is an example configuration for a data source named `FirebirdDSN`:
+  ```
+  [FirebirdDSN]
+  Description = Firebird Database
+  Driver = Firebird
+  Dbname = 127.0.0.1:/opt/firebird_db_files/database.fdb
+  User = xxxxx
+  Password = xxxxx
+  ```
 
+3. **Test the Connection**:
+ - You can test the ODBC connection using the `isql` command, which is part of the unixODBC package:
+ ```
+ isql -v FirebirdDSN
+ ```
+ - Replace `FirebirdDSN` with the name of your data source as configured in `odbc.ini`.
 
+Make sure to replace the paths and configurations with the appropriate values for your system and database setup.
 
 
 
