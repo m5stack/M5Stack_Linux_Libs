@@ -98,5 +98,3 @@ scons menuconfig
 
 Please review the documentation files located in the 'doc' directory.
 - [Detailed description of this framework.](./assets/README.md)
-
-parse
