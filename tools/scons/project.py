@@ -175,6 +175,10 @@ def build_task_init():
                 Pobj = pattern.parse(line)
                 if Pobj:
                     key, value = Pobj.fixed
+                    if key == 'TOOLCHAIN_PREFIX' and value == '""' and 'CONFIG_TOOLCHAIN_PREFIX' in os.environ:
+                        value = os.environ['CONFIG_TOOLCHAIN_PREFIX']
+                    if key == 'TOOLCHAIN_PATH' and value == '""' and 'CONFIG_TOOLCHAIN_PATH' in os.environ:
+                        value = os.environ['CONFIG_TOOLCHAIN_PATH']
                     os.environ['CONFIG_' + key] = value.strip('"')
     except:
         pass
@@ -219,12 +223,12 @@ def build_task_init():
         if os.environ['CONFIG_TOOLCHAIN_PATH']:
             env['ENV']['PATH'] = os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"') + ':' + env['ENV']['PATH']
         if os.environ['CONFIG_TOOLCHAIN_PREFIX']:
-            CONFIG_TOOLCHAIN_PATH = os.environ['CONFIG_TOOLCHAIN_PREFIX']
-            env['CC'] = CONFIG_TOOLCHAIN_PATH + 'gcc'
-            env['AS'] = CONFIG_TOOLCHAIN_PATH + 'as'
-            env['AR'] = CONFIG_TOOLCHAIN_PATH + 'ar'
-            env['CXX'] = CONFIG_TOOLCHAIN_PATH + 'g++'
-            env['LINK'] = CONFIG_TOOLCHAIN_PATH + 'g++'
+            CONFIG_TOOLCHAIN_PREFIX = os.environ['CONFIG_TOOLCHAIN_PREFIX']
+            env['CC'] = CONFIG_TOOLCHAIN_PREFIX + 'gcc'
+            env['AS'] = CONFIG_TOOLCHAIN_PREFIX + 'as'
+            env['AR'] = CONFIG_TOOLCHAIN_PREFIX + 'ar'
+            env['CXX'] = CONFIG_TOOLCHAIN_PREFIX + 'g++'
+            env['LINK'] = CONFIG_TOOLCHAIN_PREFIX + 'g++'
     else:
         print('unknow os!')
 
