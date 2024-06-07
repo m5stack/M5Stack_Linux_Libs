@@ -40,6 +40,9 @@ sudo apt update
 sudo apt install python3 python3-pip
 pip3 install gitpython parse scons pexpect paramiko scp zipfile requests
 
+wget https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/linaro/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf.tar.xz
+sudo tar Jxvf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt
+
 # Navigate to the "examples/demo1" directory.
 cd examples/demo1
 
