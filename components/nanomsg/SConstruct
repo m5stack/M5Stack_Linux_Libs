@@ -7,7 +7,8 @@ with open(env["PROJECT_TOOL_S"]) as f:
 
 
 if "CONFIG_NANOMSG_ENABLED" in os.environ:
-    SRCS = [AFile("test.c")]
+    check_component('nanomsg')
+    SRCS = []
     INCLUDE = [ADir("include")]
     PRIVATE_INCLUDE = []
     REQUIREMENTS = []
@@ -26,7 +27,7 @@ if "CONFIG_NANOMSG_ENABLED" in os.environ:
         "-DNN_HAVE_EPOLL=1",
         "-DNN_HAVE_EVENTFD=1",
         "-DNN_HAVE_GCC_ATOMIC_BUILTINS",
-        "-DNN_HAVE_GETADDRINFO_A=1",
+        # "-DNN_HAVE_GETADDRINFO_A=1",
         "-DNN_HAVE_LIBNSL=1",
         "-DNN_HAVE_LINUX",
         "-DNN_HAVE_MSG_CONTROL=1",
