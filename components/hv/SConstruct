@@ -5,7 +5,6 @@ with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
 
-
 if 'CONFIG_LHV_ENABLED' in os.environ:
     check_component('libhv')
     SRCS=[]
@@ -18,27 +17,24 @@ if 'CONFIG_LHV_ENABLED' in os.environ:
     DEFINITIONS_PRIVATE=['-w']
     LDFLAGS=[]
     LINK_SEARCH_PATH=[]
-    
-    INCLUDE.append(ADir('include'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/base'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/util'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/event'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/ssl'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/event/kcp'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/protocol'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/evpp'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/cpputil'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/http'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/http/client'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/http/server'))
-    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/mqtt'))
+    head_dirs = ['.', 'base', 'util', 'event', 'ssl', 'event/kcp', 'protocol', 'evpp', 'cpputil', 'http', 'http/client', 'http/server', 'mqtt', 'misc']
+    include_dir = str(ADir('../../github_source/libhv/include/hv'))
+    if not os.path.exists(include_dir):
+        import shutil
+        os.makedirs(include_dir)
+        for _dir in head_dirs:
+            for head_file in AGlob(os.path.join('../../github_source/libhv', _dir, '*.h')):
+                shutil.copy2(str(head_file), include_dir)
+            for head_file in AGlob(os.path.join('../../github_source/libhv', _dir, '*.hpp')):
+                shutil.copy2(str(head_file), include_dir)
+
+    PRIVATE_INCLUDE.append(ADir('../../github_source/libhv/include/hv'))
+    INCLUDE.append(ADir('../../github_source/libhv/include'))
 
     SRCS += AGlob('../../github_source/libhv/base/*.c*')
     SRCS += AGlob('../../github_source/libhv/util/*.c*')
     SRCS += AGlob('../../github_source/libhv/event/*.c*')
     SRCS += AGlob('../../github_source/libhv/ssl/*.c*')
-
 
     if 'CONFIG_LHV_WITH_KCP' in os.environ:
         SRCS += AGlob('../../github_source/libhv/event/kcp/*.c*')

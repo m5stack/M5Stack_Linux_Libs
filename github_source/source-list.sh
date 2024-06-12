@@ -14,6 +14,7 @@ git_clone_and_checkout_commit()
 
 git_clone_and_checkout_commit https://github.com/dianjixz/mongoose.git      dd5118cab0813078dbbfd116f1489c6a03a42cae
 git_clone_and_checkout_commit https://github.com/dianjixz/libhv.git         1ab8a8e551a5ab668988549779578553e3c3aa1e
+# git_clone_and_checkout_commit https://github.com/ithewei/libhv.git         c4e3b536fee8c2bfa67eec70eedf5ea0f0a4f60f
 git_clone_and_checkout_commit https://github.com/dianjixz/RtspServer.git    905357880a73b5e03fb2adb17b7df10eadcd5e4a
 git_clone_and_checkout_commit https://github.com/dianjixz/xop.git           b8c034d72a7d879e92ec3cbc2082481c78205cd1
 git_clone_and_checkout_commit https://github.com/dianjixz/gear-lib.git      cf68fddccefafaa4a5b05082819f66d8419f5811
@@ -21,8 +22,8 @@ git_clone_and_checkout_commit https://github.com/dianjixz/stb.git           5736
 git_clone_and_checkout_commit https://github.com/dianjixz/libs.git          a6456b8e7f1564b0c94c329509fe9652bb5a096b
 git_clone_and_checkout_commit https://github.com/dianjixz/nanomsg.git       2d01e935e4554580da4e9dbd94964af94e0ded9c
 git_clone_and_checkout_commit https://github.com/dianjixz/nng.git           c5e9d8acfc226418dedcf2e34a617bffae043ff6
-cd lvgl && git_clone_and_checkout_commit https://github.com/dianjixz/lvgl.git          5cdf242a21a0897ee1f24b85040d2993a817b822
-cd lvgl && git_clone_and_checkout_commit https://github.com/lvgl/lv_drivers.git        820341ea15d0e9f0faaf0b508ba03c3ef9cb1a88
+# cd lvgl && git_clone_and_checkout_commit https://github.com/dianjixz/lvgl.git          5cdf242a21a0897ee1f24b85040d2993a817b822
+# cd lvgl && git_clone_and_checkout_commit https://github.com/lvgl/lv_drivers.git        820341ea15d0e9f0faaf0b508ba03c3ef9cb1a88
 git_clone_and_checkout_commit https://github.com/dianjixz/toolkit.git       64120e079446c77990d892865fa5a105fc46036f
 git_clone_and_checkout_commit https://github.com/dianjixz/tbox.git          2e0cac8bae7a8bc921114b1e482fefd8f8a5d55e
 git_clone_and_checkout_commit https://github.com/wuhanstudio/u8g2-arm-linux.git 31a02e6e22ece76fe9bca45d472ed28c4dea720b
