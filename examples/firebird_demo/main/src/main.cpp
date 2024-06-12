@@ -3,7 +3,18 @@
 *
 * SPDX-License-Identifier: MIT
 */
-
+/**
+ * The SQL statements executed in this program.
+ * CREATE TABLE TEST1_TABLE (id INTEGER NOT NULL, name VARCHAR(50), PRIMARY KEY (id));
+ * INSERT INTO TEST1_TABLE (id, name) VALUES (1, 'Alice');
+ * INSERT INTO TEST1_TABLE (id, name) VALUES (2, 'Bob');
+ * SELECT * FROM TEST1_TABLE;
+ * UPDATE TEST1_TABLE SET name = 'Charlie' WHERE id = 2;
+ * SELECT * FROM TEST1_TABLE;
+ * DELETE FROM TEST1_TABLE WHERE id = 1;
+ * SELECT * FROM TEST1_TABLE;
+ * DELETE FROM TEST1_TABLE WHERE id = 2;
+*/
 #include <ibase.h>
 #include <cstring>
 #include <iostream>

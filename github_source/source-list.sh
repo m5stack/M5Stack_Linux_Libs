@@ -38,7 +38,7 @@ git_clone_and_checkout_commit https://github.com/stephane/libmodbus.git   5c14f1
 git_clone_and_checkout_commit https://github.com/lovyan03/LovyanGFX.git   4fd713ebd3019d17c6c89c6e2f7171d2cafeff23
 git_clone_and_checkout_commit https://github.com/Tencent/ncnn.git   5e9bf90455b02a25e7991dab4ab8b3035a4bebb3
 git_clone_and_checkout_commit https://github.com/libtom/libtommath.git   97e500351e653472b2ea00b37137ad0414165efe
-
+git_clone_and_checkout_commit https://github.com/talybin/firebird.git   16bb82d461bbb0bae10390adc20fe75ef4f420d4
 
 # opencv-mobile-2.4.13.7-armlinux https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip
 
