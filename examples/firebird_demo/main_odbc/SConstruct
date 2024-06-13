@@ -17,11 +17,10 @@ DEFINITIONS_PRIVATE = []
 LDFLAGS = []
 LINK_SEARCH_PATH = []
 
-gcc_dumpmachine = env['GCC_DUMPMACHINE'].split('-')
-
-if 'arm' in gcc_dumpmachine and 'gnueabihf' in gcc_dumpmachine:
-    print('Currently, only x86 host platforms are supported, other platforms are not supported.')
-elif 'x86_64' in gcc_dumpmachine and 'linux' in gcc_dumpmachine:
+libodbc = CC_cmd_execute(['-print-file-name=libodbc.so'])
+if libodbc == 'libodbc.so' or libodbc == '':
+    print('The main_odbc requires the installation of the ODBC library.')
+else:
     env['COMPONENTS'].append({'target':'odbc_demo',
                             'SRCS':SRCS,
                             'INCLUDE':INCLUDE,
