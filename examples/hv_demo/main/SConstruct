@@ -8,7 +8,7 @@ with open(env['PROJECT_TOOL_S']) as f:
 SRCS = []
 INCLUDE = [ADir('include'), ADir('.')]
 PRIVATE_INCLUDE = []
-REQUIREMENTS = ['pthread', 'hv']
+REQUIREMENTS = ['hv', 'pthread']
 STATIC_LIB = []
 DYNAMIC_LIB = []
 DEFINITIONS = []
