@@ -1,0 +1,24 @@
+menuconfig STATIC_PACKAGE_ENABLED
+    bool "static_package configuration"
+    default n
+
+    menuconfig OPENCV_LIB_ENABLED
+        bool "opencv lib"
+        default n
+        depends on STATIC_PACKAGE_ENABLED
+        help
+            include opencv lib(from gcc)
+
+        choice
+            prompt "opencv versions"
+            default OPENCV_LIB_NCNN_ENABLED
+            depends on OPENCV_LIB_ENABLED
+        config OPENCV_LIB_AXERA_ENABLED
+            bool "include opencv-arm-linux lib"
+            help
+                build by AXERA!
+        config OPENCV_LIB_NCNN_ENABLED
+            bool "include opencv-mobile-2.4.13.7-armlinux lib"
+            help
+                build by NCNN!
+        endchoice
