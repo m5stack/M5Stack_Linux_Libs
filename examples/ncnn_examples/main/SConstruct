@@ -9,7 +9,7 @@ with open(env['PROJECT_TOOL_S']) as f:
 SRCS = Glob('src/*.c*')
 INCLUDE = [ADir('include'), ADir('.')]
 PRIVATE_INCLUDE = []
-REQUIREMENTS = ['pthread', 'ncnn', 'dl', 'gomp']
+REQUIREMENTS = ['pthread', 'ncnn', 'dl']
 STATIC_LIB = []
 DYNAMIC_LIB = []
 DEFINITIONS = []
@@ -18,16 +18,14 @@ LDFLAGS = []
 LINK_SEARCH_PATH = []
 gcc_dumpmachine = env['GCC_DUMPMACHINE'].split('-')
 
-if 'arm' in gcc_dumpmachine and 'gnueabihf' in gcc_dumpmachine:
-    INCLUDE.append(ADir('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/include'))
-    STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_core.a'))
-    STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_highgui.a'))
-    STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_imgproc.a'))
-    STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_photo.a'))
-    STATIC_LIB.append(AFile('../../../github_source/opencv-mobile-2.4.13.7-armlinux/arm-linux-gnueabihf/lib/libopencv_video.a'))
-elif 'x86_64' in gcc_dumpmachine and 'linux' in gcc_dumpmachine:
+if 'x86_64' in gcc_dumpmachine and 'linux' in gcc_dumpmachine:
     INCLUDE.append('/usr/local/include/opencv4')
-    REQUIREMENTS += ['opencv_core', 'opencv_highgui', 'opencv_imgproc', 'opencv_photo', 'opencv_video', 'opencv_imgcodecs', 'opencv_videoio']
+    REQUIREMENTS += ['opencv_core', 'opencv_highgui', 'opencv_imgproc', 'opencv_photo', 'opencv_video', 'opencv_imgcodecs', 'opencv_videoio', 'gomp']
+else:
+    libgomp = CC_cmd_execute(['-print-file-name=libgomp.so.1'])
+    DYNAMIC_LIB.append(libgomp)
+    REQUIREMENTS += ['static_package']
+
 
 DEFINITIONS += ['-Wl,-rpath=./']
 
