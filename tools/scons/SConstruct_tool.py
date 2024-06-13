@@ -98,7 +98,11 @@ def check_component(component_name):
                         else:
                             env.Fatal("{} down failed".format(down_url))
                     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-                        zip_ref.extractall(zip_file_extrpath)
+                        for file_info in zip_ref.infolist():
+                            try:
+                                zip_ref.extract(file_info, zip_file_extrpath)
+                            except Exception as e:
+                                pass
                     shutil.move(zip_file_next_path, env['GIT_REPO_LISTS'][component_name]['path'])
                     shutil.rmtree(zip_file_extrpath)
                     # The way to download Git is to download the Git software package.
@@ -117,7 +121,7 @@ def CC_cmd_execute(cmd):
     import subprocess
     try:
         new_env = os.environ.copy()
-        new_env['PATH'] += env['ENV']['PATH']
+        new_env['PATH'] = env['ENV']['PATH']
         result = subprocess.run([env['CC']] + cmd, env=new_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
         out = result.stdout.strip()
     except:

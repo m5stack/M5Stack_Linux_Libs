@@ -236,7 +236,7 @@ def build_task_init():
     
     try:
         new_env = os.environ.copy()
-        new_env['PATH'] += env['ENV']['PATH']
+        new_env['PATH'] = env['ENV']['PATH']
         result = subprocess.run([env['CC'], '-dumpmachine'], env=new_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
         env['GCC_DUMPMACHINE'] = result.stdout.strip()
     except:
