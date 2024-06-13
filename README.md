@@ -36,9 +36,11 @@ Framework relies on the following software packages: make, cmake, python3, and e
 ``` bash
 # Assuming your current terminal is in the "dianjixz-lib" directory.
 # Install Dependencies (Only Needs to be Done Once)
+# The version of Python3 should be greater than or equal to 3.8.
 sudo apt update
-sudo apt install python3 python3-pip
-pip3 install gitpython parse scons pexpect paramiko scp zipfile requests
+sudo apt install python3 python3-pip libffi-dev
+pip3 install parse scons requests
+pip3 install setuptools-rust paramiko scp
 
 wget https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/linaro/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf.tar.xz
 sudo tar Jxvf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt
