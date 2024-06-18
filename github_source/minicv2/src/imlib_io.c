@@ -81,7 +81,7 @@ void imlib_printf_image_info(void *img)
         printf("imlib image info:\n\t\twidth:%d height:%d mode:PIXFORMAT_RGB888 size:%d pixels:%p is_data_alloc:%d \n", imlib_img->w, imlib_img->h, imlib_img->size, imlib_img->pixels, imlib_img->is_data_alloc);
         break;
     default:
-        printf("image is not info\n");
+        printf("imlib image info:\n\t\twidth:%d height:%d mode:%d size:%d pixels:%p is_data_alloc:%d \n", imlib_img->w, imlib_img->h,imlib_img->pixfmt, imlib_img->size, imlib_img->pixels, imlib_img->is_data_alloc);
         break;
     }
 }

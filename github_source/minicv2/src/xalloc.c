@@ -19,7 +19,7 @@
 
 int Debug_s = 0;
 
-#define LOG_PRINT(fmt, ...) do{\
+#define LOG_PRINT_P(fmt, ...) do{\
 	if(Debug_s)\
 	{\
 		printf(fmt"  [info:%s:%d] [%s]\n", ##__VA_ARGS__, __FILE__, __LINE__, __FUNCTION__);\
@@ -42,7 +42,7 @@ void *xalloc(size_t size)
     if (size && (mem == NULL)) {
         xalloc_fail(size);
     }
-    LOG_PRINT("xalloc:%p", mem);
+    LOG_PRINT_P("xalloc:%p", mem);
     return mem;
 }
 
@@ -60,7 +60,7 @@ void *xalloc0(size_t size)
         xalloc_fail(size);
     }
     memset(mem, 0, size);
-    LOG_PRINT("xalloc0:%p", mem);
+    LOG_PRINT_P("xalloc0:%p", mem);
     return mem;
 }
 
@@ -68,7 +68,7 @@ void *xalloc0(size_t size)
 void xfree(void *mem)
 {
     free(mem);
-    LOG_PRINT("xfree:%p", mem);
+    LOG_PRINT_P("xfree:%p", mem);
 }
 
 // returns null pointer without error if size==0
@@ -80,7 +80,7 @@ void *xrealloc(void *mem, size_t size)
     if (size && (mem == NULL)) {
         xalloc_fail(size);
     }
-    LOG_PRINT("xrealloc:%p", mem);
+    LOG_PRINT_P("xrealloc:%p", mem);
     return mem;
 }
 void *xcalloc(size_t nitems, size_t size)
@@ -89,7 +89,7 @@ void *xcalloc(size_t nitems, size_t size)
     if (size && (mem == NULL)) {
         xalloc_fail(size);
     }
-    LOG_PRINT("xalloc_fail:%p", mem);
+    LOG_PRINT_P("xalloc_fail:%p", mem);
     return mem;
 }
 

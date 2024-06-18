@@ -630,6 +630,79 @@ uint32_t imlib_yuv_to_rgb888(uint8_t y, int8_t u, int8_t v)
 
     return COLOR_R8_G8_B8_TO_RGB888(r, g, b);
 }
+uint32_t imlib_yuv442_to_rgb(uint8_t Y0, uint8_t U, uint8_t Y1, uint8_t V)
+{
+    int R, G, B;
+    int Ruv, Guv, Buv;
+    int Delta;
+
+    Ruv   = 1187 * (V - 128);
+    Guv   = -389 * (U - 128) + 833 * (V - 128);
+    Buv   = 2066 * (U - 128);
+
+    Delta = 1192 * (Y0 - 16);
+
+    R = (Delta + Ruv) >> 10;
+    G = (Delta - Guv) >> 10;
+    B = (Delta + Buv) >> 10;
+
+    R = IM_MAX(IM_MIN(R, COLOR_R8_MAX), COLOR_R8_MIN);
+    G = IM_MAX(IM_MIN(G, COLOR_R8_MAX), COLOR_R8_MIN);
+    B = IM_MAX(IM_MIN(B, COLOR_R8_MAX), COLOR_R8_MIN);
+
+    uint16_t Pixel0 = COLOR_R8_G8_B8_TO_RGB565(R, G, B);
+
+    Delta = 1192 * (Y1 - 16);
+
+    R = (Delta + Ruv) >> 10;
+    G = (Delta - Guv) >> 10;
+    B = (Delta + Buv) >> 10;
+
+    R = IM_MAX(IM_MIN(R, COLOR_R8_MAX), COLOR_R8_MIN);
+    G = IM_MAX(IM_MIN(G, COLOR_R8_MAX), COLOR_R8_MIN);
+    B = IM_MAX(IM_MIN(B, COLOR_R8_MAX), COLOR_R8_MIN);
+
+    uint16_t Pixel1 = COLOR_R8_G8_B8_TO_RGB565(R, G, B);
+
+    return  (uint32_t)(Pixel1 << 16 | Pixel0);
+}
+uint64_t imlib_yuv442_to_rgb888(uint8_t Y0, uint8_t U, uint8_t Y1, uint8_t V)
+{
+    int R, G, B;
+    int Ruv, Guv, Buv;
+    int Delta;
+
+    Ruv   = 1187 * (V - 128);
+    Guv   = -389 * (U - 128) + 833 * (V - 128);
+    Buv   = 2066 * (U - 128);
+
+    Delta = 1192 * (Y0 - 16);
+
+    R = (Delta + Ruv) >> 10;
+    G = (Delta - Guv) >> 10;
+    B = (Delta + Buv) >> 10;
+
+    R = IM_MAX(IM_MIN(R, COLOR_R8_MAX), COLOR_R8_MIN);
+    G = IM_MAX(IM_MIN(G, COLOR_R8_MAX), COLOR_R8_MIN);
+    B = IM_MAX(IM_MIN(B, COLOR_R8_MAX), COLOR_R8_MIN);
+
+    uint16_t Pixel0 = COLOR_R8_G8_B8_TO_RGB565(R, G, B);
+
+    Delta = 1192 * (Y1 - 16);
+
+    R = (Delta + Ruv) >> 10;
+    G = (Delta - Guv) >> 10;
+    B = (Delta + Buv) >> 10;
+
+    R = IM_MAX(IM_MIN(R, COLOR_R8_MAX), COLOR_R8_MIN);
+    G = IM_MAX(IM_MIN(G, COLOR_R8_MAX), COLOR_R8_MIN);
+    B = IM_MAX(IM_MIN(B, COLOR_R8_MAX), COLOR_R8_MIN);
+
+    uint32_t Pixel1 = COLOR_R8_G8_B8_TO_RGB888(R, G, B);
+    uint64_t Pixel = Pixel1;
+    Pixel = Pixel<<32 | Pixel0;
+    return  Pixel;
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(IMLIB_ENABLE_IMAGE_FILE_IO)
@@ -1544,7 +1617,7 @@ size_t __imlib_flood_fill_int(image_t *out, image_t *img, int x, int y,
 
 
 
-// #ifdef IMLIB_ENABLE_FLOOD_FILL
+#ifdef CUSTOM_IMLIB_ENABLE_FLOOD_FILL
 
 size_t __imlib_flood_fill(image_t *img, int x, int y,
                       float seed_threshold, float floating_threshold,
@@ -1649,7 +1722,7 @@ size_t __imlib_flood_fill(image_t *img, int x, int y,
     }
 	return count;
 }
-// #endif // IMLIB_ENABLE_FLOOD_FILL
+
 
 
 
@@ -1801,3 +1874,5 @@ void imlib_find_domain(image_t* img, image_t** dst, float edge_gate)
 		return ;
 	}
 }
+
+#endif // CUSTOM_IMLIB_ENABLE_FLOOD_FILL

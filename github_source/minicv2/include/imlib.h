@@ -1344,6 +1344,8 @@ uint16_t imlib_lab_to_rgb(uint8_t l, int8_t a, int8_t b);
 uint16_t imlib_yuv_to_rgb(uint8_t y, int8_t u, int8_t v);
 uint32_t imlib_lab_to_rgb888(uint8_t l, int8_t a, int8_t b);
 uint32_t imlib_yuv_to_rgb888(uint8_t y, int8_t u, int8_t v);
+uint32_t imlib_yuv442_to_rgb(uint8_t Y0, uint8_t U, uint8_t Y1, uint8_t V);
+uint64_t imlib_yuv442_to_rgb888(uint8_t Y0, uint8_t U, uint8_t Y1, uint8_t V);
 
 /* Image file functions */
 void ppm_read_geometry(FIL *fp, image_t *img, const char *path, ppm_read_settings_t *rs);
