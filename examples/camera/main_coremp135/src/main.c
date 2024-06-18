@@ -1,28 +1,9 @@
-/* main.c */
-/**
- * author:  rootming, dianjixz
- * date:    2019.4
- * version: v1.0
- * Copyright (c) 2024 M5Stack Technology CO LTD
- */
-
 /*
-    # Video capture
-    ## Basic note
-    1. use V4L2 interface open camera & capture video
-    2. use framebuffer driver for preview
-    3. text overlay video
-    4. use h264 algorithm compresse frame
-    ## Hardware
-    1. CoreMP135
-    2. USB camera
-    ## Target
-    1. capture frame size: 320*240
-    2. display fps: 20fps
-    3. memory limit: <20M
-    ## Addtion
-    1. Maybe can add log library
-*/
+ * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+ *
+ * SPDX-License-Identifier: MIT
+ */
+#include <sample_log.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -30,62 +11,57 @@
 #include <string.h>
 
 #include "camera.h"
-#include "config.h"
-#include "display.h"
-#include "queue.h"
+#include "framebuffer/fbtools.h"
+#include "imlib.h"
 
-#ifdef CONFIG_ENCODE_ENABLE
-#include "encode.h"
-#endif  // CONFIG_ENCODE_ENABLE
+#define CONFIG_DISPLAY_DEV "/dev/fb1"  // lcd
 
-/* 入队列回调 */
-void EnQueueCallback(uint8_t* pData, uint32_t Width, uint32_t Height,
-                     uint32_t Length) {
-    sQueueData QueueData;
-    QueueData.pData = malloc(Length);
-    if (!QueueData.pData) {
-        perror("Malloc failed");
-        return;
-    }
-    QueueData.Length = Length;
-    memcpy(QueueData.pData, pData, Length);
-    QueuePutData(&QueueData);
+FBDEV fbdev;
+image_t* img;
+image_t* fb_img;
+Camera_t* cam = NULL;
+
+void DisplayCallback(uint8_t* pData, uint32_t Width, uint32_t Height, uint32_t Length) {
+    // SLOGI("Get img Width Width Length %d %d %d\n", Width, Height, Length);
+    img->data = pData;
+    imlib_pixfmt_to(fb_img, img, NULL);
 }
 
 void SignalHandle(int SignalNumber) {
     printf("Now clean resource\n");
-    CameraCaptureStop();
-    CameraClose();
-    DisplayStop();
-#ifdef CONFIG_ENCODE_ENABLE
-    EncodeStop();
-#endif  // CONFIG_ENCODE_ENABLE
+    cam->CameraCaptureStop(cam);
+    CameraClose(cam);
+    cam = NULL;
+
+    imlib_image_destroy(&img);
+    imlib_image_destroy(&fb_img);
+    fb_close(&fbdev);
 }
 
 int main(int Argc, char* pArgv[]) {
     int Ret = -1;
-
+    int w = CONFIG_CAPTURE_WIDTH, h = CONFIG_CAPTURE_HEIGHT;
     signal(SIGINT, SignalHandle);
 
-    Ret = CameraOpen(CONFIG_CAPTURE_DEVICE);
-    if (Ret) {
+    memset(&fbdev, 0, sizeof(FBDEV));
+    strcpy(fbdev.dev, CONFIG_DISPLAY_DEV);
+
+    if (fb_open(&fbdev) == false) {
+        printf("open frame buffer error/n");
+        return -1;
+    }
+
+    fb_img = imlib_image_create(w, h, PIXFORMAT_RGB565, w * h * 2, (void*)fbdev.fb_mem, 0);
+
+    img = imlib_image_create(w, h, PIXFORMAT_YUV422, w * h * 2, NULL, 0);
+    cam = CameraOpen(CONFIG_CAPTURE_DEVICE);
+    if (cam == NULL) {
         printf("Camera open failed \n");
         return -1;
     }
 
-    Ret = DisplayInit(CONFIG_DISPLAY_DEV);
-
-    if (Ret) {
-        printf("Diaplay open failed \n");
-        return -1;
-    }
-
-    CameraCaptureCallbackSet(EnQueueCallback);
-    CameraCaptureStart();
-    DisplayStart();
-#ifdef CONFIG_ENCODE_ENABLE
-    EncodeStart("test.h264");
-#endif  // CONFIG_ENCODE_ENABLE
+    cam->CameraCaptureCallbackSet(cam, DisplayCallback);
+    cam->CameraCaptureStart(cam);
 
     char KeyValue = getchar();
     printf("You press [%c] button, now stop capture\n", KeyValue);
