@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "camera.h"
 #include "framebuffer/fbtools.h"
@@ -25,6 +26,21 @@ void DisplayCallback(uint8_t* pData, uint32_t Width, uint32_t Height, uint32_t L
     // SLOGI("Get img Width Width Length %d %d %d\n", Width, Height, Length);
     img->data = pData;
     imlib_pixfmt_to(fb_img, img, NULL);
+    {
+        static int fcnt = 0, fps;
+        fcnt++;
+        static struct timespec ts1, ts2;
+        clock_gettime(CLOCK_MONOTONIC, &ts2);
+        if ((ts2.tv_sec * 1000 + ts2.tv_nsec / 1000000) - (ts1.tv_sec * 1000 + ts1.tv_nsec / 1000000) >= 1000) {
+            // printf("FPS:%d\n", fps);
+            fps  = fcnt;
+            ts1  = ts2;
+            fcnt = 0;
+        }
+        char strs[100];
+        sprintf(strs, "FPS:%d", fps);
+        imlib_draw_string(fb_img, 10, 10, strs, COLOR_R8_G8_B8_TO_RGB565(0xff, 0, 0), 2, 0, 0, 1, 0, 0, 0, 0, 0, 0);
+    }
 }
 
 void SignalHandle(int SignalNumber) {
