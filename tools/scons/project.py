@@ -175,72 +175,105 @@ def build_task_init():
                 Pobj = pattern.parse(line)
                 if Pobj:
                     key, value = Pobj.fixed
-                    if key == 'TOOLCHAIN_PREFIX' and value == '""' and 'CONFIG_TOOLCHAIN_PREFIX' in os.environ:
-                        value = os.environ['CONFIG_TOOLCHAIN_PREFIX']
-                    if key == 'TOOLCHAIN_PATH' and value == '""' and 'CONFIG_TOOLCHAIN_PATH' in os.environ:
-                        value = os.environ['CONFIG_TOOLCHAIN_PATH']
-                    os.environ['CONFIG_' + key] = value.strip('"')
+                    key = 'CONFIG_' + key 
+                    if key in os.environ:
+                        continue
+                    os.environ[key] = value.strip('"')
+
     except:
-        pass
+        print('Error in parsing the {}'.format(GLOBAL_CONFIG_MK_FILE))
+        exit(-1)
 
+    env = Environment(tools=['gcc', 'g++', 'gnulink', 'ar', 'gas', 'as'])
+    env['GCCPREFIX'] = ''
+    env['GCCSUFFIX'] = ''
+    env['LINK'] = '$SMARTLINK'
+    env['SHLINK'] = '$LINK'
+    env['OBJPREFIX'] = ''
+    env['OBJSUFFIX'] = '.o'
+    env['LIBPREFIX'] = 'lib'
+    env['LIBSUFFIX'] = '.a'
+    env['SHLIBPREFIX'] = '$LIBPREFIX'
+    env['SHLIBSUFFIX'] = '.so'
+    env['INCPREFIX'] = '-I'
+    env['INCSUFFIX'] = ''
+    env['LIBDIRPREFIX'] = '-L'
+    env['LIBDIRSUFFIX'] = ''
+    env['LIBLINKPREFIX'] = '-l'
+    env['LIBLINKSUFFIX'] = ''
+    env['CPPDEFPREFIX'] = '-D'
+    env['CPPDEFSUFFIX'] = ''
+    env['PROGSUFFIX'] = ''
+    env['ARFLAGS'] = ['rc']
+    env['SHCCFLAGS'] = ['$CCFLAGS', '-fPIC']
+    env['SHLINKFLAGS'] = ['$LINKFLAGS', '-shared']
+    env['CFLAGS'] = []
+    env['CXXFLAGS'] = []
+    env['ASFLAGS'] = []
+    env['LINKFLAGS'] = []
 
+    env['CCCOM'] = '$CC -o $TARGET -c $CFLAGS $CCFLAGS $_CCCOMCOM $SOURCES'
+    env['CXXCOM'] = '$CXX -o $TARGET -c $CXXFLAGS $CCFLAGS $_CCCOMCOM $SOURCES'
+    env['ASCOM'] ='$AS $ASFLAGS -o $TARGET $SOURCES'
+    env['ARCOM'] = '$AR $ARFLAGS $TARGET $SOURCES'
+    env['SHCCCOM'] = '$SHCC -o $TARGET -c $SHCFLAGS $SHCCFLAGS $_CCCOMCOM $SOURCES'
+    env['SHCXXCOM'] = '$SHCXX -o $TARGET -c $SHCXXFLAGS $SHCCFLAGS $_CCCOMCOM $SOURCES'
+    env['LINKCOM'] = '$LINK -o $TARGET $SOURCES $LINKFLAGS $__RPATH  $_LIBDIRFLAGS $_LIBFLAGS'
+    env['SHLINKCOM'] = '$SHLINK -o $TARGET $SHLINKFLAGS $__SHLIBVERSIONFLAGS $__RPATH $SOURCES $_LIBDIRFLAGS $_LIBFLAGS'
+    env['STRIPCOM'] = '$STRIP $SOURCES'
 
-    if sys.platform.startswith('win'):
-        env = Environment(tools=['gcc', 'g++', 'gnulink', 'ar', 'gas', 'as'])
-        
-        env['SPAWN'] = ourspawn
-        
-        if os.environ['CONFIG_TOOLCHAIN_PATH']:
-            env['ENV']['PATH'] = os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"') + ';' + env['ENV']['PATH']
-        else:
-            env['ENV']['PATH'] = env['ENV']['PATH'] + ';' +  os.getenv('Path')
-        if os.environ['CONFIG_TOOLCHAIN_PREFIX']:
-            if os.environ['CONFIG_TOOLCHAIN_PATH']:
-                env['CC'] = str(Path(os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"'))  / str(os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'gcc.exe')) 
-                env['AS'] = str(Path(os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"'))  / str(os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'as.exe' ))
-                env['AR'] = str(Path(os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"'))  / str(os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'ar.exe' ))
-                env['CXX'] = str(Path(os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"')) / str(os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'g++.exe'))
-                env['LINK'] = str(Path(os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"'))/ str(os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'g++.exe'))
-                env['PROGSUFFIX'] = ''
-            else:
-                env['CC'] = os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'gcc.exe' 
-                env['AS'] = os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'as.exe' 
-                env['AR'] = os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'ar.exe' 
-                env['CXX'] = os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'g++.exe'
-                env['LINK'] = os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"') + 'g++.exe'
-                env['PROGSUFFIX'] = ''
-        else:
-            env['CC'] = 'gcc.exe'
-            env['AS'] = 'as.exe'
-            env['AR'] = 'ar.exe'
-            env['CXX'] = 'g++.exe'
-            env['LINK'] = 'g++.exe'
-            env['PROGSUFFIX'] = ''
-        
-            
-    elif sys.platform.startswith('linux'):
-        env = Environment()
-        if os.environ['CONFIG_TOOLCHAIN_PATH']:
-            env['ENV']['PATH'] = os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"') + ':' + env['ENV']['PATH']
-        if os.environ['CONFIG_TOOLCHAIN_PREFIX']:
-            CONFIG_TOOLCHAIN_PREFIX = os.environ['CONFIG_TOOLCHAIN_PREFIX']
-            env['CC'] = CONFIG_TOOLCHAIN_PREFIX + 'gcc'
-            env['AS'] = CONFIG_TOOLCHAIN_PREFIX + 'as'
-            env['AR'] = CONFIG_TOOLCHAIN_PREFIX + 'ar'
-            env['CXX'] = CONFIG_TOOLCHAIN_PREFIX + 'g++'
-            env['LINK'] = CONFIG_TOOLCHAIN_PREFIX + 'g++'
-    else:
-        print('unknow os!')
+    if 'CONFIG_COMMPILE_DEBUG' not in os.environ:
+        env['CCCOMSTR'] = "CC $SOURCES"
+        env['CXXCOMSTR'] = "CXX $SOURCES"
+        env['SHCCCOMSTR'] = "CC -fPIC $SOURCES"
+        env['SHCXXCOMSTR'] = "CXX -fPIC $SOURCES"
+        env['ARCOMSTR'] = "LD $TARGET"
+        env['SHLINKCOMSTR'] = "Linking $TARGET"
+        env['LINKCOMSTR'] = 'Linking $TARGET'
 
     env.AddMethod(Fatal, "Fatal")
+
+    if os.environ['CONFIG_TOOLCHAIN_PREFIX']:
+        env['GCCPREFIX'] = os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"')    
+
+    if env['HOST_OS'].startswith('win'):
+        if os.environ['CONFIG_TOOLCHAIN_PATH']:
+            env['ENV']['PATH'] = os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"') + ';' + env['ENV']['PATH'] + ';' + os.getenv('Path')
+        else:
+            env['ENV']['PATH'] = env['ENV']['PATH'] + ';' +  os.getenv('Path')
+        env['GCCSUFFIX'] = '.exe'
+        env['SPAWN'] = ourspawn
+    elif env['HOST_OS'].startswith('posix'):
+        if os.environ['CONFIG_TOOLCHAIN_PATH']:
+            env['ENV']['PATH'] = os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"') + ':' + env['ENV']['PATH']
+    else:
+        print('unknow os!', env['HOST_OS'])
     
+    env['GCCPREFIX'] = os.path.join(os.environ['CONFIG_TOOLCHAIN_PATH'].strip('"'), os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"'))
+    if os.environ['CONFIG_TOOLCHAIN_FLAGS']:
+        env.MergeFlags(os.environ['CONFIG_TOOLCHAIN_FLAGS'])
+    env.Append(CPPPATH=[BUILD_CONFIG_PATH])
+    env['CC']    = '${_concat(GCCPREFIX, "gcc", GCCSUFFIX, __env__)}'          
+    env['CXX']   = '${_concat(GCCPREFIX, "g++", GCCSUFFIX, __env__)}'     
+    env['AR']    = '${_concat(GCCPREFIX, "ar", GCCSUFFIX, __env__)}'      
+    env['AS']    = '${_concat(GCCPREFIX, "as", GCCSUFFIX, __env__)}'        
+    env['STRIP'] = '${_concat(GCCPREFIX, "strip", GCCSUFFIX, __env__)}'     
+
     try:
-        new_env = os.environ.copy()
-        new_env['PATH'] = env['ENV']['PATH']
-        result = subprocess.run([env['CC'], '-dumpmachine'], env=new_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
-        env['GCC_DUMPMACHINE'] = result.stdout.strip()
+        env.ParseConfig('${CC} -v 2> gcc_out.txt')
+        version_r = parse.compile("gcc version {} {}")
+        Target_r = parse.compile("Target: {}\n")
+        with open('gcc_out.txt', 'r') as conf_file:
+            for line in conf_file.readlines():
+                version = version_r.parse(line)
+                if version:
+                    env['CCVERSION'] = version[0]
+                Target = Target_r.parse(line)
+                if Target:
+                    env['GCC_DUMPMACHINE'] = Target[0]
+        os.remove('gcc_out.txt')
     except:
-        pass
+        print('Failed to obtain GCC parameters!')
 
     env['GIT_REPO_LISTS'] = {}
     try:
@@ -260,21 +293,7 @@ def build_task_init():
     except:
         pass
 
-    if os.environ['CONFIG_TOOLCHAIN_FLAGS']:
-        env.MergeFlags(os.environ['CONFIG_TOOLCHAIN_FLAGS'])
-
-
-    env.Append(CPPPATH=[BUILD_CONFIG_PATH])
-    # env['LINKCOM'] = '$LINK -o $TARGET $SOURCES $LINKFLAGS $__RPATH  $_LIBDIRFLAGS '
-
-    if 'CONFIG_COMMPILE_DEBUG' not in os.environ:
-        env['CCCOMSTR'] = "CC $SOURCES"
-        env['CXXCOMSTR'] = "CXX $SOURCES"
-        env['SHCCCOMSTR'] = "CC -fPIC $SOURCES"
-        env['SHCXXCOMSTR'] = "CXX -fPIC $SOURCES"
-        env['ARCOMSTR'] = "LD $TARGET"
-        env['SHLINKCOMSTR'] = "Linking $TARGET"
-        env['LINKCOMSTR'] = 'Linking $TARGET'
+    # print(env.Dump())
 
     env['PROJECT_PATH'] = PROJECT_PATH
     env['PROJECT_NAME'] = os.path.basename(PROJECT_PATH)
@@ -283,8 +302,6 @@ def build_task_init():
     env['COMPONENTS'] = []
     env['COMPONENTS_ENV'] = env.Clone()
     env['COMPONENTS_PATH'] = [str(Path(SDK_PATH)/'components')]
-    # env['COMPONENTS_PATH'] = []
-
 
     for component in env['COMPONENTS_PATH']:
         for component_name in os.listdir(component):
@@ -292,18 +309,13 @@ def build_task_init():
                 env['component_dir'] = str(Path(component)/component_name)
                 SConscript(str(Path(component)/component_name/'SConstruct'), exports='env')
 
-
-
     for project_dir in os.listdir(PROJECT_PATH):
         if project_dir.startswith("main"):
             env['component_dir'] = str(Path(PROJECT_PATH)/project_dir)
             SConscript(str(Path(PROJECT_PATH)/project_dir/'SConstruct'), exports='env')
-
     
     for iteam in env['COMPONENTS']:
         task_lists[iteam['target']] = iteam
-
-
 
 def creat_commpile_Program():
     if not os.path.exists('build'):
@@ -323,11 +335,10 @@ def creat_commpile_Program():
             else:
                 yield obj
         def get_srcs(obj):
-            file = str(obj)
-            ofile = file.replace('/', '_')
+            ofile = str(obj).replace('/', '_')
             ofile = ofile.replace('\\', '_')
             ofile = ofile.replace(':', '_')
-            ofile = str(Path(component_build_dir)/ofile) + '.o'
+            ofile = os.path.join(component_build_dir, ofile + '.o')
             return ofile
         _srcs = [str(o) for o in deep_iter_or_return(component['SRCS'])]
         _srco = list(map(get_srcs, _srcs))
@@ -368,23 +379,17 @@ def creat_commpile_Program():
                         _BUILD_ENV.Append(LIBS=[c_requirement])
             else:
                 _BUILD_ENV.Append(LIBS=[requirement])
-        # reduse = lambda value: sorted(set(value),key=value.index)
-        # _LIBO = reduse(_LIBO)
         
         if component['REGISTER'] == 'static':
             _OBJS = list(map(lambda file: _BUILD_ENV.Object(target = file[0], source = file[1]), list(zip(_srco, _srcs))))
             for src_file in _srcs_custom:
                 _OBJS += _BUILD_ENV.Object(target = _srcs_custom[src_file]['SRCO'], source = str(src_file), CPPFLAGS=_srcs_custom[src_file]['CPPFLAGS'], CCFLAGS=_srcs_custom[src_file]['CCFLAGS'])
-            # _LIBO = list(map(lambda o: str(o), component['STATIC_LIB']))
-            # component['_target'] = _BUILD_ENV.Library(target = _TARGET, source = _OBJS + _LIBO)
             component['_target'] = _BUILD_ENV.Library(target = _TARGET, source = _OBJS)
             component['_target_build_env'] = _BUILD_ENV
         elif component['REGISTER'] == 'shared':
             _OBJS = list(map(lambda file: _BUILD_ENV.SharedObject(target = file[0], source = file[1]), list(zip(_srco, _srcs))))
             for src_file in _srcs_custom:
                 _OBJS += _BUILD_ENV.SharedObject(target = _srcs_custom[src_file]['SRCO'], source = str(src_file), CPPFLAGS=_srcs_custom[src_file]['CPPFLAGS'], CCFLAGS=_srcs_custom[src_file]['CCFLAGS'])
-            # _LIBO = list(map(lambda o: str(o), component['DYNAMIC_LIB']))
-            # component['_target'] = _BUILD_ENV.SharedLibrary(target = _TARGET, source = _OBJS + _LIBO)
             component['_target'] = _BUILD_ENV.SharedLibrary(target = _TARGET, source = _OBJS)
             component['_target_build_env'] = _BUILD_ENV
             if 'CONFIG_TOOLCHAIN_SYSTEM_UNIX' in os.environ:
@@ -405,8 +410,6 @@ def creat_commpile_Program():
             if component['DYNAMIC_LIB']:
                 _BUILD_ENV.Append(LINKFLAGS=['-Wl,-rpath=./'])
             component['_target'] = _BUILD_ENV.Program(target = _TARGET, source = [empty_src_file, component_build_dir + '/lib' + component['target'] + '.a'] + _LIBO)
-            # _BUILD_ENV['LIBS'] = [component['target']] + _BUILD_ENV['LIBS']
-            # _BUILD_ENV.Append(LIBPATH=[component_build_dir])
             component['_target_build_env'] = _BUILD_ENV
             if 'CONFIG_TOOLCHAIN_SYSTEM_UNIX' in os.environ:
                 _BUILD_ENV.Command(os.path.join('dist', component['target']), str(Path('build')/component['target']/component['target']), action=copy_file)

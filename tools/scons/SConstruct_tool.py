@@ -118,12 +118,8 @@ def check_component(component_name):
 
 def CC_cmd_execute(cmd):
     import os
-    import subprocess
-    try:
-        new_env = os.environ.copy()
-        new_env['PATH'] = env['ENV']['PATH']
-        result = subprocess.run([env['CC']] + cmd, env=new_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
-        out = result.stdout.strip()
-    except:
-        out = None
+    env.ParseConfig('${{CC}} {} > gcc_out.txt 2>&1'.format(cmd))
+    with open('gcc_out.txt', 'r') as conf_file:
+        out = conf_file.read()
+    os.remove('gcc_out.txt')
     return out

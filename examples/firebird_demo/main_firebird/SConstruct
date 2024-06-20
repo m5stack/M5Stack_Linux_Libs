@@ -7,7 +7,7 @@ with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
 # The GCC version needs to be greater than or equal to 8.
-gcc_dumpversion = CC_cmd_execute(['-dumpversion'])
+gcc_dumpversion = CC_cmd_execute('-dumpversion')
 if int(gcc_dumpversion.split('.')[0]) >= 8:
     check_component('firebird')
 

@@ -2,3 +2,19 @@ from pathlib import Path
 import os
 with open(str(Path(os.getcwd())/'..'/'..'/'tools'/'scons'/'project.py')) as f:
     exec(f.read())
+
+# # 创建一个构建环境
+# env = Environment()
+
+# config_info = env.ParseConfig('${CC} -v')
+# # 使用 env.Execute 执行一个命令
+# result = env.Execute('echo', 'Hello, SCons!')
+# print(result)
+# # # 检查命令是否成功
+# # if result.status == 0:
+# #     # 获取命令的标准输出
+# #     print("标准输出: ", result.stdout)
+# #     # 获取命令的标准错误输出
+# #     print("标准错误输出: ", result.stderr)
+# # else:
+# #     print("命令执行失败，错误代码: ", result.status)

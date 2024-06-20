@@ -23,7 +23,7 @@ if 'x86_64' in gcc_dumpmachine and 'linux' in gcc_dumpmachine:
     INCLUDE.append('/usr/local/include/opencv4')
     REQUIREMENTS += ['opencv_core', 'opencv_highgui', 'opencv_imgproc', 'opencv_photo', 'opencv_video', 'opencv_imgcodecs', 'opencv_videoio']
 else:
-    libgomp = CC_cmd_execute(['-print-file-name=libgomp.so.1'])
+    libgomp = CC_cmd_execute('-print-file-name=libgomp.so.1').rstrip()
     DYNAMIC_LIB.append(libgomp)
     REQUIREMENTS += ['static_package']
 

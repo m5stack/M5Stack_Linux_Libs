@@ -17,8 +17,8 @@ DEFINITIONS_PRIVATE = []
 LDFLAGS = []
 LINK_SEARCH_PATH = []
 
-libodbc = CC_cmd_execute(['-print-file-name=libodbc.so'])
-if libodbc == 'libodbc.so' or libodbc == '':
+libodbc = CC_cmd_execute('-print-file-name=libodbc.so')
+if libodbc.startswith('libodbc.so') or libodbc == '':
     print('The main_odbc requires the installation of the ODBC library.')
 else:
     env['COMPONENTS'].append({'target':'odbc_demo',
