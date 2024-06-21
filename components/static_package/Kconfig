@@ -22,3 +22,8 @@ menuconfig STATIC_PACKAGE_ENABLED
             help
                 build by NCNN!
         endchoice
+
+    config GRPC_LIB_ENABLED
+        bool "grpc static lib"
+        default n
+        depends on STATIC_PACKAGE_ENABLED
