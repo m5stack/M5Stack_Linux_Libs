@@ -1,0 +1,49 @@
+# project_root/src/SConscript
+import os
+# Import the environment from the SConstruct file
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+SRCS = []
+INCLUDE = [ADir('include'), ADir('.')]
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread', 'static_package']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = []
+DEFINITIONS_PRIVATE = []
+LDFLAGS = []
+LINK_SEARCH_PATH = []
+
+SRCS = [AFile('src/greet.pb.cc'), AFile('src/greet.grpc.pb.cc'), AFile('src/server.cpp')]
+env['COMPONENTS'].append({'target':'grpc_server',
+                        'SRCS':SRCS,
+                        'INCLUDE':INCLUDE,
+                        'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                        'REQUIREMENTS':REQUIREMENTS,
+                        'STATIC_LIB':STATIC_LIB,
+                        'DYNAMIC_LIB':DYNAMIC_LIB,
+                        'DEFINITIONS':DEFINITIONS,
+                        'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                        'LDFLAGS':LDFLAGS,
+                        'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                        'REGISTER':'project'
+                        })
+
+
+SRCS = [AFile('src/greet.pb.cc'), AFile('src/greet.grpc.pb.cc'), AFile('src/client.cpp')]
+env['COMPONENTS'].append({'target':'grpc_client',
+                        'SRCS':SRCS,
+                        'INCLUDE':INCLUDE,
+                        'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                        'REQUIREMENTS':REQUIREMENTS,
+                        'STATIC_LIB':STATIC_LIB,
+                        'DYNAMIC_LIB':DYNAMIC_LIB,
+                        'DEFINITIONS':DEFINITIONS,
+                        'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                        'LDFLAGS':LDFLAGS,
+                        'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                        'REGISTER':'project'
+                        })
+
