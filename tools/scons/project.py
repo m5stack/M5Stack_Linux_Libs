@@ -16,7 +16,7 @@ import subprocess
 import uuid
 
 # from parse import compile as parse_compile
-SDK_PATH = os.environ.get('SDK_PATH', str(Path(os.getcwd())/'..'/'..'))
+SDK_PATH = os.path.normpath(os.environ.get('SDK_PATH', str(Path(os.getcwd())/'..'/'..')))
 PROJECT_NAME = os.environ.get('PROJECT_NAME', os.path.basename(sys.path[0]))
 PROJECT_PATH = os.environ.get('PROJECT_PATH', sys.path[0])
 BUILD_PATH = os.environ.get('BUILD_PATH', str(Path(PROJECT_PATH)/'build'))
@@ -335,9 +335,10 @@ def creat_commpile_Program():
             else:
                 yield obj
         def get_srcs(obj):
-            ofile = str(obj).replace('/', '_')
-            ofile = ofile.replace('\\', '_')
-            ofile = ofile.replace(':', '_')
+            file = str(obj)
+            if file.startswith(SDK_PATH):
+                file = file[len(SDK_PATH) + 1:]
+            ofile = file
             ofile = os.path.join(component_build_dir, ofile + '.o')
             return ofile
         _srcs = [str(o) for o in deep_iter_or_return(component['SRCS'])]
