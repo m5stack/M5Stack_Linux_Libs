@@ -68,7 +68,6 @@ scons distclean
 - WebSocket server/client examples.
 - MQTT client example.
 - C/C++ Hybrid Development.
-- Fast cross-compilation. Use the command `make set_arm` to switch the cross-compiler and enjoy seamless cross-compilation.
 - Minimal dependencies. Automatic packaging of dependencies for framework components within, with the option for dynamic and static dependencies. Say goodbye to the complexities of dependencies.
 - Configuration for minimal executable size. Enabling the "release" compilation mode generates the smallest executable file size possible.
 
