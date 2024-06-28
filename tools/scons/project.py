@@ -139,7 +139,11 @@ def copy_file(target, source, env):
     source_path = str(source[0])
     target_path = str(target[0])
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    shutil.copy2(source_path, target_path)
+    if os.path.isfile(source_path):
+        shutil.copy2(source_path, target_path)
+    elif os.path.isdir(source_path):
+        shutil.copytree(source_path, target_path)
+    
 
 def build_task_init():
     global env
