@@ -39,7 +39,9 @@ Framework relies on the following software packages: make, cmake, python3, and e
 # The version of Python3 should be greater than or equal to 3.8.
 sudo apt update
 sudo apt install python3 python3-pip libffi-dev
-pip3 install parse scons requests windows-curses
+pip3 install parse scons requests 
+# if windows
+# pip3 install windows-curses
 pip3 install setuptools-rust paramiko scp
 
 wget https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/linaro/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf.tar.xz
