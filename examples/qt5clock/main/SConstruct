@@ -1,0 +1,44 @@
+# project_root/src/SConscript
+import os
+# Import the environment from the SConstruct file
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+if not env['HOST_OS'].startswith('posix'):
+    env.Fatal("This project can only be compiled in Linux.")
+
+os.system('moc `pkg-config --cflags-only-other Qt5Widgets Qt5Gui Qt5Core` -o src/moc_ClockWidget.cpp src/ClockWidget.h')
+os.system('pkg-config --cflags Qt5Widgets Qt5Gui Qt5Core > ../build/config/defintion.txt')
+os.system('pkg-config --libs Qt5Widgets Qt5Gui Qt5Core > ../build/config/link.txt')
+
+SRCS = Glob('src/*.c*')
+INCLUDE = [ADir('include'), ADir('src')]
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = ['-fPIC']
+DEFINITIONS_PRIVATE = []
+LDFLAGS = []
+LINK_SEARCH_PATH = []
+
+with open('../build/config/defintion.txt' , 'r') as f:
+    DEFINITIONS += f.read().strip().split()
+
+with open('../build/config/link.txt' , 'r') as f:
+    LDFLAGS += f.read().strip().split()
+
+env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
+                          'SRCS':SRCS,
+                          'INCLUDE':INCLUDE,
+                          'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                          'REQUIREMENTS':REQUIREMENTS,
+                          'STATIC_LIB':STATIC_LIB,
+                          'DYNAMIC_LIB':DYNAMIC_LIB,
+                          'DEFINITIONS':DEFINITIONS,
+                          'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                          'LDFLAGS':LDFLAGS,
+                          'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                          'REGISTER':'project'
+                          })
