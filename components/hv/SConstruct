@@ -69,5 +69,5 @@ if 'CONFIG_LHV_ENABLED' in os.environ:
                             'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
                             'LDFLAGS':LDFLAGS,
                             'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
-                            'REGISTER':'static'
+                            'REGISTER':'shared' if 'CONFIG_LHV_DYNAMIC' in os.environ else 'static'
                             })
