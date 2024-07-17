@@ -13,8 +13,10 @@ STATIC_LIB = []
 DYNAMIC_LIB = []
 DEFINITIONS = []
 DEFINITIONS_PRIVATE = []
-LDFLAGS = ['-static']
+LDFLAGS = []
 LINK_SEARCH_PATH = []
+
+LDFLAGS += ['-Wl,-rpath=./']
 
 all_src_files = Glob('src/*.c*')
 
