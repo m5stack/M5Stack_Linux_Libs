@@ -18,8 +18,6 @@ if "CONFIG_U8G2_COMPONENT_ENABLED" in os.environ:
     LDFLAGS = []
     LINK_SEARCH_PATH = []
 
-    SRCS.append(AFile("test.c"))
-
     if "CONFIG_U8G2_COMPONENT_CXX" in os.environ:
         INCLUDE.append(ADir("../../github_source/u8g2/csrc"))
         SRCS += append_srcs_dir(ADir("../../github_source/u8g2/csrc"))
@@ -28,19 +26,16 @@ if "CONFIG_U8G2_COMPONENT_ENABLED" in os.environ:
         INCLUDE.append(ADir("../../github_source/u8g2/cppsrc"))
         SRCS += append_srcs_dir(ADir("../../github_source/u8g2/cppsrc"))
 
-    env["COMPONENTS"].append(
-        {
-            "target": os.path.basename(env["component_dir"]),
-            "SRCS": SRCS,
-            "INCLUDE": INCLUDE,
-            "PRIVATE_INCLUDE": PRIVATE_INCLUDE,
-            "REQUIREMENTS": REQUIREMENTS,
-            "STATIC_LIB": STATIC_LIB,
-            "DYNAMIC_LIB": DYNAMIC_LIB,
-            "DEFINITIONS": DEFINITIONS,
-            "DEFINITIONS_PRIVATE": DEFINITIONS_PRIVATE,
-            "LDFLAGS": LDFLAGS,
-            "LINK_SEARCH_PATH": LINK_SEARCH_PATH,
-            "REGISTER": "static",
-        }
-    )
+    env["COMPONENTS"].append({"target": os.path.basename(env["component_dir"]),
+                              "SRCS": SRCS,
+                              "INCLUDE": INCLUDE,
+                              "PRIVATE_INCLUDE": PRIVATE_INCLUDE,
+                              "REQUIREMENTS": REQUIREMENTS,
+                              "STATIC_LIB": STATIC_LIB,
+                              "DYNAMIC_LIB": DYNAMIC_LIB,
+                              "DEFINITIONS": DEFINITIONS,
+                              "DEFINITIONS_PRIVATE": DEFINITIONS_PRIVATE,
+                              "LDFLAGS": LDFLAGS,
+                              "LINK_SEARCH_PATH": LINK_SEARCH_PATH,
+                              "REGISTER": "static",
+                             })

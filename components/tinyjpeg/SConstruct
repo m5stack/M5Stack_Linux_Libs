@@ -7,7 +7,7 @@ with open(env['PROJECT_TOOL_S']) as f:
 
 
 if 'CONFIG_TINY_JPEG_ENABLED' in os.environ:
-    SRCS=[AFile('test.c')]
+    SRCS=[]
     INCLUDE=[ADir('include')]
     PRIVATE_INCLUDE=[]
     REQUIREMENTS=[]

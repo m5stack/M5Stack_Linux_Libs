@@ -8,7 +8,7 @@ with open(env['PROJECT_TOOL_S']) as f:
 
 if 'CONFIG_STB_ENABLED' in os.environ:
     check_component('stb')
-    SRCS=[AFile('test.c')]
+    SRCS=[]
     INCLUDE=[ADir('include'), ADir('../../github_source/stb')]
     PRIVATE_INCLUDE=[]
     REQUIREMENTS=['m']

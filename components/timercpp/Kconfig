@@ -1,6 +1,0 @@
-
-menuconfig TIMERCPP_ENABLED
-    bool "Enable timercpp"
-    default n
-
-

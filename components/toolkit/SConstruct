@@ -7,6 +7,7 @@ with open(env['PROJECT_TOOL_S']) as f:
 
 
 if 'CONFIG_TOOLKIT_ENABLED' in os.environ:
+    check_component('toolkit')
     SRCS = []
     INCLUDE = []
     PRIVATE_INCLUDE = []
@@ -18,7 +19,6 @@ if 'CONFIG_TOOLKIT_ENABLED' in os.environ:
     LDFLAGS = []
     LINK_SEARCH_PATH = []
 
-    SRCS.append(AFile("test.c"))
     INCLUDE.append(ADir("include"))
     INCLUDE.append(ADir("../../github_source/toolkit/include"))
     SRCS += append_srcs_dir(ADir('../../github_source/toolkit/src'))

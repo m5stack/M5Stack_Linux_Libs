@@ -7,7 +7,7 @@ with open(env['PROJECT_TOOL_S']) as f:
 
 
 if 'CONFIG_NANOJPEG_ENABLED' in os.environ:
-    SRCS=Glob('src/*.c*')
+    SRCS=[]
     INCLUDE=[ADir('include')]
     PRIVATE_INCLUDE=[]
     REQUIREMENTS=[]

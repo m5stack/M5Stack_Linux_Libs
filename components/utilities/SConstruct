@@ -22,8 +22,9 @@ if 'CONFIG_UTILITIES_ENABLED' in os.environ:
         INCLUDE.append(ADir('party/fmt/include'))
 
     if 'CONFIG_UTILITIES_EASYMSGCPP_ENABLED' in os.environ:
-        INCLUDE.append(ADir('party/easymsgcpp/src/include'))  
-        SRCS += AGlob('party/easymsgcpp/src/*.c*')
+        check_component('EasyMsgCpp')
+        INCLUDE.append(ADir('../../github_source/EasyMsgCpp/src/include'))  
+        SRCS += AGlob('../../github_source/EasyMsgCpp/src/*.c*')
 
     if 'CONFIG_UTILITIES_INI_ENABLED' in os.environ:
         INCLUDE.append(ADir('party/ini'))  
@@ -34,8 +35,6 @@ if 'CONFIG_UTILITIES_ENABLED' in os.environ:
         SRCS += AGlob('party/base64/*.c*')
     
     INCLUDE.append(ADir('include'))  
-
-    SRCS.append(AFile('test.c'))
 
     env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
                             'SRCS':SRCS,
