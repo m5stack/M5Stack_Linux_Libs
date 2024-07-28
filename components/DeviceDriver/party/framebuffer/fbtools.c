@@ -52,6 +52,7 @@ int fb_open(PFBDEV pFbdev)
 /* close frame buffer */
 int fb_close(PFBDEV pFbdev)
 {
+    munmap(pFbdev->fb, pFbdev->fb_mem);
     close(pFbdev->fb);
     pFbdev->fb = -1;
     return 0;
