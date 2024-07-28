@@ -187,7 +187,8 @@ def build_task_init():
     except:
         print('Error in parsing the {}'.format(GLOBAL_CONFIG_MK_FILE))
         exit(-1)
-
+    
+    SConsignFile('build/sconsign.dblite')
     env = Environment(tools=['gcc', 'g++', 'gnulink', 'ar', 'gas', 'as'])
     env['GCCPREFIX'] = ''
     env['GCCSUFFIX'] = ''
