@@ -1,0 +1,9 @@
+
+menuconfig QRENCODE_COMPONENT_ENABLED
+    bool "Enable qrencode_component"
+    default n
+    config QRENCODE_COMPONENT_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on QRENCODE_COMPONENT_ENABLED
+

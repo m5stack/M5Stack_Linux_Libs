@@ -1,0 +1,41 @@
+# component/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+if 'CONFIG_QRENCODE_COMPONENT_ENABLED' in os.environ:
+    check_component('libqrencode')
+    SRCS=[]
+    INCLUDE=[ADir('../../github_source/libqrencode')]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=['m', 'pthread']
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE = []
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+    _srcs = AGlob('../../github_source/libqrencode/*.c*')
+    for src in _srcs:
+        if "qrenc.c" in str(src):
+            continue
+        SRCS.append(src)    
+    
+    DEFINITIONS_PRIVATE = ['-DHAVE_LIBPTHREAD=1', '-DMAJOR_VERSION=4', '-DMICRO_VERSION=1', '-DMINOR_VERSION=1', '-DVERSION=\\\\\\"4.1.1\\\\\\\"']
+    if 'CONFIG_QRENCODE_COMPONENT_DYNAMIC' not in os.environ:
+            DEFINITIONS_PRIVATE += ['-DSTATIC_IN_RELEASE=static']
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'shared' if 'CONFIG_QRENCODE_COMPONENT_DYNAMIC' in os.environ else 'static'
+                            })
