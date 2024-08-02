@@ -307,6 +307,9 @@ def build_task_init():
     env['COMPONENTS'] = []
     env['COMPONENTS_ENV'] = env.Clone()
     env['COMPONENTS_PATH'] = [str(Path(SDK_PATH)/'components')]
+    if 'EXT_COMPONENTS_PATH' in os.environ:
+        for ecp in os.environ['EXT_COMPONENTS_PATH'].split(':'):
+            env['COMPONENTS_PATH'].append(ecp)
 
     for component in env['COMPONENTS_PATH']:
         for component_name in os.listdir(component):
