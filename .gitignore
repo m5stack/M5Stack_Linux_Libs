@@ -63,7 +63,7 @@ __pycache__
 
 github_source
 
-examples_private*
+*_private
 *.sconsign.dblite
 
 github_source/*
