@@ -42,6 +42,7 @@ git_clone_and_checkout_commit https://github.com/libtom/libtommath.git   97e5003
 git_clone_and_checkout_commit https://github.com/talybin/firebird.git   16bb82d461bbb0bae10390adc20fe75ef4f420d4
 git_clone_and_checkout_commit https://github.com/Smalldy/EasyMsgCpp.git   a265a4049eddd844a19c74850e4e6e53ca007a7f
 git_clone_and_checkout_commit https://github.com/fukuchi/libqrencode.git   715e29fd4cd71b6e452ae0f4e36d917b43122ce8
+git_clone_and_checkout_commit https://github.com/tinyalsa/tinyalsa.git   7f06b2f219294de385caf9bcbca24b0709224f8c
 
 # opencv-mobile-2.4.13.7-armlinux https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip
 
