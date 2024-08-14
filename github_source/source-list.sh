@@ -18,10 +18,11 @@ git_clone_and_checkout_commit https://github.com/dianjixz/libhv.git         1ab8
 git_clone_and_checkout_commit https://github.com/dianjixz/RtspServer.git    905357880a73b5e03fb2adb17b7df10eadcd5e4a
 git_clone_and_checkout_commit https://github.com/dianjixz/xop.git           b8c034d72a7d879e92ec3cbc2082481c78205cd1
 git_clone_and_checkout_commit https://github.com/dianjixz/gear-lib.git      cf68fddccefafaa4a5b05082819f66d8419f5811
-git_clone_and_checkout_commit https://github.com/dianjixz/stb.git           5736b15f7ea0ffb08dd38af21067c314d6a3aae9
+# git_clone_and_checkout_commit https://github.com/dianjixz/stb.git           5736b15f7ea0ffb08dd38af21067c314d6a3aae9
+git_clone_and_checkout_commit https://github.com/dianjixz/stb.git           3b31d1d0a3fd0e563fd5cfaabf67c9921a08bb61
 git_clone_and_checkout_commit https://github.com/dianjixz/libs.git          a6456b8e7f1564b0c94c329509fe9652bb5a096b
 git_clone_and_checkout_commit https://github.com/dianjixz/nanomsg.git       2d01e935e4554580da4e9dbd94964af94e0ded9c
-git_clone_and_checkout_commit https://github.com/dianjixz/nng.git           c5e9d8acfc226418dedcf2e34a617bffae043ff6
+git_clone_and_checkout_commit https://github.com/nanomsg/nng.git           a8a8bd435690e24e55dcdad485e97225902cb0c8
 # cd lvgl && git_clone_and_checkout_commit https://github.com/dianjixz/lvgl.git          5cdf242a21a0897ee1f24b85040d2993a817b822
 # cd lvgl && git_clone_and_checkout_commit https://github.com/lvgl/lv_drivers.git        820341ea15d0e9f0faaf0b508ba03c3ef9cb1a88
 git_clone_and_checkout_commit https://github.com/dianjixz/toolkit.git       64120e079446c77990d892865fa5a105fc46036f
@@ -43,6 +44,7 @@ git_clone_and_checkout_commit https://github.com/talybin/firebird.git   16bb82d4
 git_clone_and_checkout_commit https://github.com/Smalldy/EasyMsgCpp.git   a265a4049eddd844a19c74850e4e6e53ca007a7f
 git_clone_and_checkout_commit https://github.com/fukuchi/libqrencode.git   715e29fd4cd71b6e452ae0f4e36d917b43122ce8
 git_clone_and_checkout_commit https://github.com/tinyalsa/tinyalsa.git   7f06b2f219294de385caf9bcbca24b0709224f8c
+git_clone_and_checkout_commit https://github.com/libjpeg-turbo/libjpeg-turbo.git 8db0312668f986891f65af9dbcc94e7e92ede099
 
 # opencv-mobile-2.4.13.7-armlinux https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip
 
