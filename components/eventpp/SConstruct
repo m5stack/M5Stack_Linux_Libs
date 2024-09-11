@@ -5,10 +5,10 @@ with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
 
-
 if 'CONFIG_EVENTPP_ENABLED' in os.environ:
-    SRCS=[AFile('test.cpp')]
-    INCLUDE=[ADir('include')]
+    check_component('eventpp')
+    SRCS=[]
+    INCLUDE=[ADir('../../github_source/eventpp/include')]
     PRIVATE_INCLUDE=[]
     REQUIREMENTS=[]
     STATIC_LIB=[]
@@ -17,7 +17,6 @@ if 'CONFIG_EVENTPP_ENABLED' in os.environ:
     DEFINITIONS_PRIVATE=[]
     LDFLAGS=[]
     LINK_SEARCH_PATH=[]
-
 
     env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
                             'SRCS':SRCS,
