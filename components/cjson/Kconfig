@@ -1,0 +1,6 @@
+
+menuconfig CJSON_ENABLED
+    bool "Enable cJSON"
+    default n
+
+

@@ -45,6 +45,7 @@ git_clone_and_checkout_commit https://github.com/fukuchi/libqrencode.git   715e2
 git_clone_and_checkout_commit https://github.com/tinyalsa/tinyalsa.git   7f06b2f219294de385caf9bcbca24b0709224f8c
 git_clone_and_checkout_commit https://github.com/libjpeg-turbo/libjpeg-turbo.git 8db0312668f986891f65af9dbcc94e7e92ede099
 git_clone_and_checkout_commit https://github.com/wqking/eventpp.git c472fb22e71ead0e58ff7df89e12c66b0bdfb533
+git_clone_and_checkout_commit https://github.com/DaveGamble/cJSON.git 078c4e6c53f13dff15f0eaac1611abb6379e0206
 
 # opencv-mobile-2.4.13.7-armlinux https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip
 
