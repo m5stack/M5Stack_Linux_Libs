@@ -62,7 +62,7 @@ make distclean
 ## Features
 
 <!-- - Platform reuse（Linux, Windows, macOS） -->
-- Integrate multiple C/C++ software libraries such as libhv, mongoose, stb, CImg, and more, which enable you to quickly utilize these libraries.
+- Integrate multiple C/C++ software libraries such as libhv, stb, CImg, and more, which enable you to quickly utilize these libraries.
 - Comes with usage examples for various libraries, sparing you the effort of searching, downloading, installing, and then seeking out the usage methods for libraries online. Simple libraries provide code and documentation, while complex ones offer direct usage examples.
 - Examples of TCP/UDP server/client and more.
 - Reliable UDP support: Example with KCP.

@@ -12,7 +12,6 @@ git_clone_and_checkout_commit()
     popd
 }
 
-git_clone_and_checkout_commit https://github.com/dianjixz/mongoose.git      dd5118cab0813078dbbfd116f1489c6a03a42cae
 git_clone_and_checkout_commit https://github.com/dianjixz/libhv.git         1ab8a8e551a5ab668988549779578553e3c3aa1e
 # git_clone_and_checkout_commit https://github.com/ithewei/libhv.git         c4e3b536fee8c2bfa67eec70eedf5ea0f0a4f60f
 git_clone_and_checkout_commit https://github.com/dianjixz/RtspServer.git    905357880a73b5e03fb2adb17b7df10eadcd5e4a
