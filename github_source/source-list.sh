@@ -20,7 +20,6 @@ git_clone_and_checkout_commit https://github.com/dianjixz/gear-lib.git      cf68
 # git_clone_and_checkout_commit https://github.com/dianjixz/stb.git           5736b15f7ea0ffb08dd38af21067c314d6a3aae9
 git_clone_and_checkout_commit https://github.com/dianjixz/stb.git           3b31d1d0a3fd0e563fd5cfaabf67c9921a08bb61
 git_clone_and_checkout_commit https://github.com/dianjixz/libs.git          a6456b8e7f1564b0c94c329509fe9652bb5a096b
-git_clone_and_checkout_commit https://github.com/dianjixz/nanomsg.git       2d01e935e4554580da4e9dbd94964af94e0ded9c
 # cd lvgl && git_clone_and_checkout_commit https://github.com/dianjixz/lvgl.git          5cdf242a21a0897ee1f24b85040d2993a817b822
 # cd lvgl && git_clone_and_checkout_commit https://github.com/lvgl/lv_drivers.git        820341ea15d0e9f0faaf0b508ba03c3ef9cb1a88
 git_clone_and_checkout_commit https://github.com/dianjixz/toolkit.git       64120e079446c77990d892865fa5a105fc46036f
