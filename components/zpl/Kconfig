@@ -1,0 +1,10 @@
+
+menuconfig ZPL_ENABLED
+    bool "Enable libzpl"
+    default n
+
+    config ZPL_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on ZPL_ENABLED
+
