@@ -1,27 +1,27 @@
-#ifndef _SAMPLE_LOG_H_
-#define _SAMPLE_LOG_H_
+#ifndef _ZXCVBSAMPLE_LOG_H_
+#define _ZXCVBSAMPLE_LOG_H_
 
 #include <stdio.h>
 
 typedef enum {
-    SAMPLE_LOG_MIN       = -1,
-    SAMPLE_LOG_EMERGENCY = 0,
-    SAMPLE_LOG_ALERT     = 1,
-    SAMPLE_LOG_CRITICAL  = 2,
-    SAMPLE_LOG_ERROR     = 3,
-    SAMPLE_LOG_WARN      = 4,
-    SAMPLE_LOG_NOTICE    = 5,
-    SAMPLE_LOG_INFO      = 6,
-    SAMPLE_LOG_DEBUG     = 7,
-    SAMPLE_LOG_MAX
-} SAMPLE_LOG_LEVEL_E;
+    SAMPLE_LOG_MIN_       = -1,
+    SAMPLE_LOG_EMERGENCY_ = 0,
+    SAMPLE_LOG_ALERT_     = 1,
+    SAMPLE_LOG_CRITICAL_  = 2,
+    SAMPLE_LOG_ERROR_     = 3,
+    SAMPLE_LOG_WARN_      = 4,
+    SAMPLE_LOG_NOTICE_    = 5,
+    SAMPLE_LOG_INFO_      = 6,
+    SAMPLE_LOG_DEBUG_     = 7,
+    SAMPLE_LOG_MAX_
+} SAMPLE_LOG_LEVEL_E_;
 
-#if defined(CONFIG_SAMPLE_LOG_LEVEL)
-static SAMPLE_LOG_LEVEL_E log_level = CONFIG_SAMPLE_LOG_LEVEL;
-#elif defined(CONFIG_SAMPLE_LOG_LEVEL_EXPORT)
-extern SAMPLE_LOG_LEVEL_E log_level;
+#if defined(CONFIG_SAMPLE_LOG_LEVEL_)
+static SAMPLE_LOG_LEVEL_E_ log_level_ = CONFIG_SAMPLE_LOG_LEVEL_;
+#elif defined(CONFIG_SAMPLE_LOG_LEVEL_EXPORT_)
+extern SAMPLE_LOG_LEVEL_E_ log_level_;
 #else
-static SAMPLE_LOG_LEVEL_E log_level = SAMPLE_LOG_INFO;
+static SAMPLE_LOG_LEVEL_E_ log_level_ = SAMPLE_LOG_INFO_;
 #endif
 
 #if 1
@@ -46,16 +46,16 @@ static SAMPLE_LOG_LEVEL_E log_level = SAMPLE_LOG_INFO;
 
 #define SLOGE(fmt, ...) printf(MACRO_RED "[E][%32s][%4d]: " fmt MACRO_END "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define SLOGW(fmt, ...)               \
-    if (log_level >= SAMPLE_LOG_WARN) \
+    if (log_level_ >= SAMPLE_LOG_WARN_) \
     printf(MACRO_YELLOW "[W][%s][%4d]: " fmt MACRO_END "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define SLOGI(fmt, ...)               \
-    if (log_level >= SAMPLE_LOG_INFO) \
+    if (log_level_ >= SAMPLE_LOG_INFO_) \
     printf(MACRO_GREEN "[I][%s][%4d]: " fmt MACRO_END "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define SLOGD(fmt, ...)                \
-    if (log_level >= SAMPLE_LOG_DEBUG) \
+    if (log_level_ >= SAMPLE_LOG_DEBUG_) \
     printf(MACRO_WHITE "[D][%s][%4d]: " fmt MACRO_END "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define SLOGN(fmt, ...)                 \
-    if (log_level >= SAMPLE_LOG_NOTICE) \
+    if (log_level_ >= SAMPLE_LOG_NOTICE_) \
     printf(MACRO_PURPLE "[N][%s][%4d]: " fmt MACRO_END "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #endif /* _SAMPLE_LOG_H_ */

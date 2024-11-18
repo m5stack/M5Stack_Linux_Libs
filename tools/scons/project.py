@@ -27,7 +27,11 @@ KCONFIG_FILE = os.environ.get('KCONFIG_FILE', str(Path(SDK_PATH)/'Kconfig'))
 GLOBAL_CONFIG_MK_FILE = os.environ.get('GLOBAL_CONFIG_MK_FILE', str(Path(PROJECT_PATH)/'build'/'config'/'global_config.mk'))
 GLOBAL_CONFIG_H_FILE = os.environ.get('GLOBAL_CONFIG_H_FILE', str(Path(PROJECT_PATH)/'build'/'config'/'global_config.h'))
 TOOL_FILE = os.environ.get('TOOL_FILE', str(Path(SDK_PATH)/'tools'))
-GIT_REPO_FILE = os.environ.get('GIT_REPO_FILE', str(Path(SDK_PATH)/'github_source'/'source-list.sh'))
+GIT_REPO_PATH = os.environ.get('GIT_REPO_PATH', str(Path(SDK_PATH)/'github_source'))
+GIT_REPO_FILE = os.environ.get('GIT_REPO_FILE', str(Path(GIT_REPO_PATH)/'source-list.sh'))
+
+if 'GIT_REPO_PATH' not in os.environ:
+    os.environ['GIT_REPO_PATH'] = GIT_REPO_PATH
 
 def ourspawn(sh, escape, cmd, args, e):
     filename = str(uuid.uuid4())
@@ -348,7 +352,10 @@ def creat_commpile_Program():
             if file.startswith(SDK_PATH):
                 file = file[len(SDK_PATH) + 1:]
             ofile = file
-            ofile = os.path.join(component_build_dir, ofile + '.o')
+            if os.path.isabs(ofile):
+                ofile = os.path.join(component_build_dir, ofile[1:] + '.o')
+            else:
+                ofile = os.path.join(component_build_dir, ofile + '.o')
             return ofile
         _srcs = [str(o) for o in deep_iter_or_return(component['SRCS'])]
         _srco = list(map(get_srcs, _srcs))
@@ -359,7 +366,6 @@ def creat_commpile_Program():
             _srco_custom = list(map(get_srcs, _srcs_list))
             for index, obj in enumerate(_srcs_list):
                 _srcs_custom[obj]['SRCO'] = _srco_custom[index]
-
         if len(_srcs) == 0:
             empty_src_file = str(Path(component_build_dir)/'empty_src_file.cpp')
             open(empty_src_file, 'w').close()
