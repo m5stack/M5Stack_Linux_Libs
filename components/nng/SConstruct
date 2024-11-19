@@ -23,12 +23,11 @@ if 'CONFIG_LNNG_ENABLED' in os.environ:
     DEFINITIONS_PRIVATE += ['-DNNG_LITTLE_ENDIAN=1', '-DNNG_HIDDEN_VISIBILITY']
     DEFINITIONS_PRIVATE += ['-D_GNU_SOURCE', '-D_POSIX_PTHREAD_SEMANTICS', '-DNNG_USE_EVENTFD', '-D_THREAD_SAFE']
     DEFINITIONS_PRIVATE += ['-DNNG_STATIC_LIB', '-DNNG_ENABLE_STATS']
-    DEFINITIONS_PRIVATE += ['-DNNG_HAVE_ABSTRACT_SOCKETS', '-DNNG_HAVE_BACKTRACE=1']
     DEFINITIONS_PRIVATE += ['-DNNG_HAVE_CLOCK_GETTIME', '-DNNG_HAVE_EPOLL=1', '-DNNG_HAVE_EPOLL_CREATE1=1',
                             '-DNNG_HAVE_FLOCK', '-DNNG_HAVE_GETENTROPY=1', '-DNNG_HAVE_GETRANDOM=1',
                             '-DNNG_HAVE_LANGINFO=1', '-DNNG_HAVE_LIBATOMIC=1',
                             '-DNNG_HAVE_LIBNSL=1', '-DNNG_HAVE_LOCALTIME_R=1', '-DNNG_HAVE_LOCKF=1',
-                            '-DNNG_HAVE_MSG_CONTROL=1', '-DNNG_RESOLV_CONCURRENCY=4']
+                            '-DNNG_HAVE_MSG_CONTROL=1', '-DNNG_RESOLV_CONCURRENCY=4', '-DNNG_HAVE_PTHREAD_SETNAME_NP=1']
 
     _SRCS = []
     _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/*.c'))
@@ -90,9 +89,10 @@ if 'CONFIG_LNNG_ENABLED' in os.environ:
     if 'CONFIG_NNG_SUPP_HTTP' in os.environ:
         DEFINITIONS_PRIVATE += ['-DNNG_SUPP_HTTP']
         _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/http/*.c'))
-
     if 'CONFIG_NNG_ENABLE_IPV6' in os.environ:
         DEFINITIONS_PRIVATE += ['-DNNG_ENABLE_IPV6', '-DNNG_HAVE_INET6=1']
+    if 'CONFIG_NNG_HAVE_BACKTRACE' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_HAVE_BACKTRACE=1']
 
     _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/websocket/*.c'))
     _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/tls/*.c'))

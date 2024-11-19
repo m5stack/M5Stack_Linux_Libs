@@ -107,6 +107,11 @@ menuconfig LNNG_ENABLED
         default y
         depends on LNNG_ENABLED
 
+    config NNG_HAVE_BACKTRACE
+        bool "enable backtrce"
+        default y
+        depends on LNNG_ENABLED
+
     config LNNG_DYNAMIC
         bool "compile component as dynamic(shared) lib"
         default n
