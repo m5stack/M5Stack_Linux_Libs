@@ -1,0 +1,119 @@
+# component2/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+if 'CONFIG_LNNG_ENABLED' in os.environ:
+    check_component('nng')
+    SRCS=[]
+    INCLUDE=[]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=[]
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=['-w']
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+
+    COMPONENT_PATH = os.path.join(os.environ['GIT_REPO_PATH'], 'nng')
+    INCLUDE.append(os.path.join(COMPONENT_PATH, 'include'))
+    PRIVATE_INCLUDE.append(os.path.join(COMPONENT_PATH, 'src'))
+    DEFINITIONS_PRIVATE += ['-DNNG_LITTLE_ENDIAN=1', '-DNNG_HIDDEN_VISIBILITY']
+    DEFINITIONS_PRIVATE += ['-D_GNU_SOURCE', '-D_POSIX_PTHREAD_SEMANTICS', '-DNNG_USE_EVENTFD', '-D_THREAD_SAFE']
+    DEFINITIONS_PRIVATE += ['-DNNG_STATIC_LIB', '-DNNG_ENABLE_STATS']
+    DEFINITIONS_PRIVATE += ['-DNNG_HAVE_ABSTRACT_SOCKETS', '-DNNG_HAVE_BACKTRACE=1']
+    DEFINITIONS_PRIVATE += ['-DNNG_HAVE_CLOCK_GETTIME', '-DNNG_HAVE_EPOLL=1', '-DNNG_HAVE_EPOLL_CREATE1=1',
+                            '-DNNG_HAVE_FLOCK', '-DNNG_HAVE_GETENTROPY=1', '-DNNG_HAVE_GETRANDOM=1',
+                            '-DNNG_HAVE_LANGINFO=1', '-DNNG_HAVE_LIBATOMIC=1',
+                            '-DNNG_HAVE_LIBNSL=1', '-DNNG_HAVE_LOCALTIME_R=1', '-DNNG_HAVE_LOCKF=1',
+                            '-DNNG_HAVE_MSG_CONTROL=1', '-DNNG_RESOLV_CONCURRENCY=4']
+
+    _SRCS = []
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/*.c'))
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/core/*.c'))
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/*.c'))
+
+    DEFINITIONS_PRIVATE.append('-DNNG_MAX_EXPIRE_THREADS={}'.format(os.environ['CONFIG_NNG_MAX_EXPIRE_THREADS']))
+    DEFINITIONS_PRIVATE.append('-DNNG_MAX_POLLER_THREADS={}'.format(os.environ['CONFIG_NNG_MAX_POLLER_THREADS']))
+    DEFINITIONS_PRIVATE.append('-DNNG_MAX_TASKQ_THREADS={}'.format(os.environ['CONFIG_NNG_MAX_TASKQ_THREADS']))
+
+    if 'CONFIG_TOOLCHAIN_SYSTEM_UNIX' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_PLATFORM_LINUX', '-DNNG_PLATFORM_POSIX', '-DNNG_USE_EVENTFD', '-DNNG_HAVE_ABSTRACT_SOCKETS']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/platform/posix/*.c'))
+    elif 'CONFIG_TOOLCHAIN_SYSTEM_WIN' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_PLATFORM_WINDOWS', '-D_CRT_SECURE_NO_WARNINGS', '-D_CRT_RAND_S', '-D_WIN32_WINNT=0x0600']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/platform/windows/*.c'))
+
+    if 'CONFIG_NNG_HAVE_BUS0' in os.environ:
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/protocol/bus0/*.c'))
+    if 'CONFIG_NNG_HAVE_PAIR0' in os.environ:
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/protocol/pair0/*.c'))
+    if 'CONFIG_NNG_HAVE_PAIR1' in os.environ:
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/protocol/pair1/*.c'))
+    if 'CONFIG_NNG_HAVE_SURVEYOR0' in os.environ:
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/protocol/survey0/*.c'))
+    if 'CONFIG_NNG_HAVE_PUBSUB0' in os.environ:
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/protocol/pubsub0/*.c'))
+    if 'CONFIG_NNG_HAVE_PULLPUSH0' in os.environ:
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/protocol/pipeline0/*.c'))
+    if 'CONFIG_NNG_HAVE_REPREQ0' in os.environ:
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/protocol/reqrep0/*.c'))
+    if 'CONFIG_NNG_TRANSPORT_FDC' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_TRANSPORT_FDC']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/transport/socket/*.c'))
+        DEFINITIONS_PRIVATE += ['-DNNG_HAVE_SOCKETPAIR=1']
+    if 'CONFIG_NNG_TRANSPORT_INPROC' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_TRANSPORT_INPROC']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/transport/inproc/*.c'))
+    if 'CONFIG_NNG_TRANSPORT_IPC' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_TRANSPORT_IPC']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/transport/ipc/*.c'))
+    if 'CONFIG_NNG_TRANSPORT_TCP' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_TRANSPORT_TCP']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/transport/tcp/*.c'))
+    if 'CONFIG_NNG_TRANSPORT_TLS' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_TRANSPORT_TLS']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/transport/tls/*.c'))
+        if 'CONFIG_TLS_MBEDTLS_ENABLED' in os.environ:
+            _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/tls/mbedtls/*.c'))
+        if 'CONFIG_TLS_WOLFSSL_ENABLED' in os.environ:
+            _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/tls/wolfssl/*.c'))
+
+    if 'CONFIG_NNG_TRANSPORT_UDP' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_TRANSPORT_UDP']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/transport/udp/*.c'))
+    if 'CONFIG_NNG_TRANSPORT_WS' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_TRANSPORT_WS']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/sp/transport/ws/*.c'))
+    if 'CONFIG_NNG_SUPP_HTTP' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_SUPP_HTTP']
+        _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/http/*.c'))
+
+    if 'CONFIG_NNG_ENABLE_IPV6' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DNNG_ENABLE_IPV6', '-DNNG_HAVE_INET6=1']
+
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/websocket/*.c'))
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/tls/*.c'))
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/base64/*.c'))
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/sha1/*.c'))
+    _SRCS += AGlob(os.path.join(COMPONENT_PATH,'src/supplemental/util/*.c'))
+
+    for src in _SRCS:
+        if not str(src).endswith('test.c'):
+            SRCS.append(src)
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'shared' if 'CONFIG_LNNG_DYNAMIC' in os.environ else 'static'
+                            })

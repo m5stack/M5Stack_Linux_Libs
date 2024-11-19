@@ -1,0 +1,114 @@
+menuconfig LNNG_ENABLED
+    bool "Enable nng"
+    default n
+
+    config NNG_HAVE_BUS0
+        bool "compile bus0"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_HAVE_PAIR0
+        bool "compile pair0"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_HAVE_PAIR1
+        bool "compile pair1"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_HAVE_SURVEYOR0
+        bool "compile surveyor0"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_HAVE_PUBSUB0
+        bool "compile pubsub0"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_HAVE_PULLPUSH0
+        bool "compile pullpush0"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_HAVE_REPREQ0
+        bool "compile repreq"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_TRANSPORT_FDC
+        bool "compile fdc"
+        default n
+        depends on LNNG_ENABLED
+
+    config NNG_TRANSPORT_INPROC
+        bool "compile inproc"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_TRANSPORT_IPC
+        bool "compile ipc"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_TRANSPORT_TCP
+        bool "compile tcp"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_TRANSPORT_TLS
+        bool "compile tls"
+        default n
+        depends on LNNG_ENABLED
+
+        choice
+            prompt "choice TLS engine"
+            default TLS_MBEDTLS_ENABLED
+            depends on NNG_TRANSPORT_TLS
+        config TLS_MBEDTLS_ENABLED
+            bool "enable mbedtls"
+        config TLS_WOLFSSL_ENABLED
+            bool "enable wolfssl"
+        endchoice
+
+    config NNG_TRANSPORT_UDP
+        bool "compile udp"
+        default y
+        depends on LNNG_ENABLED
+
+    config NNG_TRANSPORT_WS
+        bool "compile ws"
+        default n
+        depends on LNNG_ENABLED
+
+    config NNG_SUPP_HTTP
+        bool "compile http"
+        default n
+        depends on LNNG_ENABLED
+
+    config NNG_MAX_EXPIRE_THREADS
+        int "nng max expire threads"
+        default 2
+        depends on LNNG_ENABLED
+
+    config NNG_MAX_POLLER_THREADS
+        int "nng max poller threads"
+        default 2
+        depends on LNNG_ENABLED
+
+    config NNG_MAX_TASKQ_THREADS
+        int "nng max taskq threads"
+        default 4
+        depends on LNNG_ENABLED
+
+    config NNG_ENABLE_IPV6
+        bool "enable ipv6"
+        default y
+        depends on LNNG_ENABLED
+
+    config LNNG_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on LNNG_ENABLED
+
