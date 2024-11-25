@@ -1,135 +1,152 @@
 # component2/SConscript
-Import('env')
+Import("env")
 import os
-with open(env['PROJECT_TOOL_S']) as f:
+
+with open(env["PROJECT_TOOL_S"]) as f:
     exec(f.read())
 
-
-
-if 'CONFIG_NCNN_ENABLED' in os.environ:
-    check_component('ncnn')
-    SRCS=[]
+if "CONFIG_NCNN_ENABLED" in os.environ:
+    check_component("ncnn")
+    SRCS = []
     SRCS_CUSTOM = {}
-    INCLUDE=[]
-    PRIVATE_INCLUDE=[]
-    REQUIREMENTS=[]
-    STATIC_LIB=[]
-    DYNAMIC_LIB=[]
-    DEFINITIONS=[]
+    INCLUDE = []
+    PRIVATE_INCLUDE = []
+    REQUIREMENTS = []
+    STATIC_LIB = []
+    DYNAMIC_LIB = []
+    DEFINITIONS = []
     DEFINITIONS_PRIVATE = []
-    LDFLAGS=[]
-    LINK_SEARCH_PATH=[]
-    
-    INCLUDE.append(ADir('../../github_source/ncnn/src'))
-    INCLUDE.append(ADir('../../github_source/ncnn/src/layer'))
-    gcc_dumpmachine = env['GCC_DUMPMACHINE'].split('-')
-    if 'arm' in gcc_dumpmachine and 'gnueabihf' in gcc_dumpmachine:
-        DEFINITIONS_PRIVATE += ['-O3 -DNDEBUG -fPIC -DNCNN_STATIC_DEFINE -Wall -Wextra -Wno-unused-function -Ofast -ffast-math -fvisibility=hidden -fvisibility-inlines-hidden -fopenmp -pthread']
-        DEFINITIONS_PRIVATE += ['-march=armv7-a -mfloat-abi=hard -mfpu=neon']
+    LDFLAGS = []
+    LINK_SEARCH_PATH = []
+
+    INCLUDE.append(ADir("../../github_source/ncnn/src"))
+    INCLUDE.append(ADir("../../github_source/ncnn/src/layer"))
+    gcc_dumpmachine = env["GCC_DUMPMACHINE"].split("-")
+    if "arm" in gcc_dumpmachine and "gnueabihf" in gcc_dumpmachine:
+        DEFINITIONS_PRIVATE += [
+            "-O3 -DNDEBUG -fPIC -DNCNN_STATIC_DEFINE -Wall -Wextra -Wno-unused-function -Ofast -ffast-math -fvisibility=hidden -fvisibility-inlines-hidden -fopenmp -pthread"
+        ]
+        DEFINITIONS_PRIVATE += ["-march=armv7-a -mfloat-abi=hard -mfpu=neon"]
         # DEFINITIONS_PRIVATE += ['-DNCNN_SIMPLEOCV']
-        
-        INCLUDE.append(ADir('include/arm-linux-gnueabihf'))
-        INCLUDE.append(ADir('../../github_source/ncnn/src/layer/arm'))
-        SRCS += AGlob('../../github_source/ncnn/src/*.cpp')
-        SRCS += AGlob('../../github_source/ncnn/src/layer/*.cpp')
-        SRCS += AGlob('../../github_source/ncnn/src/layer/arm/*.cpp')
 
-        filter_cpp = ['argmax.cpp'
-                ,'spp.cpp'
-                ,'mat_pixel_android.cpp'
-                ,'batchnorm_arm_asimdhp.cpp'
-                ,'binaryop_arm_asimdhp.cpp'
-                ,'clip_arm_asimdhp.cpp'
-                ,'convolution1d_arm_asimdhp.cpp'
-                ,'convolution_arm_asimddp.cpp'
-                ,'convolution_arm_asimdhp.cpp'
-                ,'convolution_arm_i8mm.cpp'
-                ,'convolutiondepthwise_arm_asimdhp.cpp'
-                ,'deconvolution_arm_asimdhp.cpp'
-                ,'deconvolutiondepthwise_arm_asimdhp.cpp'
-                ,'dequantize_arm_asimdhp.cpp'
-                ,'eltwise_arm_asimdhp.cpp'
-                ,'gelu_arm_asimdhp.cpp'
-                ,'gru_arm_asimddp.cpp'
-                ,'gru_arm_asimdhp.cpp'
-                ,'hardsigmoid_arm_asimdhp.cpp'
-                ,'hardswish_arm_asimdhp.cpp'
-                ,'instancenorm_arm_asimdhp.cpp'
-                ,'interp_arm_asimdhp.cpp'
-                ,'lstm_arm_asimddp.cpp'
-                ,'lstm_arm_asimdhp.cpp'
-                ,'mish_arm_asimdhp.cpp'
-                ,'pooling_arm_asimdhp.cpp'
-                ,'prelu_arm_asimdhp.cpp'
-                ,'quantize_arm_asimdhp.cpp'
-                ,'relu_arm_asimdhp.cpp'
-                ,'rnn_arm_asimddp.cpp'
-                ,'rnn_arm_asimdhp.cpp'
-                ,'sigmoid_arm_asimdhp.cpp'
-                ,'swish_arm_asimdhp.cpp'
-                ,'tanh_arm_asimdhp.cpp'
-                ,'unaryop_arm_asimdhp.cpp'
-                ,'cast_arm_bf16.cpp'
-                ,'gemm_arm_asimdhp.cpp'
-                ,'gemm_arm_vfpv4.cpp'
-                ,'gemm_arm_asimdfhm.cpp'
-                ,'innerproduct_arm_asimdfhm.cpp'
-                ,'innerproduct_arm_asimdhp.cpp'
-                ,'innerproduct_arm_vfpv4.cpp'
-                ,'softmax_arm_asimdhp.cpp'
-        ]
+        INCLUDE.append(ADir("include/arm-linux-gnueabihf"))
+        INCLUDE.append(ADir("../../github_source/ncnn/src/layer/arm"))
+        SRCS += AGlob("../../github_source/ncnn/src/*.cpp")
+        SRCS += AGlob("../../github_source/ncnn/src/layer/*.cpp")
+        SRCS += AGlob("../../github_source/ncnn/src/layer/arm/*.cpp")
 
-        SRCS = list(filter(lambda x: os.path.basename(str(x)) not in filter_cpp, SRCS))
-
-    elif 'x86_64' in gcc_dumpmachine and 'linux' in gcc_dumpmachine:
-        DEFINITIONS_PRIVATE += ['-std=c++11 -std=c++11  -O3 -DNDEBUG -DNCNN_STATIC_DEFINE -Wall -Wextra -Wno-unused-function -Ofast -ffast-math -fvisibility=hidden -fvisibility-inlines-hidden']
-        DEFINITIONS_PRIVATE += ['-msse2 -msse -fopenmp']
-        # -fPIC
-        
-        INCLUDE.append(ADir('include/build-host-gcc-linux'))
-        INCLUDE.append(ADir('../../github_source/ncnn/src/layer/x86'))
-        INCLUDE.append(ADir('../../github_source/ncnn/build-host-gcc-linux/src'))
-        SRCS += AGlob('../../github_source/ncnn/src/*.cpp')
-        SRCS += AGlob('../../github_source/ncnn/src/layer/*.cpp')
-        SRCS += AGlob('../../github_source/ncnn/src/layer/x86/*.cpp')
-        
-        
         filter_cpp = [
-            'mat_pixel_android.cpp'
-            ,'argmax.cpp'
-            ,'spp.cpp'
-            ,'cast_x86_avx512bf16.cpp'
-            ,'innerproduct_x86_f16c.cpp'
+            "argmax.cpp",
+            "spp.cpp",
+            "mat_pixel_android.cpp",
+            "batchnorm_arm_asimdhp.cpp",
+            "binaryop_arm_asimdhp.cpp",
+            "clip_arm_asimdhp.cpp",
+            "convolution1d_arm_asimdhp.cpp",
+            "convolution_arm_asimddp.cpp",
+            "convolution_arm_asimdhp.cpp",
+            "convolution_arm_i8mm.cpp",
+            "convolutiondepthwise_arm_asimdhp.cpp",
+            "deconvolution_arm_asimdhp.cpp",
+            "deconvolutiondepthwise_arm_asimdhp.cpp",
+            "dequantize_arm_asimdhp.cpp",
+            "eltwise_arm_asimdhp.cpp",
+            "gelu_arm_asimdhp.cpp",
+            "gru_arm_asimddp.cpp",
+            "gru_arm_asimdhp.cpp",
+            "hardsigmoid_arm_asimdhp.cpp",
+            "hardswish_arm_asimdhp.cpp",
+            "instancenorm_arm_asimdhp.cpp",
+            "interp_arm_asimdhp.cpp",
+            "lstm_arm_asimddp.cpp",
+            "lstm_arm_asimdhp.cpp",
+            "mish_arm_asimdhp.cpp",
+            "pooling_arm_asimdhp.cpp",
+            "prelu_arm_asimdhp.cpp",
+            "quantize_arm_asimdhp.cpp",
+            "relu_arm_asimdhp.cpp",
+            "rnn_arm_asimddp.cpp",
+            "rnn_arm_asimdhp.cpp",
+            "sigmoid_arm_asimdhp.cpp",
+            "swish_arm_asimdhp.cpp",
+            "tanh_arm_asimdhp.cpp",
+            "unaryop_arm_asimdhp.cpp",
+            "cast_arm_bf16.cpp",
+            "gemm_arm_asimdhp.cpp",
+            "gemm_arm_vfpv4.cpp",
+            "gemm_arm_asimdfhm.cpp",
+            "innerproduct_arm_asimdfhm.cpp",
+            "innerproduct_arm_asimdhp.cpp",
+            "innerproduct_arm_vfpv4.cpp",
+            "softmax_arm_asimdhp.cpp",
+        ]
+        SRCS = list(filter(lambda x: os.path.basename(str(x)) not in filter_cpp, SRCS))
+
+    elif "x86_64" in gcc_dumpmachine and "linux" in gcc_dumpmachine:
+        DEFINITIONS_PRIVATE += [
+            "-std=c++11 -std=c++11  -O3 -DNDEBUG -DNCNN_STATIC_DEFINE -Wall -Wextra -Wno-unused-function -Ofast -ffast-math -fvisibility=hidden -fvisibility-inlines-hidden"
+        ]
+        DEFINITIONS_PRIVATE += ["-msse2 -msse -fopenmp"]
+        # -fPIC
+
+        INCLUDE.append(ADir("include/build-host-gcc-linux"))
+        INCLUDE.append(ADir("../../github_source/ncnn/src/layer/x86"))
+        INCLUDE.append(ADir("../../github_source/ncnn/build-host-gcc-linux/src"))
+        SRCS += AGlob("../../github_source/ncnn/src/*.cpp")
+        SRCS += AGlob("../../github_source/ncnn/src/layer/*.cpp")
+        SRCS += AGlob("../../github_source/ncnn/src/layer/x86/*.cpp")
+
+        filter_cpp = [
+            "mat_pixel_android.cpp",
+            "argmax.cpp",
+            "spp.cpp",
+            "cast_x86_avx512bf16.cpp",
+            "innerproduct_x86_f16c.cpp",
         ]
 
         SRCS = list(filter(lambda x: os.path.basename(str(x)) not in filter_cpp, SRCS))
 
-        
-
-        SRCS_TMP = AGlob('../../github_source/ncnn/build-host-gcc-linux/src/layer/x86/*.cpp')
+        SRCS_TMP = AGlob(
+            "../../github_source/ncnn/build-host-gcc-linux/src/layer/x86/*.cpp"
+        )
         for src in SRCS_TMP:
             if os.path.basename(str(src)) in filter_cpp:
                 continue
-            elif str(src).endswith('avx512.cpp'):
-                SRCS_CUSTOM[src] = {'CPPFLAGS':['-mavx512f', '-mavx512cd', '-mavx512bw', '-mavx512dq', '-mavx512vl', '-mfma', '-mf16c'], 'CCFLAGS':[]}
-            elif str(src).endswith('fma.cpp'):
-                SRCS_CUSTOM[src] = {'CPPFLAGS':['-mavx', '-mfma', '-mf16c'], 'CCFLAGS':[]}
-            elif str(src).endswith('avx.cpp'):
-                SRCS_CUSTOM[src] = {'CPPFLAGS':['-mavx'], 'CCFLAGS':[]}
+            elif str(src).endswith("avx512.cpp"):
+                SRCS_CUSTOM[src] = {
+                    "CPPFLAGS": [
+                        "-mavx512f",
+                        "-mavx512cd",
+                        "-mavx512bw",
+                        "-mavx512dq",
+                        "-mavx512vl",
+                        "-mfma",
+                        "-mf16c",
+                    ],
+                    "CCFLAGS": [],
+                }
+            elif str(src).endswith("fma.cpp"):
+                SRCS_CUSTOM[src] = {
+                    "CPPFLAGS": ["-mavx", "-mfma", "-mf16c"],
+                    "CCFLAGS": [],
+                }
+            elif str(src).endswith("avx.cpp"):
+                SRCS_CUSTOM[src] = {"CPPFLAGS": ["-mavx"], "CCFLAGS": []}
 
-        # for f in SRCS:
-        #     print(str(f))
-    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
-                            'SRCS':SRCS,
-                            'SRCS_CUSTOM':SRCS_CUSTOM,
-                            'INCLUDE':INCLUDE,
-                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
-                            'REQUIREMENTS':REQUIREMENTS,
-                            'STATIC_LIB':STATIC_LIB,
-                            'DYNAMIC_LIB':DYNAMIC_LIB,
-                            'DEFINITIONS':DEFINITIONS,
-                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
-                            'LDFLAGS':LDFLAGS,
-                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
-                            'REGISTER':'static'
-                            })
+    env["COMPONENTS"].append(
+        {
+            "target": os.path.basename(env["component_dir"]),
+            "SRCS": SRCS,
+            "SRCS_CUSTOM": SRCS_CUSTOM,
+            "INCLUDE": INCLUDE,
+            "PRIVATE_INCLUDE": PRIVATE_INCLUDE,
+            "REQUIREMENTS": REQUIREMENTS,
+            "STATIC_LIB": STATIC_LIB,
+            "DYNAMIC_LIB": DYNAMIC_LIB,
+            "DEFINITIONS": DEFINITIONS,
+            "DEFINITIONS_PRIVATE": DEFINITIONS_PRIVATE,
+            "LDFLAGS": LDFLAGS,
+            "LINK_SEARCH_PATH": LINK_SEARCH_PATH,
+            "REGISTER": "static",
+        }
+    )

@@ -1,0 +1,9 @@
+menuconfig SIMDJSON_COMPENENT_ENABLED
+    bool "Enable simdjson"
+    default n
+
+    config SIMDJSON_COMPENENT_DYNAMIC
+        bool "compile component as dynamic(shared) lib"
+        default n
+        depends on SIMDJSON_COMPENENT_ENABLED
+

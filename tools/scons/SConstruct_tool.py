@@ -69,6 +69,53 @@ def compare_and_copy(file1, file2):
         with open(file1, "rb") as f1, open(file2, "wb") as f2:
             f2.write(f1.read())
 
+def sample_wget(down_url, file_path):
+    if not os.path.exists(file_path):
+        import requests
+        response = requests.get(down_url)
+        if response.status_code == 200:
+            with open(file_path, 'wb') as file:
+                file.write(response.content)
+        else:
+            env.Fatal("{} down failed".format(down_url))
+    return file_path
+
+def wget_tar_gz(url, file_name):
+    file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
+    path  = file_path[:-7]
+    if not os.path.exists(path):
+        sample_wget(url, file_path)
+        import  tarfile
+        with tarfile.open(file_path, 'r:gz') as tar:
+            tar.extractall(path=path)
+    return path
+
+def wget_zip(url, file_name):
+    file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
+    path  = file_path[:-4]
+    if not os.path.exists(path):
+        sample_wget(url, file_path)
+        import  zipfile
+        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+            for file_info in zip_ref.infolist():
+                try:
+                    zip_ref.extract(file_info, path)
+                except Exception as e:
+                    pass
+    return path
+
+def wget_github_commit(url, commit):
+    import parse
+    import shutil
+    repo = parse.parse("{}://{}/{}/{}.git", url)
+    github_url = url.rstrip('.git')
+    down_url = github_url + "/archive/{}.zip".format(commit)
+    zip_file_name = '{}-{}.zip'.format(repo[3], commit)
+    file_path = wget_zip(down_url, zip_file_name)
+    shutil.move(os.path.join(file_path, zip_file_name[:-4]), os.path.join(os.environ['GIT_REPO_PATH'], repo[3]))
+    shutil.rmtree(file_path)
+    return down_url
+
 def check_component(component_name):
     if component_name in env['GIT_REPO_LISTS']:
         if not os.path.exists(env['GIT_REPO_LISTS'][component_name]['path']):
@@ -78,43 +125,42 @@ def check_component(component_name):
                 down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(component_name))
                 down = down.lower()
             if down == 'y':
-                # from git import Repo
-                import requests
-                import parse
-                import zipfile
-                import shutil
                 try:
-                    # Downloading via HTTP (more common)
-                    repo = parse.parse("{}://{}/{}/{}.git", env['GIT_REPO_LISTS'][component_name]['url'])
-                    zip_file = "{}-{}.zip".format(env['GIT_REPO_LISTS'][component_name]['path'], env['GIT_REPO_LISTS'][component_name]['commit'])
-                    zip_file_extrpath = "{}-{}".format(env['GIT_REPO_LISTS'][component_name]['path'], env['GIT_REPO_LISTS'][component_name]['commit'])
-                    zip_file_next_path = os.path.join(zip_file_extrpath, "{}-{}".format(repo[3], env['GIT_REPO_LISTS'][component_name]['commit']))
-                    down_url = "https://github.com/{}/{}/archive/{}.zip".format(repo[2], repo[3], env['GIT_REPO_LISTS'][component_name]['commit'])
-                    if not os.path.exists(zip_file):
-                        response = requests.get(down_url)
-                        if response.status_code == 200:
-                            with open(zip_file, 'wb') as file:
-                                file.write(response.content)
-                        else:
-                            env.Fatal("{} down failed".format(down_url))
-                    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-                        for file_info in zip_ref.infolist():
-                            try:
-                                zip_ref.extract(file_info, zip_file_extrpath)
-                            except Exception as e:
-                                pass
-                    shutil.move(zip_file_next_path, env['GIT_REPO_LISTS'][component_name]['path'])
-                    shutil.rmtree(zip_file_extrpath)
-                    # The way to download Git is to download the Git software package.
-                    # Repo.clone_from(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path'])
-                    # repo = Repo(env['GIT_REPO_LISTS'][component_name]['path'])
-                    # repo.git.checkout(env['GIT_REPO_LISTS'][component_name]['commit'])
+                    down_url = wget_github_commit(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['commit'])
                     print("The {} download successful.".format(down_url))
                 except Exception as e:
                     print('Please manually download {} to {}.'.format(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path']))
                     env.Fatal("Cloning failed.: {}".format(e))
             else:
                 env.Fatal('Please manually download {} to {}.'.format(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path']))
+
+def check_wget_down(url, file_name):
+    if file_name.endswith('.zip'):
+        file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
+        path  = file_path[:-4]
+        if not os.path.exists(path):
+            if 'CONFIG_REPO_AUTOMATION' in os.environ:
+                down = 'y'
+            else:
+                down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(file_path))
+                down = down.lower()
+            if down == 'y':
+                return wget_zip(url, file_name)
+        return path
+    elif file_name.endswith('.tar.gz'):
+        file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
+        path  = file_path[:-7]
+        if not os.path.exists(path):
+            if 'CONFIG_REPO_AUTOMATION' in os.environ:
+                down = 'y'
+            else:
+                down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(file_path))
+                down = down.lower()
+            if down == 'y':
+                return wget_tar_gz(url, file_name)
+        return path
+    else:
+        env.Fatal('{} not support'.format(file_name))
 
 def CC_cmd_execute(cmd):
     import os

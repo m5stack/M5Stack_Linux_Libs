@@ -1,75 +1,50 @@
 # component/SConscript
-Import('env')
+Import("env")
 import os
-with open(env['PROJECT_TOOL_S']) as f:
+
+with open(env["PROJECT_TOOL_S"]) as f:
     exec(f.read())
 
+
 def get_sqlite3_lib():
-    sqlite3_path = str(ADir('../../github_source/sqlite3'))
-    if not os.path.exists(sqlite3_path):
-        zip_file = str(AFile('../../github_source/sqlite-amalgamation-3460000.zip'))
-        zip_file_extrpath = sqlite3_path + '_tmp'
-        down_url = "https://sqlite.org/2024/sqlite-amalgamation-3460000.zip"
-        
-        if 'CONFIG_REPO_AUTOMATION' in os.environ:
-            down = 'y'
-        else:
-            down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format('sqlite-amalgamation-3460000.zip'))
-            down = down.lower()
-        if down == 'y':
-            # from git import Repo
-            import requests
-            import parse
-            import zipfile
-            import shutil
-            try:
-                # Downloading via HTTP (more common)
-                if not os.path.exists(zip_file):
-                    response = requests.get(down_url)
-                    if response.status_code == 200:
-                        with open(zip_file, 'wb') as file:
-                            file.write(response.content)
-                    else:
-                        env.Fatal("{} down failed".format(down_url))
-                with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-                    zip_ref.extractall(zip_file_extrpath)
-                shutil.move(os.path.join(zip_file_extrpath, 'sqlite-amalgamation-3460000'), sqlite3_path)
-                shutil.rmtree(zip_file_extrpath)
-                print("The {} download successful.".format(down_url))
-            except Exception as e:
-                print('Please manually download {} to {} .'.format(down_url, zip_file))
-                env.Fatal("Cloning failed.: {}".format(e))
-        else:
-            env.Fatal('Please manually download {} to {} .'.format(down_url, zip_file))
-    INCLUDE = [sqlite3_path]
-    SRCS = [AFile('../../github_source/sqlite3/sqlite3.c')]
+    sqlite3_path = check_wget_down(
+        "https://sqlite.org/2024/sqlite-amalgamation-3460000.zip",
+        "sqlite-amalgamation-3460000.zip",
+    )
+    sqlite3_project_path = os.path.join(sqlite3_path, "sqlite-amalgamation-3460000")
+    INCLUDE = [sqlite3_project_path]
+    SRCS = [os.path.join(sqlite3_project_path, "sqlite3.c")]
     return INCLUDE, SRCS
 
-if 'CONFIG_SQLITE3_COMPOENENT_ENABLED' in os.environ:
-    SRCS=[]
-    INCLUDE=[]
-    PRIVATE_INCLUDE=[]
-    REQUIREMENTS=[]
-    STATIC_LIB=[]
-    DYNAMIC_LIB=[]
-    DEFINITIONS=[]
-    DEFINITIONS_PRIVATE=[]
-    LDFLAGS=[]
-    LINK_SEARCH_PATH=[]
+
+if "CONFIG_SQLITE3_COMPOENENT_ENABLED" in os.environ:
+    SRCS = []
+    INCLUDE = []
+    PRIVATE_INCLUDE = []
+    REQUIREMENTS = []
+    STATIC_LIB = []
+    DYNAMIC_LIB = []
+    DEFINITIONS = []
+    DEFINITIONS_PRIVATE = []
+    LDFLAGS = []
+    LINK_SEARCH_PATH = []
     _INCLUDE, _SRCS = get_sqlite3_lib()
     INCLUDE += _INCLUDE
     SRCS += _SRCS
 
-    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
-                            'SRCS':SRCS,
-                            'INCLUDE':INCLUDE,
-                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
-                            'REQUIREMENTS':REQUIREMENTS,
-                            'STATIC_LIB':STATIC_LIB,
-                            'DYNAMIC_LIB':DYNAMIC_LIB,
-                            'DEFINITIONS':DEFINITIONS,
-                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
-                            'LDFLAGS':LDFLAGS,
-                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
-                            'REGISTER':'static'
-                            })
+    env["COMPONENTS"].append(
+        {
+            "target": os.path.basename(env["component_dir"]),
+            "SRCS": SRCS,
+            "INCLUDE": INCLUDE,
+            "PRIVATE_INCLUDE": PRIVATE_INCLUDE,
+            "REQUIREMENTS": REQUIREMENTS,
+            "STATIC_LIB": STATIC_LIB,
+            "DYNAMIC_LIB": DYNAMIC_LIB,
+            "DEFINITIONS": DEFINITIONS,
+            "DEFINITIONS_PRIVATE": DEFINITIONS_PRIVATE,
+            "LDFLAGS": LDFLAGS,
+            "LINK_SEARCH_PATH": LINK_SEARCH_PATH,
+            "REGISTER": "static",
+        }
+    )
