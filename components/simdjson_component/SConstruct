@@ -17,7 +17,7 @@ if "CONFIG_SIMDJSON_COMPENENT_ENABLED" in os.environ:
     DEFINITIONS_PRIVATE = []
     LDFLAGS = []
     LINK_SEARCH_PATH = []
-
+    DEFINITIONS += ['-std=c++17']
     COMPONENT_PATH = os.path.join(os.environ["GIT_REPO_PATH"], "simdjson")
     SRCS += [os.path.join(COMPONENT_PATH, "src/simdjson.cpp")]
 
