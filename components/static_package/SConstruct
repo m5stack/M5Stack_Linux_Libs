@@ -25,11 +25,12 @@ def get_opencv_from_ncnn():
         "https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip",
         "opencv-mobile-2.4.13.7-armlinux.zip",
     )
+    opencv_path += '/opencv-mobile-2.4.13.7-armlinux'
     gcc_dumpmachine = env["GCC_DUMPMACHINE"]
     INCLUDE = [os.path.join(opencv_path, gcc_dumpmachine, "include")]
     STATIC_LIB = AGlob(
         os.path.join(
-            "../../github_source/opencv-mobile-2.4.13.7-armlinux",
+            opencv_path,
             gcc_dumpmachine,
             "lib/*.a",
         )
