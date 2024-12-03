@@ -28,6 +28,11 @@ menuconfig DEVICE_DRIVER_ENABLED
         default n
         depends on DEVICE_DRIVER_ENABLED
 
+    config DEVICE_V4L2_ENABLED
+        bool "compile v4l2 camera lib"
+        default n
+        depends on DEVICE_DRIVER_ENABLED
+
     config DEVICE_PTMX_ENABLED
         bool "compile ptmx lib"
         default n
