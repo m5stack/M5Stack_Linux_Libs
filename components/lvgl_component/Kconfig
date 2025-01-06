@@ -20,7 +20,7 @@ if LVGL_COMPONENT_ENABLED
     endmenu
 
 if LVGL_9_3_SRC
-	source "${SDK_PATH}/github_source/lvgl/lvgl_9_3/lvgl/Kconfig"
+	osource "${SDK_PATH}/components/lvgl_component/lvgl_9_3/Kconfig"
 endif
 
 endif
