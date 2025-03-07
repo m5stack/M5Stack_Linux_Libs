@@ -47,6 +47,9 @@ git_clone_and_checkout_commit https://github.com/DaveGamble/cJSON.git 078c4e6c53
 git_clone_and_checkout_commit https://github.com/zpl-c/zpl.git 7e4d5889e9fc7c67251e627d30b7673c915fab0d
 git_clone_and_checkout_commit https://github.com/nanomsg/nng.git 9ea51a5bd5828648c68dbfbc43b2edcde65e5262
 git_clone_and_checkout_commit https://github.com/simdjson/simdjson.git 9b314922a1f5ecbda366115992893e368cd2f0e0
+git_clone_and_checkout_commit https://github.com/abseil/abseil-cpp.git ce986ae569c3b11ce2f2e53ed00c0b597bdfed58
+git_clone_and_checkout_commit https://github.com/google/flatbuffers.git 1c514626e83c20fffa8557e75641848e1e15cd5e
+
 
 # opencv-mobile-2.4.13.7-armlinux https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip
 
