@@ -1,0 +1,114 @@
+# component/SConscript
+Import('env')
+import os
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+if 'CONFIG_MONGO_C_DRIVER_ENABLED' in os.environ:
+    check_component('mongo-c-driver')
+    SRCS=[]
+    INCLUDE=[ADir('include'), ADir('../../github_source/mongo-c-driver/src/common/src')]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=[]
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=['-O2']
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+
+
+    if 'CONFIG_LIBBSON_ENABLED' in os.environ:
+        _SRCS = AGlob('../../github_source/mongo-c-driver/src/common/src/*.c*')
+        _SRCS += AGlob('../../github_source/mongo-c-driver/src/libbson/src/bson/*.c*')
+        _SRCS += AGlob('../../github_source/mongo-c-driver/src/libbson/src/jsonsl/*.c*')
+        _INCLUDE = [ADir('../../github_source/mongo-c-driver/src/libbson/src')]
+        _DEFINITIONS_PRIVATE = ['-DBSON_COMPILATION', '-DBSON_STATIC', '-DJSONSL_PARSE_NAN', '-DMCOMMON_NAME_PREFIX=_bson_mcommon', '-D_BSD_SOURCE', '-D_DEFAULT_SOURCE', '-D_MLIB_BUILD_CONFIG=RelWithDebInfo', '-D_XOPEN_SOURCE=700']
+        env['COMPONENTS'].append({'target':'bson',
+                                'SRCS':SRCS + _SRCS,
+                                'INCLUDE':INCLUDE + _INCLUDE,
+                                'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                                'REQUIREMENTS':REQUIREMENTS,
+                                'STATIC_LIB':STATIC_LIB,
+                                'DYNAMIC_LIB':DYNAMIC_LIB,
+                                'DEFINITIONS':DEFINITIONS,
+                                'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE + _DEFINITIONS_PRIVATE,
+                                'LDFLAGS':LDFLAGS,
+                                'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                                'REGISTER':'static'
+                                })
+
+
+
+    if 'CONFIG_LIBZLIB_ENABLED' in os.environ:
+        _SRCS = AGlob('../../github_source/mongo-c-driver/src/zlib-1.3.1/*.c')
+        _INCLUDE = [ADir('../../github_source/mongo-c-driver/src/zlib-1.3.1')]
+        env['COMPONENTS'].append({'target':'zlib',
+                                'SRCS':SRCS + _SRCS,
+                                'INCLUDE':INCLUDE + _INCLUDE,
+                                'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                                'REQUIREMENTS':REQUIREMENTS,
+                                'STATIC_LIB':STATIC_LIB,
+                                'DYNAMIC_LIB':DYNAMIC_LIB,
+                                'DEFINITIONS':DEFINITIONS,
+                                'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                                'LDFLAGS':LDFLAGS,
+                                'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                                'REGISTER':'static'
+                                })
+
+    if 'CONFIG_KMS_MESSAGE_ENABLED' in os.environ:
+        _SRCS = AGlob('../../github_source/mongo-c-driver/src/kms-message/src/*.c')
+        _INCLUDE = [ADir('../../github_source/mongo-c-driver/src/kms-message/src')]
+        _DEFINITIONS_PRIVATE = ['-DBSON_STATIC'  ,'-DHAVE_STDARG_H'  ,'-DHAVE_UNISTD_H'  ,'-DKMS_MESSAGE_ENABLE_CRYPTO'  ,'-DKMS_MESSAGE_ENABLE_CRYPTO_LIBCRYPTO'  ,'-DKMS_MESSAGE_LITTLE_ENDIAN'  ,'-DKMS_MSG_STATIC'  ,'-DMCOMMON_NAME_PREFIX=_mongoc_mcommon'  ,'-DMONGOC_COMPILATION'  ,'-DMONGOC_STATIC'  ,'-DUTF8PROC_STATIC'  ,'-D_BSD_SOURCE'  ,'-D_DEFAULT_SOURCE'  ,'-D_MLIB_BUILD_CONFIG=RelWithDebInfo'  ,'-D_XOPEN_SOURCE=700']
+        _SRCS = list(filter(lambda x: not str(x).endswith('kms_kmip_reader_writer.c'), _SRCS))
+        env['COMPONENTS'].append({'target':'kms-message',
+                                'SRCS':SRCS + _SRCS,
+                                'INCLUDE':INCLUDE + _INCLUDE,
+                                'PRIVATE_INCLUDE':PRIVATE_INCLUDE ,
+                                'REQUIREMENTS':REQUIREMENTS + ['ssl', 'crypto'],
+                                'STATIC_LIB':STATIC_LIB,
+                                'DYNAMIC_LIB':DYNAMIC_LIB,
+                                'DEFINITIONS':DEFINITIONS,
+                                'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE + _DEFINITIONS_PRIVATE,
+                                'LDFLAGS':LDFLAGS,
+                                'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                                'REGISTER':'static'
+                                })
+
+    if 'CONFIG_LIBMONGOC_ENABLED' in os.environ:
+        _PRIVATE_INCLUDE = [ADir('../../github_source/mongo-c-driver/src/uthash'), ADir('../../github_source/mongo-c-driver/src/libbson/src'), ADir('../../github_source/mongo-c-driver/src/kms-message/src'), ADir('../../github_source/mongo-c-driver/src/utf8proc-2.8.0')]
+        _SRCS = AGlob('../../github_source/mongo-c-driver/src/common/src/*.c*')
+        _SRCS += AGlob('../../github_source/mongo-c-driver/src/libmongoc/src/mongoc/*.c')
+        _SRCS += [AFile('../../github_source/mongo-c-driver/src/utf8proc-2.8.0/utf8proc.c')]
+        _INCLUDE = [ADir('../../github_source/mongo-c-driver/src/libmongoc/src')]
+        _DEFINITIONS_PRIVATE = ['-DBSON_STATIC', '-DHAVE_STDARG_H', '-DHAVE_UNISTD_H', '-DKMS_MESSAGE_ENABLE_CRYPTO', '-DKMS_MESSAGE_ENABLE_CRYPTO_LIBCRYPTO', '-DKMS_MESSAGE_LITTLE_ENDIAN', '-DKMS_MSG_STATIC', '-DMCOMMON_NAME_PREFIX=_mongoc_mcommon', '-DMONGOC_COMPILATION', '-DMONGOC_STATIC', '-DUTF8PROC_STATIC', '-D_BSD_SOURCE', '-D_DEFAULT_SOURCE', '-D_MLIB_BUILD_CONFIG=RelWithDebInfo', '-D_XOPEN_SOURCE=700']
+        env['COMPONENTS'].append({'target':'mongoc',
+                                'SRCS':SRCS + _SRCS,
+                                'INCLUDE':INCLUDE + _INCLUDE,
+                                'PRIVATE_INCLUDE':PRIVATE_INCLUDE + _PRIVATE_INCLUDE,
+                                'REQUIREMENTS':REQUIREMENTS + ['kms-message', 'bson', 'zlib', 'zstd', 'resolv'],
+                                'STATIC_LIB':STATIC_LIB,
+                                'DYNAMIC_LIB':DYNAMIC_LIB,
+                                'DEFINITIONS':DEFINITIONS ,
+                                'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE + _DEFINITIONS_PRIVATE ,
+                                'LDFLAGS':LDFLAGS,
+                                'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                                'REGISTER':'static'
+                                })
+
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'static'
+                            })
