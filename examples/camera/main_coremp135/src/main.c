@@ -11,7 +11,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "camera.h"
+#include "linux_v4l2/linux_camera.h"
 #include "framebuffer/fbtools.h"
 #include "imlib.h"
 
@@ -20,10 +20,11 @@
 FBDEV fbdev;
 image_t* img;
 image_t* fb_img;
-Camera_t* cam = NULL;
-
-void DisplayCallback(uint8_t* pData, uint32_t Width, uint32_t Height, uint32_t Length) {
-    // SLOGI("Get img Width Width Length %d %d %d\n", Width, Height, Length);
+camera_t* cam = NULL;
+int asdasd    = 0;
+void DisplayCallback(uint8_t* pData, uint32_t Width, uint32_t Height, uint32_t Length, void* ctx)
+{
+    SLOGI("Get img Width Width Length %d %d %d %d\n", Width, Height, Length, asdasd++);
     img->data = pData;
     imlib_pixfmt_to(fb_img, img, NULL);
     {
@@ -43,10 +44,11 @@ void DisplayCallback(uint8_t* pData, uint32_t Width, uint32_t Height, uint32_t L
     }
 }
 
-void SignalHandle(int SignalNumber) {
+void SignalHandle(int SignalNumber)
+{
     printf("Now clean resource\n");
-    cam->CameraCaptureStop(cam);
-    CameraClose(cam);
+    cam->camera_capture_stop(cam);
+    camera_close(cam);
     cam = NULL;
 
     imlib_image_destroy(&img);
@@ -54,9 +56,10 @@ void SignalHandle(int SignalNumber) {
     fb_close(&fbdev);
 }
 
-int main(int Argc, char* pArgv[]) {
+int main(int Argc, char* pArgv[])
+{
     int Ret = -1;
-    int w = CONFIG_CAPTURE_WIDTH, h = CONFIG_CAPTURE_HEIGHT;
+    int w = 320, h = 240;
     signal(SIGINT, SignalHandle);
 
     memset(&fbdev, 0, sizeof(FBDEV));
@@ -70,14 +73,14 @@ int main(int Argc, char* pArgv[]) {
     fb_img = imlib_image_create(w, h, PIXFORMAT_RGB565, w * h * 2, (void*)fbdev.fb_mem, 0);
 
     img = imlib_image_create(w, h, PIXFORMAT_YUV422, w * h * 2, NULL, 0);
-    cam = CameraOpen(CONFIG_CAPTURE_DEVICE);
+    cam = camera_open("/dev/video0", 320, 240, 30);
     if (cam == NULL) {
         printf("Camera open failed \n");
         return -1;
     }
 
-    cam->CameraCaptureCallbackSet(cam, DisplayCallback);
-    cam->CameraCaptureStart(cam);
+    cam->camera_capture_callback_set(cam, DisplayCallback);
+    cam->camera_capture_start(cam);
 
     char KeyValue = getchar();
     printf("You press [%c] button, now stop capture\n", KeyValue);

@@ -1,0 +1,6 @@
+
+menuconfig LIBFLATBUFFERS_ENABLED
+    bool "Enable libflatbuffers"
+    default n
+
+

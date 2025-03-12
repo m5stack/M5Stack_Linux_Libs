@@ -9,6 +9,7 @@ from pathlib import Path
 import paramiko
 from scp import SCPClient 
 import sys
+import hashlib
 
 def create_ssh_client(hostname, port, username, password):
     client = paramiko.SSHClient()
@@ -26,34 +27,50 @@ def create_ssh_client(hostname, port, username, password):
         client = None
     return client, scpclient
 
+def get_file_md5(file_path):
+    """Calculate MD5 checksum of a file."""
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 def ssh_push_file(file_group, remote_host, remote_port, username, password):
     ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
     for local_file, remote_file in file_group:
-        print("push", local_file, remote_file, '...')
+        print("Checking", local_file)
         sys.stdout.flush()
         remote_dir = Path(Path(remote_file).parent).as_posix()
         
-        if ssh is not None:
-            # print('[ -d "{}" ] || mkdir -p "{}"'.format(remote_dir, remote_dir))
-            for cout in range(3):
-                try:
-                    stdin, stdout, stderr = ssh.exec_command('[ -d "{}" ] || mkdir -p "{}"'.format(remote_dir, remote_dir))
-                    exit_status = stdout.channel.recv_exit_status()
-                    scpclient.put(local_file, remote_file)
-                    print("push", local_file, remote_file, 'success!')
-                    sys.stdout.flush()
-                    break
-                except paramiko.SSHException:
-                    if cout != 2:
-                        print("push", local_file, remote_file, 'error, will be retry ...')
-                    else:
-                        print("push", local_file, remote_file, 'error!')
-                    ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
-            # local_file_stat = os.stat(local_file)
-            # sys.stdout.write("\033[A\033[K")
-            # print("push", local_file, remote_file, 'success!')
-            # sys.stdout.flush()
+        try:
+            # Retrieve remote file MD5 checksum if it exists
+            stdin, stdout, stderr = ssh.exec_command(f'md5sum {remote_file} || echo "no_remote_md5"')
+            remote_md5 = stdout.read().strip().split()[0].decode('utf-8')
+        except Exception as e:
+            print("Could not retrieve remote file checksum:", e)
+            remote_md5 = "no_remote_md5"
+
+        local_md5 = get_file_md5(local_file)
+        if local_md5 != remote_md5:
+            print("push", local_file, remote_file, '...')
+            sys.stdout.flush()
+            if ssh is not None:
+                for cout in range(3):
+                    try:
+                        stdin, stdout, stderr = ssh.exec_command('[ -d "{}" ] || mkdir -p "{}"'.format(remote_dir, remote_dir))
+                        exit_status = stdout.channel.recv_exit_status()
+                        scpclient.put(local_file, remote_file)
+                        print("push", local_file, remote_file, 'success!')
+                        sys.stdout.flush()
+                        break
+                    except paramiko.SSHException:
+                        if cout != 2:
+                            print("push", local_file, remote_file, 'error, will be retry ...')
+                        else:
+                            print("push", local_file, remote_file, 'error!')
+                        ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
+        else:
+            print("No changes detected for", local_file, ", skipping upload.")
 
 
 

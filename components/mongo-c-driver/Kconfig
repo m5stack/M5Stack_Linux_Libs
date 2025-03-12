@@ -1,0 +1,36 @@
+
+menuconfig MONGO_C_DRIVER_ENABLED
+    bool "Enable mongo-c-driver"
+    default n
+
+	config LIBBSON_ENABLED
+		bool "compile mongo-c-driver libbson"
+		default n
+		depends on MONGO_C_DRIVER_ENABLED
+
+	config LIBZLIB_ENABLED
+		bool "compile mongo-c-driver libzlib"
+		default n
+		depends on MONGO_C_DRIVER_ENABLED
+
+	config KMS_MESSAGE_ENABLED
+		bool "compile mongo-c-driver kms-message"
+		default n
+		depends on MONGO_C_DRIVER_ENABLED
+
+	config LIBMONGOC_ENABLED
+		bool "compile mongo-c-driver libmongoc"
+		default n
+		depends on MONGO_C_DRIVER_ENABLED && LIBZLIB_ENABLED && LIBBSON_ENABLED && KMS_MESSAGE_ENABLED
+
+
+
+
+
+
+
+
+
+
+
+

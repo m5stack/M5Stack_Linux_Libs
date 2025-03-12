@@ -4,9 +4,7 @@ import os
 with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
-
-
-if 'CONFIG_LVGL_COMPONENT_ENABLED' in os.environ:
+if 'CONFIG_LVGL_9_0_SRC' in os.environ:
     SRCS=[]
     INCLUDE=[]
     PRIVATE_INCLUDE=[]
@@ -19,12 +17,49 @@ if 'CONFIG_LVGL_COMPONENT_ENABLED' in os.environ:
     LINK_SEARCH_PATH=[]
     INCLUDE.append(ADir('include'))
     INCLUDE.append(ADir('../../github_source/lvgl'))
-    if 'CONFIG_LVGL_COMPONENT_LVGL' in os.environ:
-        SRCS += append_srcs_dir([ADir('../../github_source/lvgl/lvgl/src'), 
-                                 ADir('../../github_source/lvgl/lvgl/demos'),
-                                 ADir('../../github_source/lvgl/lvgl/examples')])
-    if 'CONFIG_LVGL_COMPONENT_LV_DRIVERS' in os.environ:
-        SRCS += append_srcs_dir([ADir('../../github_source/lvgl/lv_drivers')])
+    SRCS += append_srcs_dir([ADir('../../github_source/lvgl/lvgl/src'), 
+                                ADir('../../github_source/lvgl/lvgl/demos'),
+                                ADir('../../github_source/lvgl/lvgl/examples')])
+    SRCS += append_srcs_dir([ADir('../../github_source/lvgl/lv_drivers')])
+
+    env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
+                            'SRCS':SRCS,
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'REGISTER':'static'
+                            })
+
+if 'CONFIG_LVGL_9_3_SRC' in os.environ:
+    SRCS=[]
+    INCLUDE=[]
+    PRIVATE_INCLUDE=[]
+    REQUIREMENTS=[]
+    STATIC_LIB=[]
+    DYNAMIC_LIB=[]
+    DEFINITIONS=[]
+    DEFINITIONS_PRIVATE=[]
+    LDFLAGS=[]
+    LINK_SEARCH_PATH=[]
+    lvgl_src = os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl')
+    git_commit = 'fc8fcf40fb01e94b325cb774f77b36415d589517'
+    if not os.path.exists(lvgl_src):
+        down_lvgl_src = check_wget_down('https://github.com/dianjixz/lvgl/archive/{}.zip'.format(git_commit), 'lvgl-{}.zip'.format(git_commit))
+        import shutil
+        shutil.move(down_lvgl_src, os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3'))
+        os.rename(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl-{}'.format(git_commit)),lvgl_src)
+
+    INCLUDE.append(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3'))
+    SRCS += append_srcs_dir([os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl/src'),
+                             os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl/demos'),
+                             os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl/examples')])
+    DEFINITIONS += [ '-I.', '-DLV_CONF_KCONFIG_EXTERNAL_INCLUDE=\\\\\\"build/config/global_config.h\\\\\\"']
 
     env['COMPONENTS'].append({'target':os.path.basename(env['component_dir']),
                             'SRCS':SRCS,

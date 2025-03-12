@@ -1,0 +1,8 @@
+namespace MyGame.Example;  
+  
+table Person {  
+  name:string;  
+  age:int;  
+}  
+  
+root_type Person;
