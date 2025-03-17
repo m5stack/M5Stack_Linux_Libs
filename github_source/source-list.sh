@@ -50,6 +50,7 @@ git_clone_and_checkout_commit https://github.com/simdjson/simdjson.git 9b314922a
 git_clone_and_checkout_commit https://github.com/abseil/abseil-cpp.git ce986ae569c3b11ce2f2e53ed00c0b597bdfed58
 git_clone_and_checkout_commit https://github.com/google/flatbuffers.git 1c514626e83c20fffa8557e75641848e1e15cd5e
 git_clone_and_checkout_commit https://github.com/mongodb/mongo-c-driver.git 915277362a01f7304a6e119fb7c2030f5401dca9
+git_clone_and_checkout_commit https://github.com/Mbed-TLS/mbedtls.git 107ea89daaefb9867ea9121002fbbdf926780e98
 
 # opencv-mobile-2.4.13.7-armlinux https://github.com/nihui/opencv-mobile/releases/download/v26/opencv-mobile-2.4.13.7-armlinux.zip
 

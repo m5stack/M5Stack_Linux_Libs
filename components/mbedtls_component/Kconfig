@@ -1,0 +1,43 @@
+
+menuconfig MBEDTLS_COMPONENT_ENABLED
+    bool "Enable mbedtls component"
+    default n
+
+	config EVEREST_ENABLED
+		bool "compile mbedtls libeverest"
+		default n
+		depends on MBEDTLS_COMPONENT_ENABLED
+
+	config P256M_ENABLED
+		bool "compile mbedtls libp256m"
+		default n
+		depends on MBEDTLS_COMPONENT_ENABLED
+
+	config MBEDCRYPTO_ENABLED
+		bool "compile mbedtls libmbedcrypto"
+		default n
+		depends on MBEDTLS_COMPONENT_ENABLED
+
+	config MBEDX509_ENABLED
+		bool "compile mbedtls libmbedx509"
+		default n
+		depends on MBEDTLS_COMPONENT_ENABLED
+
+	config MBEDTLS_ENABLED
+		bool "compile mbedtls libmbedtls"
+		default n
+		depends on MBEDTLS_COMPONENT_ENABLED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
