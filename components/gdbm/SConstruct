@@ -1,0 +1,40 @@
+# component2/SConscript
+Import("env")
+import os
+
+with open(env["PROJECT_TOOL_S"]) as f:
+    exec(f.read())
+
+if "CONFIG_GDBM_ENABLED" in os.environ:
+    COMPONENT_PATH = check_wget_down("https://ftp.gnu.org/gnu/gdbm/gdbm-1.24.tar.gz", 'gdbm-1.24.tar.gz')
+    SRCS = []
+    INCLUDE = [ADir('include')]
+    PRIVATE_INCLUDE = []
+    REQUIREMENTS = []
+    STATIC_LIB = []
+    DYNAMIC_LIB = []
+    DEFINITIONS = []
+    DEFINITIONS_PRIVATE = ['-DHAVE_CONFIG_H', '-O2']
+    LDFLAGS = []
+    LINK_SEARCH_PATH = []
+    
+    SRCS += Glob(os.path.join(COMPONENT_PATH, "gdbm-1.24/src/*.c"))
+    SRCS = list(filter(lambda x: str(x).endswith('debug.c') == False, SRCS))
+
+    # print(SRCS)
+    env["COMPONENTS"].append(
+        {
+            "target": os.path.basename(env["component_dir"]),
+            "SRCS": SRCS,
+            "INCLUDE": INCLUDE,
+            "PRIVATE_INCLUDE": PRIVATE_INCLUDE,
+            "REQUIREMENTS": REQUIREMENTS,
+            "STATIC_LIB": STATIC_LIB,
+            "DYNAMIC_LIB": DYNAMIC_LIB,
+            "DEFINITIONS": DEFINITIONS,
+            "DEFINITIONS_PRIVATE": DEFINITIONS_PRIVATE,
+            "LDFLAGS": LDFLAGS,
+            "LINK_SEARCH_PATH": LINK_SEARCH_PATH,
+            "REGISTER": "shared" if "CONFIG_LNNG_DYNAMIC" in os.environ else "static",
+        }
+    )
