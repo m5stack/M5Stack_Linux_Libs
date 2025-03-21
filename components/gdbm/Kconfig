@@ -1,0 +1,5 @@
+menuconfig GDBM_ENABLED
+    bool "Enable GNU dbm"
+    default n
+
+
