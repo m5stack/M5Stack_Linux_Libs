@@ -268,21 +268,24 @@ def build_task_init():
     env['AS']    = '${_concat(GCCPREFIX, "as", GCCSUFFIX, __env__)}'        
     env['STRIP'] = '${_concat(GCCPREFIX, "strip", GCCSUFFIX, __env__)}'     
 
-    try:
-        env.ParseConfig('${CC} -v 2> gcc_out.txt')
-        version_r = parse.compile("gcc version {} {}")
-        Target_r = parse.compile("Target: {}\n")
-        with open('gcc_out.txt', 'r') as conf_file:
-            for line in conf_file.readlines():
-                version = version_r.parse(line)
-                if version:
-                    env['CCVERSION'] = version[0]
-                Target = Target_r.parse(line)
-                if Target:
-                    env['GCC_DUMPMACHINE'] = Target[0]
-        os.remove('gcc_out.txt')
-    except:
-        print('Failed to obtain GCC parameters!')
+    if 'CONFIG_GCC_DUMPMACHINE' in os.environ:
+        env['GCC_DUMPMACHINE'] = os.environ['CONFIG_GCC_DUMPMACHINE'].strip('"')
+    else:
+        try:
+            env.ParseConfig('${CC} -v 2> gcc_out.txt')
+            version_r = parse.compile("gcc version {} {}")
+            Target_r = parse.compile("Target: {}\n")
+            with open('gcc_out.txt', 'r') as conf_file:
+                for line in conf_file.readlines():
+                    version = version_r.parse(line)
+                    if version:
+                        env['CCVERSION'] = version[0]
+                    Target = Target_r.parse(line)
+                    if Target:
+                        env['GCC_DUMPMACHINE'] = Target[0]
+            os.remove('gcc_out.txt')
+        except:
+            print('Failed to obtain GCC parameters!')
 
     env['GIT_REPO_LISTS'] = {}
     try:
@@ -381,6 +384,12 @@ def creat_commpile_Program():
 
         _BUILD_ENV.Append(LIBPATH=component['LINK_SEARCH_PATH'])
         _LIBO = []
+
+        for requirement in component['REQUIREMENTS']:
+            if requirement in task_lists:
+                for c_requirement in task_lists[requirement]['REQUIREMENTS']: 
+                    if c_requirement in task_lists:
+                        component['REQUIREMENTS'].append(c_requirement)
 
         for requirement in component['REQUIREMENTS']:
             if requirement in task_lists:
