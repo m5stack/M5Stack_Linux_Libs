@@ -14,7 +14,7 @@ if "CONFIG_SIMDJSON_COMPENENT_ENABLED" in os.environ:
     STATIC_LIB = []
     DYNAMIC_LIB = []
     DEFINITIONS = []
-    DEFINITIONS_PRIVATE = []
+    DEFINITIONS_PRIVATE = ['-O2']
     LDFLAGS = []
     LINK_SEARCH_PATH = []
     DEFINITIONS += ['-std=c++17']
