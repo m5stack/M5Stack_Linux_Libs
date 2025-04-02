@@ -1,13 +1,15 @@
 /*
 Thread Safe Version STL in C++11
 Copyright(c) 2021
-Author: tashaxing
+Author: tashaxing, dianjixz
+update: 2025,04,02. add get put
 */
 #ifndef THREAD_SAFE_LIST_H_INCLUDED
 #define THREAD_SAFE_LIST_H_INCLUDED
 
 #include <list>
 #include <mutex>
+#include <condition_variable>
 
 namespace thread_safe {
 
@@ -117,9 +119,14 @@ public:
     // Allocator
     allocator_type get_allocator( void ) const { std::lock_guard<std::mutex> lock( mutex ); return storage.get_allocator(); }
 
+    T get() { std::unique_lock<std::mutex> lock(mutex); cond_var.wait(lock, [this] { return !storage.empty(); }); T value = storage.front(); storage.pop_front(); return value; }
+    void put(const T& value) { std::lock_guard<std::mutex> lock(mutex); storage.push_back(value); cond_var.notify_one(); }
+    void put(T&& value) { std::lock_guard<std::mutex> lock(mutex); storage.emplace_back(std::move(value)); cond_var.notify_one(); }
+
 private:
     std::list<T, Allocator> storage;
     mutable std::mutex mutex;
+    std::condition_variable cond_var;
 };
 
 }
