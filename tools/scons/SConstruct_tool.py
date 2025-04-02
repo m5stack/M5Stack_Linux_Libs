@@ -104,17 +104,21 @@ def wget_zip(url, file_name):
                     pass
     return path
 
-def wget_github_commit(url, commit):
+def wget_github_commit(url, commit, outpath = False):
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
     github_url = url.rstrip('.git')
     down_url = github_url + "/archive/{}.zip".format(commit)
     zip_file_name = '{}-{}.zip'.format(repo[3], commit)
-    file_path = wget_zip(down_url, zip_file_name)
-    shutil.move(os.path.join(file_path, zip_file_name[:-4]), os.path.join(os.environ['GIT_REPO_PATH'], repo[3]))
-    shutil.rmtree(file_path)
-    return down_url
+    if not os.path.exists(os.path.join(os.environ['GIT_REPO_PATH'], repo[3])):
+        file_path = wget_zip(down_url, zip_file_name)
+        shutil.move(os.path.join(file_path, zip_file_name[:-4]), os.path.join(os.environ['GIT_REPO_PATH'], repo[3]))
+        shutil.rmtree(file_path)
+    if outpath:
+        return os.path.join(os.environ['GIT_REPO_PATH'], repo[3])
+    else:
+        return down_url
 
 def check_component(component_name):
     if component_name in env['GIT_REPO_LISTS']:
