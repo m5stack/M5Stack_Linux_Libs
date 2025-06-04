@@ -1,0 +1,5 @@
+
+menuconfig HTTP_PARSER_ENABLED
+    bool "Enable http-parser"
+    default n
+
