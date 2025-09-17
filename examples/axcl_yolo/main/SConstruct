@@ -8,6 +8,10 @@ with open(env['PROJECT_TOOL_S']) as f:
 if not os.path.exists('axcl-samples'):
     os.system('git clone https://github.com/dianjixz/axcl-samples.git')
 
+
+CONFIG_USE_HOST_OPENCV4LIB = os.environ.get('CONFIG_USE_HOST_OPENCV4LIB', 'n').lower() in ['y', 'yes', '1', 'true']
+
+
 SRCS = []
 INCLUDE = [ADir('.')]
 PRIVATE_INCLUDE = []
@@ -34,9 +38,14 @@ INCLUDE += [os.path.join(env["MSP_PATH"], '../sample')]
 SRCS += Glob('axcl-samples/examples/axcl/ax_model_runner/*.c*')
 
 if 'aarch64' in env['GCC_DUMPMACHINE']:
-    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/include/opencv4')]
-    LINK_SEARCH_PATH += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/lib')]
-    LINK_SEARCH_PATH += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/lib/opencv4/3rdparty')]
+    if CONFIG_USE_HOST_OPENCV4LIB:
+        # Use host OPENCV4
+        INCLUDE += ['/usr/include/opencv4']
+    else:
+        # Use OPENCV4 from axcl_msp
+        INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/include/opencv4')]
+        LINK_SEARCH_PATH += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/lib')]
+        LINK_SEARCH_PATH += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/lib/opencv4/3rdparty')]
 
 
 elif 'x86' in env['GCC_DUMPMACHINE']:
@@ -45,8 +54,12 @@ elif 'x86' in env['GCC_DUMPMACHINE']:
     DEFINITIONS['CCFLAGS']  += ['-mavx2']
 
 
-REQUIREMENTS += ['dl', 'tegra_hal', 'zlib']
-LDFLAGS += '-lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -l:liblibtiff.a  -l:liblibopenjp2.a -l:liblibjpeg-turbo.a -l:liblibwebp.a -l:liblibpng.a -l:libittnotify.a'.split()
+REQUIREMENTS += ['dl']
+LDFLAGS += '-lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio'.split()
+if not CONFIG_USE_HOST_OPENCV4LIB:
+    # Use OPENCV4 from axcl_msp
+    LDFLAGS += '-l:liblibtiff.a  -l:liblibopenjp2.a -l:liblibjpeg-turbo.a -l:liblibwebp.a -l:liblibpng.a -l:libittnotify.a -ltegra_hal -lzlib'.split()
+
 
 # data/ivps/1920x1080.nv12
 # STATIC_FILES += [os.path.join(env["MSP_PATH"], 'data/ivps/1920x1080.nv12')]

@@ -122,12 +122,16 @@ The project uses several configuration files:
 
 ## Important Notes
 
-⚠️ **OpenCV Video Library Limitation**: The OpenCV library included in the AXCL MSP SDK does not have video processing capabilities. If you want to use video-related examples such as `ax_yolo11_steps_video`, you need to modify the `examples/axcl_yolo/main/SConstruct` build script to reference OpenCV libraries from your host compilation environment that include video support.
+⚠️ **OpenCV Video Library Limitation**: The OpenCV library included with the AXCL MSP SDK does not support video processing functionalities. If you want to use video-related examples such as `ax_yolo11_steps_video`, you need to execute the following command in the build terminal:
+```bash
+export CONFIG_USE_HOST_OPENCV4LIB=y
+```
+This will enable the use of the host's OpenCV library with video support during compilation.
 
-To enable video functionality:
-1. Modify `examples/axcl_yolo/main/SConstruct`
-2. Update the OpenCV library paths to point to a full OpenCV installation with video support
-3. Ensure the host OpenCV libraries are compatible with your target architecture
+To enable video functionality, please follow these steps:
+1. Set the environment variable `CONFIG_USE_HOST_OPENCV4LIB=y`
+2. Install `libopencv4-dev` on your host machine
+3. Ensure that the host OpenCV library is compatible with your target architecture
 
 ## Troubleshooting
 
