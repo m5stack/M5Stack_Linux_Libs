@@ -1,0 +1,38 @@
+menuconfig AXCL_MSP_ENABLED
+    bool "Enable axcl_msp support"
+    default n
+    help
+        enable axera axcl bsp support
+
+    choice
+        prompt "choice board"
+        default AX_8850_MSP_ENABLED
+        depends on AXCL_MSP_ENABLED
+    config AX_650_MSP_ENABLED
+        bool "enable ax650 bsp"
+        help
+            build by AXERA!
+    config AX_8850_MSP_ENABLED
+        bool "enable ax8850 bsp"
+        help
+            build by AXERA!
+    endchoice
+    
+    choice
+        prompt "choice common version"
+        default MSP_V3_6_2_ENABLED
+        depends on AXCL_MSP_ENABLED
+    config MSP_V3_6_2_ENABLED
+        bool "enable v3.6.2 bsp"
+        help
+            build by m5stack!
+    config MSP_V3_6_4_ENABLED
+        bool "enable v3.6.4 bsp"
+        help
+            build by m5stack!
+    config MSP_V3_0_2_ENABLED
+        bool "enable v3.0.2 bsp"
+        help
+            build by m5stack!
+    endchoice
+

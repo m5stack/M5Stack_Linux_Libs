@@ -1,0 +1,32 @@
+import os
+import platform
+import fileinput
+if platform.machine() == 'aarch64':
+    config_txt = ''
+    for line in fileinput.input(files=('config_defaults.mk',)):
+        if line.startswith('CONFIG_TOOLCHAIN_PATH') or line.startswith('CONFIG_TOOLCHAIN_PREFIX'):
+            config_txt += '# ' + line
+        else:
+            config_txt += line
+    try:
+        with open('config_defaults.mk', 'w') as f:
+            f.write(config_txt)
+    except Exception as e:
+        print(e)
+    
+
+env = SConscript(
+    os.path.join(os.getcwd(), "../../tools/scons/project.py"),
+    variant_dir=os.getcwd(),
+    duplicate=0,
+)
+
+
+
+# for t in env['MYTARGETS']:
+#     m_project = env["task_list"][t]
+#     m_project["_target_build_env"].Command(
+#         target=f"dist/{t}.rpath",  # 目标文件
+#         source=f"build/{t}/{t}",  # 源文件
+#         action="patchelf --force-rpath --set-rpath '/usr/lib/axcl:/usr/lib/axcl/ffmpeg' $SOURCES ; cp $SOURCES $TARGET",  # 执行命令
+#     )

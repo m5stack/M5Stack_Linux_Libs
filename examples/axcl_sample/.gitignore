@@ -1,0 +1,10 @@
+dist
+build
+.config.mk
+.flash.conf.json
+.vscode
+static_lib**
+*.deb
+*.tar.gz
+m5stack_*
+debian*

@@ -1,0 +1,65 @@
+import os
+import socket
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+SRCS = Glob('./*.c*')
+INCLUDE = []
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread', 'axcl_msp']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = {'CCFLAGS':[], 'CXXFLAGS':[]}
+DEFINITIONS_PRIVATE = []
+LDFLAGS = ['-Wl,-rpath=/usr/lib/axcl/ffmpeg']
+LINK_SEARCH_PATH = []
+STATIC_FILES = []
+
+
+DEFINITIONS['CCFLAGS']  += ['-MMD', f'-DCOMPILER_HOSTNAME=\\\"{socket.gethostname()}\\\"', '-DAXCL_CMA_CACHED']
+DEFINITIONS['CXXFLAGS'] += ['--std=c++17']
+
+REQUIREMENTS += ['axcl_rt', 'axcl_pkg', 'axcl_comm', 'axcl_token','spdlog', 'axcl_pcie_msg', 'axcl_pcie_dma', 'axcl_sys', 'axcl_vdec', 'axcl_venc']
+
+INCLUDE += [ADir('common')]
+INCLUDE += [os.path.join(env["MSP_PATH"], '../sample')]
+
+if 'aarch64' in env['GCC_DUMPMACHINE']:
+    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/ffmpeg/arm64/include')]
+    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/spdlog/arm64/include')]
+elif 'x86' in env['GCC_DUMPMACHINE']:
+    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/ffmpeg/x64/include')]
+    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/spdlog/x64/include')]
+    DEFINITIONS['CCFLAGS']  += ['-mavx2']
+
+SRCS += AGlob('common/*.c*')
+
+
+LINK_SEARCH_PATH = [os.path.join(env["MSP_PATH"], 'lib/ffmpeg')]
+REQUIREMENTS += ['avcodec', 'avformat','swresample', 'avutil']
+
+
+
+# data/ivps/1920x1080.nv12
+
+STATIC_FILES += [os.path.join(env["MSP_PATH"], 'data/ivps/1920x1080.nv12')]
+
+env['COMPONENTS'].append({'target':'axcl_sample_venc',
+                          'SRCS':SRCS,
+                          'INCLUDE':INCLUDE,
+                          'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                          'REQUIREMENTS':REQUIREMENTS,
+                          'STATIC_LIB':STATIC_LIB,
+                          'DYNAMIC_LIB':DYNAMIC_LIB,
+                          'DEFINITIONS':DEFINITIONS,
+                          'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                          'LDFLAGS':LDFLAGS,
+                          'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                          'STATIC_FILES':STATIC_FILES,
+                          'REGISTER':'project'
+                          })
+try:
+    env['MYTARGETS'].append('axcl_sample_venc')
+except:
+    env['MYTARGETS'] = ['axcl_sample_venc']

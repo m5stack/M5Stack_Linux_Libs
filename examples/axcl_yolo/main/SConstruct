@@ -1,0 +1,73 @@
+import os
+import socket
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+
+if not os.path.exists('axcl-samples'):
+    os.system('git clone https://github.com/dianjixz/axcl-samples.git')
+
+SRCS = []
+INCLUDE = [ADir('.')]
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread', 'axcl_msp']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = {'CCFLAGS':[], 'CXXFLAGS':[]}
+DEFINITIONS_PRIVATE = []
+LDFLAGS = ['-Wl,-rpath=/usr/lib/axcl/ffmpeg']
+LINK_SEARCH_PATH = []
+STATIC_FILES = []
+
+
+DEFINITIONS['CCFLAGS']  += ['-MMD', f'-DCOMPILER_HOSTNAME=\\\"{socket.gethostname()}\\\"', '-DAXCL_CMA_CACHED']
+DEFINITIONS['CXXFLAGS'] += ['--std=c++17']
+
+REQUIREMENTS += ['axcl_rt', 'axcl_pkg', 'axcl_comm', 'axcl_token','spdlog', 'axcl_pcie_msg', 'axcl_pcie_dma', 'axcl_sys']
+
+INCLUDE += [ADir('axcl-samples/examples')]
+INCLUDE += [os.path.join(env["MSP_PATH"], '../sample')]
+
+
+
+SRCS += Glob('axcl-samples/examples/axcl/ax_model_runner/*.c*')
+
+if 'aarch64' in env['GCC_DUMPMACHINE']:
+    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/include/opencv4')]
+    LINK_SEARCH_PATH += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/lib')]
+    LINK_SEARCH_PATH += [os.path.join(env["MSP_PATH"], '../3rdparty/opencv-4.5.5/arm64/lib/opencv4/3rdparty')]
+
+
+elif 'x86' in env['GCC_DUMPMACHINE']:
+    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/ffmpeg/x64/include')]
+    INCLUDE += [os.path.join(env["MSP_PATH"], '../3rdparty/spdlog/x64/include')]
+    DEFINITIONS['CCFLAGS']  += ['-mavx2']
+
+
+REQUIREMENTS += ['dl', 'tegra_hal', 'zlib']
+LDFLAGS += '-lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -l:liblibtiff.a  -l:liblibopenjp2.a -l:liblibjpeg-turbo.a -l:liblibwebp.a -l:liblibpng.a -l:libittnotify.a'.split()
+
+# data/ivps/1920x1080.nv12
+# STATIC_FILES += [os.path.join(env["MSP_PATH"], 'data/ivps/1920x1080.nv12')]
+
+project_srcs = Glob('axcl-samples/examples/axcl/*.cc')
+for project_src in project_srcs:
+    env['COMPONENTS'].append({'target':os.path.basename(str(project_src)[:-3]),
+                            'SRCS':SRCS + [project_src],
+                            'INCLUDE':INCLUDE,
+                            'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                            'REQUIREMENTS':REQUIREMENTS,
+                            'STATIC_LIB':STATIC_LIB,
+                            'DYNAMIC_LIB':DYNAMIC_LIB,
+                            'DEFINITIONS':DEFINITIONS,
+                            'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                            'LDFLAGS':LDFLAGS,
+                            'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                            'STATIC_FILES':STATIC_FILES,
+                            'REGISTER':'project'
+                            })
+    try:
+        env['MYTARGETS'].append(os.path.basename(str(project_src)[:-3]))
+    except:
+        env['MYTARGETS'] = [os.path.basename(str(project_src)[:-3])]
