@@ -39,13 +39,28 @@ Framework relies on the following software packages: make, cmake, python3, and e
 # The version of Python3 should be greater than or equal to 3.8.
 sudo apt update
 sudo apt install python3 python3-pip libffi-dev
-pip3 install parse scons requests 
+pip3 install parse scons requests tqdm
 # if windows
 # pip3 install windows-curses
 pip3 install setuptools-rust paramiko scp
 
 wget https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/linaro/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf.tar.xz
 sudo tar Jxvf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt
+
+# Add $HOME/.local/bin to the environment path.
+cat << 'EOF' | sudo tee /etc/profile.d/01-local-path.sh > /dev/null
+# /etc/profile.d/01-local-path.sh
+
+if [ -d "$HOME/.local/bin" ]; then
+    case ":$PATH:" in
+        *":$HOME/.local/bin:"*) ;;
+        *)
+            export PATH="$HOME/.local/bin:$PATH"
+            ;;
+    esac
+fi
+EOF
+export PATH="$HOME/.local/bin:$PATH"
 
 # Navigate to the "examples/hello_world" directory.
 cd examples/hello_world
