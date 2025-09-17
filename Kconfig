@@ -27,6 +27,15 @@ menu "Toolchain configuration"
 		bool "win"
 	endchoice
 
+	choice
+		prompt "empty src file type"
+		default EMPTY_SRC_FILE_CPP
+	config EMPTY_SRC_FILE_CPP
+		bool "empty_src_file.cpp"
+	config EMPTY_SRC_FILE_C
+		bool "empty_src_file.c"
+	endchoice
+
 	config REPO_AUTOMATION
 		bool 'Download automation for the repo.'
 		default n
@@ -34,6 +43,7 @@ menu "Toolchain configuration"
 	config COMMPILE_DEBUG
 		bool 'commpile debug msg!'
 		default n
+
 endmenu
 
 menu "Components configuration"

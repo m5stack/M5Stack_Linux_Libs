@@ -14,7 +14,7 @@ def append_srcs_dir(directories):
     import os
     from collections.abc import Iterable
 
-    supported_extensions = ['.c', '.cc', '.cpp', '.S']
+    supported_extensions = ['.c', '.cc', '.cpp', '.S', '.s']
     # if isinstance(sfile, list):
     def _find_file(path):
         directory = str(path)
@@ -72,13 +72,32 @@ def compare_and_copy(file1, file2):
 def sample_wget(down_url, file_path):
     if not os.path.exists(file_path):
         import requests
-        response = requests.get(down_url)
+        from tqdm import tqdm
+        
+        response = requests.get(down_url, stream=True)
         if response.status_code == 200:
+            # 获取文件总大小
+            total_size = int(response.headers.get('content-length', 0))
+            
             with open(file_path, 'wb') as file:
-                file.write(response.content)
+                with tqdm(total=total_size, unit='B', unit_scale=True, desc=os.path.basename(file_path)) as pbar:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            file.write(chunk)
+                            pbar.update(len(chunk))
         else:
             env.Fatal("{} down failed".format(down_url))
     return file_path
+
+def wget_tar_xz(url, file_name):
+    file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
+    path  = file_path[:-7]
+    if not os.path.exists(path):
+        sample_wget(url, file_path)
+        import  tarfile
+        with tarfile.open(file_path, 'r:xz') as tar:
+            tar.extractall(path=path)
+    return path
 
 def wget_tar_gz(url, file_name):
     file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
@@ -108,7 +127,9 @@ def wget_github_commit(url, commit):
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
-    github_url = url.rstrip('.git')
+    github_url = url
+    if github_url.endswith('.git'):
+        github_url = github_url[:-4]
     down_url = github_url + "/archive/{}.zip".format(commit)
     zip_file_name = '{}-{}.zip'.format(repo[3], commit)
     file_path = wget_zip(down_url, zip_file_name)
@@ -159,8 +180,29 @@ def check_wget_down(url, file_name):
             if down == 'y':
                 return wget_tar_gz(url, file_name)
         return path
+    elif file_name.endswith('.tar.xz'):
+        file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
+        path  = file_path[:-7]
+        if not os.path.exists(path):
+            if 'CONFIG_REPO_AUTOMATION' in os.environ:
+                down = 'y'
+            else:
+                down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(file_path))
+                down = down.lower()
+            if down == 'y':
+                return wget_tar_xz(url, file_name)
+        return path
     else:
-        env.Fatal('{} not support'.format(file_name))
+        file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
+        if not os.path.exists(file_path):
+            if 'CONFIG_REPO_AUTOMATION' in os.environ:
+                down = 'y'
+            else:
+                down = input('{} does not exist. Please choose whether to download it automatically? Y/N :'.format(file_path))
+                down = down.lower()
+            if down == 'y':
+                return sample_wget(url, file_path)
+        return file_path
 
 def CC_cmd_execute(cmd):
     import os
@@ -169,3 +211,55 @@ def CC_cmd_execute(cmd):
         out = conf_file.read()
     os.remove('gcc_out.txt')
     return out
+
+
+def DefineProject(target, SRCS=[], INCLUDE=[], PRIVATE_INCLUDE=[], REQUIREMENTS=[], STATIC_LIB=[], DYNAMIC_LIB=[], DEFINITIONS=[], DEFINITIONS_PRIVATE=[], LDFLAGS=[], LINK_SEARCH_PATH=[], STATIC_FILES = []):
+    component_info = {'SRCS': SRCS,
+                      'INCLUDE': INCLUDE,
+                      'PRIVATE_INCLUDE': PRIVATE_INCLUDE,
+                      'REQUIREMENTS': REQUIREMENTS,
+                      'STATIC_LIB': STATIC_LIB,
+                      'DYNAMIC_LIB': DYNAMIC_LIB,
+                      'DEFINITIONS': DEFINITIONS,
+                      'DEFINITIONS_PRIVATE': DEFINITIONS_PRIVATE,
+                      'LDFLAGS': LDFLAGS,
+                      'LINK_SEARCH_PATH': LINK_SEARCH_PATH,
+                      'STATIC_FILES': STATIC_FILES,
+                      'target': target,
+                      'project': 'project'
+                      }
+    env['COMPONENTS'].append(component_info)
+
+def DefineStatic(target, SRCS=[], INCLUDE=[], PRIVATE_INCLUDE=[], REQUIREMENTS=[], STATIC_LIB=[], DYNAMIC_LIB=[], DEFINITIONS=[], DEFINITIONS_PRIVATE=[], LDFLAGS=[], LINK_SEARCH_PATH=[], STATIC_FILES = []):
+    component_info = {'SRCS': SRCS,
+                      'INCLUDE': INCLUDE,
+                      'PRIVATE_INCLUDE': PRIVATE_INCLUDE,
+                      'REQUIREMENTS': REQUIREMENTS,
+                      'STATIC_LIB': STATIC_LIB,
+                      'DYNAMIC_LIB': DYNAMIC_LIB,
+                      'DEFINITIONS': DEFINITIONS,
+                      'DEFINITIONS_PRIVATE': DEFINITIONS_PRIVATE,
+                      'LDFLAGS': LDFLAGS,
+                      'LINK_SEARCH_PATH': LINK_SEARCH_PATH,
+                      'STATIC_FILES': STATIC_FILES,
+                      'target': target,
+                      'project': 'static'
+                      }
+    env['COMPONENTS'].append(component_info)
+
+def DefineShared(target, SRCS=[], INCLUDE=[], PRIVATE_INCLUDE=[], REQUIREMENTS=[], STATIC_LIB=[], DYNAMIC_LIB=[], DEFINITIONS=[], DEFINITIONS_PRIVATE=[], LDFLAGS=[], LINK_SEARCH_PATH=[], STATIC_FILES = []):
+    component_info = {'SRCS': SRCS,
+                      'INCLUDE': INCLUDE,
+                      'PRIVATE_INCLUDE': PRIVATE_INCLUDE,
+                      'REQUIREMENTS': REQUIREMENTS,
+                      'STATIC_LIB': STATIC_LIB,
+                      'DYNAMIC_LIB': DYNAMIC_LIB,
+                      'DEFINITIONS': DEFINITIONS,
+                      'DEFINITIONS_PRIVATE': DEFINITIONS_PRIVATE,
+                      'LDFLAGS': LDFLAGS,
+                      'LINK_SEARCH_PATH': LINK_SEARCH_PATH,
+                      'STATIC_FILES': STATIC_FILES,
+                      'target': target,
+                      'project': 'shared'
+                      }
+    env['COMPONENTS'].append(component_info)
