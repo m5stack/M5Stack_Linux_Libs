@@ -5,11 +5,15 @@ Import('env')
 with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
-compare_and_copy('include/lv_drv_conf.h', '../../../github_source/lvgl/lv_drv_conf.h')
-compare_and_copy('include/lv_conf.h', '../../../github_source/lvgl/lv_conf.h')
+
+lvgl_component = list(filter(lambda x: x['target'] == 'lvgl_component', env['COMPONENTS']))[0]
+lvgl_component['INCLUDE'] += [ADir('include')]
+lvgl_component['DEFINITIONS'] += ['-DLV_CONF_INCLUDE_SIMPLE']
+
+
 
 SRCS = Glob('src/*.c*')
-INCLUDE = [ADir('include'), ADir('.')]
+INCLUDE = [ADir('.')]
 PRIVATE_INCLUDE = []
 REQUIREMENTS = ['pthread', 'lvgl_component']
 STATIC_LIB = []
