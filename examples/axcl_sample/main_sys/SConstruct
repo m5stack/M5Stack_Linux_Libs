@@ -10,14 +10,15 @@ PRIVATE_INCLUDE = []
 REQUIREMENTS = ['pthread', 'axcl_msp']
 STATIC_LIB = []
 DYNAMIC_LIB = []
-DEFINITIONS = []
+DEFINITIONS = {'CCFLAGS':[], 'CXXFLAGS':[]}
 DEFINITIONS_PRIVATE = []
 LDFLAGS = []
 LINK_SEARCH_PATH = []
 STATIC_FILES = []
 
 
-DEFINITIONS += ['--std=c++17', '-MMD', f'-DCOMPILER_HOSTNAME=\\\"{socket.gethostname()}\\\"', '-DAXCL_CMA_CACHED']
+DEFINITIONS['CCFLAGS']  += ['-MMD', f'-DCOMPILER_HOSTNAME=\\\"{socket.gethostname()}\\\"', '-DAXCL_CMA_CACHED']
+DEFINITIONS['CXXFLAGS'] += ['--std=c++17']
 
 REQUIREMENTS += ['axcl_rt', 'axcl_pkg', 'axcl_comm', 'axcl_token','spdlog', 'axcl_pcie_msg', 'axcl_pcie_dma', 'axcl_sys']
 

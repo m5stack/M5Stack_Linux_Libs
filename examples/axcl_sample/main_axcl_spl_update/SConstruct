@@ -1,0 +1,46 @@
+import os
+import socket
+Import('env')
+with open(env['PROJECT_TOOL_S']) as f:
+    exec(f.read())
+
+SRCS = Glob('./*.c*')
+INCLUDE = []
+PRIVATE_INCLUDE = []
+REQUIREMENTS = ['pthread', 'axcl_msp']
+STATIC_LIB = []
+DYNAMIC_LIB = []
+DEFINITIONS = {'CCFLAGS':[], 'CXXFLAGS':[]}
+DEFINITIONS_PRIVATE = []
+LDFLAGS = []
+LINK_SEARCH_PATH = []
+STATIC_FILES = []
+
+
+DEFINITIONS['CCFLAGS']  += ['-MMD', f'-DCOMPILER_HOSTNAME=\\\"{socket.gethostname()}\\\"', '-DAXCL_CMA_CACHED']
+DEFINITIONS['CXXFLAGS'] += ['--std=c++17']
+
+REQUIREMENTS += ['axcl_rt', 'axcl_pkg', 'axcl_comm', 'axcl_token','spdlog', 'axcl_pcie_msg', 'axcl_pcie_dma', 'axcl_sys']
+
+INCLUDE += [os.path.join(env["MSP_PATH"], '../sample/sys')]
+# SRCS += [os.path.join(env["MSP_PATH"], '../sample/sys/sample_sys.cpp')]
+
+
+env['COMPONENTS'].append({'target':'axcl_spl_update',
+                          'SRCS':SRCS,
+                          'INCLUDE':INCLUDE,
+                          'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
+                          'REQUIREMENTS':REQUIREMENTS,
+                          'STATIC_LIB':STATIC_LIB,
+                          'DYNAMIC_LIB':DYNAMIC_LIB,
+                          'DEFINITIONS':DEFINITIONS,
+                          'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
+                          'LDFLAGS':LDFLAGS,
+                          'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
+                          'STATIC_FILES':STATIC_FILES,
+                          'REGISTER':'project'
+                          })
+try:
+    env['MYTARGETS'].append('axcl_test')
+except:
+    env['MYTARGETS'] = ['axcl_test']
