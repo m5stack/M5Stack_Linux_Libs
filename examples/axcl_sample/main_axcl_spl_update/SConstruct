@@ -4,6 +4,9 @@ Import('env')
 with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
+
+spl_file = check_wget_down('https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/linux/ax8850_card/spl_AX650_card_signed.bin', 'spl_AX650_card_signed.bin')
+
 SRCS = Glob('./*.c*')
 INCLUDE = []
 PRIVATE_INCLUDE = []
@@ -24,7 +27,7 @@ REQUIREMENTS += ['axcl_rt', 'axcl_pkg', 'axcl_comm', 'axcl_token','spdlog', 'axc
 
 INCLUDE += [os.path.join(env["MSP_PATH"], '../sample/sys')]
 # SRCS += [os.path.join(env["MSP_PATH"], '../sample/sys/sample_sys.cpp')]
-
+STATIC_FILES += [spl_file]
 
 env['COMPONENTS'].append({'target':'axcl_spl_update',
                           'SRCS':SRCS,
