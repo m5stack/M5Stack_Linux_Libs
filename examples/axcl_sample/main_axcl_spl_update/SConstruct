@@ -1,11 +1,12 @@
 import os
 import socket
+import hashlib
 Import('env')
 with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
 
-spl_file = check_wget_down('https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/linux/ax8850_card/spl_AX650_card_signed.bin', 'spl_AX650_card_signed.bin')
+spl_file = check_wget_down('https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/linux/ax8850_card/ax8850_firmware.tar.gz', 'ax8850_firmware.tar.gz')
 
 SRCS = Glob('./*.c*')
 INCLUDE = []
@@ -27,7 +28,17 @@ REQUIREMENTS += ['axcl_rt', 'axcl_pkg', 'axcl_comm', 'axcl_token','spdlog', 'axc
 
 INCLUDE += [os.path.join(env["MSP_PATH"], '../sample/sys')]
 # SRCS += [os.path.join(env["MSP_PATH"], '../sample/sys/sample_sys.cpp')]
-STATIC_FILES += [spl_file]
+
+with open(os.path.join(spl_file, 'spl_AX650_card_signed.bin'), "rb") as f:
+    spl_file_bin = f.read()
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(spl_file_bin)
+    with open(os.path.join(spl_file, 'spl_AX650_card_signed.txt'), "rb") as f:
+        sha256_hash_txt = f.read().decode('utf-8').split()[0]
+    if sha256_hash_txt != sha256_hash.digest().hex():
+        env.Fatal("spl file sha256 check failed")
+
+STATIC_FILES += [os.path.join(spl_file, 'spl_AX650_card_signed.bin'), os.path.join(spl_file, 'spl_AX650_card_signed.txt')]
 
 env['COMPONENTS'].append({'target':'axcl_spl_update',
                           'SRCS':SRCS,
