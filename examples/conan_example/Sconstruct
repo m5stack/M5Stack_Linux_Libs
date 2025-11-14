@@ -1,0 +1,6 @@
+import os
+env = SConscript(
+    os.path.join(os.getcwd(), "../../tools/scons/project.py"),
+    variant_dir=os.getcwd(),
+    duplicate=0,
+)
