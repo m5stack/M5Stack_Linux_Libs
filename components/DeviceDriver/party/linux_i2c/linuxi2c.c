@@ -368,7 +368,7 @@ int linuxi2c_select(int bus, unsigned long dev_addr, unsigned long tenbit)
     }
 
     /* Set i2c device as slave ans set it address */
-    if (ioctl(bus, I2C_SLAVE, dev_addr)) {
+    if (ioctl(bus, I2C_SLAVE_FORCE, dev_addr)) {
 
         perror("Set i2c device address failed");
         return -1;
