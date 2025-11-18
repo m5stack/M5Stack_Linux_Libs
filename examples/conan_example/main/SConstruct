@@ -1,31 +1,33 @@
+# project_root/src/SConscript
 import os
-import socket
+# Import the environment from the SConstruct file
 Import('env')
 with open(env['PROJECT_TOOL_S']) as f:
     exec(f.read())
 
-SRCS = Glob('./*.c*')
-INCLUDE = []
+
+
+SRCS = Glob('src/*.c*')
+INCLUDE = [ADir('include'), ADir('.')]
 PRIVATE_INCLUDE = []
-REQUIREMENTS = ['pthread', 'axcl_msp']
+REQUIREMENTS = ['pthread']
 STATIC_LIB = []
 DYNAMIC_LIB = []
 DEFINITIONS = []
 DEFINITIONS_PRIVATE = []
 LDFLAGS = []
 LINK_SEARCH_PATH = []
-STATIC_FILES = []
 
 
-DEFINITIONS += ['--std=c++17', '-MMD', f'-DCOMPILER_HOSTNAME=\\\"{socket.gethostname()}\\\"', '-DAXCL_CMA_CACHED']
+conandeps = Export_conanenv()
+INCLUDE += conandeps["conandeps"]['CPPPATH']
+LINK_SEARCH_PATH += conandeps["conandeps"]['LIBPATH']
+REQUIREMENTS += conandeps["conandeps"]['LIBS']
+DEFINITIONS += [ "-D"+ f for f in  conandeps["conandeps"]['CPPDEFINES'] ]
 
-REQUIREMENTS += ['axcl_rt', 'axcl_pkg', 'axcl_comm', 'axcl_token','spdlog', 'axcl_pcie_msg', 'axcl_pcie_dma', 'axcl_sys']
-
-INCLUDE += [os.path.join(env["MSP_PATH"], '../sample/sys')]
-# SRCS += [os.path.join(env["MSP_PATH"], '../sample/sys/sample_sys.cpp')]
 
 
-env['COMPONENTS'].append({'target':'axcl_test',
+env['COMPONENTS'].append({'target':env['PROJECT_NAME'],
                           'SRCS':SRCS,
                           'INCLUDE':INCLUDE,
                           'PRIVATE_INCLUDE':PRIVATE_INCLUDE,
@@ -36,10 +38,5 @@ env['COMPONENTS'].append({'target':'axcl_test',
                           'DEFINITIONS_PRIVATE':DEFINITIONS_PRIVATE,
                           'LDFLAGS':LDFLAGS,
                           'LINK_SEARCH_PATH':LINK_SEARCH_PATH,
-                          'STATIC_FILES':STATIC_FILES,
                           'REGISTER':'project'
                           })
-try:
-    env['MYTARGETS'].append('axcl_test')
-except:
-    env['MYTARGETS'] = ['axcl_test']

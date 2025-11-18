@@ -2,6 +2,13 @@
 mainmenu "C/CPP CMake project framework Kconfig configuration"
 
 menu "Toolchain configuration"
+
+	menu "Toolchain info"
+		config CPU_ARCH
+			string "cpu arch"
+			default "x86_64"
+	endmenu
+
 	config TOOLCHAIN_PATH
 		string "toolchain path"
 		default ""

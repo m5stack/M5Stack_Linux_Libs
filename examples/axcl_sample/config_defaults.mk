@@ -1,5 +1,5 @@
-CONFIG_TOOLCHAIN_PATH="/opt/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/bin"
-CONFIG_TOOLCHAIN_PREFIX="aarch64-none-linux-gnu-"
+# CONFIG_TOOLCHAIN_PATH="/opt/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/bin"
+# CONFIG_TOOLCHAIN_PREFIX="aarch64-none-linux-gnu-"
 
 CONFIG_SAMPLE_COMMON_ENABLED=y
 CONFIG_AXCL_MSP_ENABLED=y
