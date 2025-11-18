@@ -267,8 +267,7 @@ def DefineShared(target, SRCS=[], INCLUDE=[], PRIVATE_INCLUDE=[], REQUIREMENTS=[
 def Export_conanenv():
     CONANDEPS = "../build/Release/generators/SConscript_conandeps"
     import os
-    if not os.path.exists('/home/$USER/.conan2/profiles/default'):
-        os.system("conan profile detect")
+    os.system('if [ ! -f "/home/$USER/.conan2/profiles/default" ] ; then conan profile detect ; fi')
     temport = os.path.join(os.path.dirname(env['PROJECT_TOOL_S']), '..', 'corss-toolchina')
     with open(os.path.join(env['PROJECT_PATH'], "build", 'config', "corss-toolchina"), 'w') as f:
         with open(temport, 'r') as f2:

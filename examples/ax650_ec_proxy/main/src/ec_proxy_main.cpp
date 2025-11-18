@@ -18,12 +18,12 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include "json.hpp"
-// #include "../../../../SDK/components/utilities/include/sample_log.h"
+#include "sample_log.h"
 
 int main_exit_flage = 0;
 static void __sigint(int iSigNo)
 {
-    // SLOGW("llm_ec_prox will be exit!");
+    SLOGW("llm_ec_prox will be exit!");
     main_exit_flage = 1;
 }
 
@@ -851,6 +851,10 @@ private:
         }
         return return_success_result("\"ok\"");
     }
+    std::string _None(StackFlows::pzmq *_pzmq, const std::shared_ptr<StackFlows::pzmq_data> &data)
+    {
+        return return_success_result("\"None\"");
+    }
 
 public:
     llm_ec_prox()
@@ -864,6 +868,14 @@ public:
         rpc_ctx_ = std::make_unique<pzmq>("ipc:///tmp/rpc.ec_prox", ZMQ_RPC_FUN);
 
         // clang-format off
+        rpc_ctx_->register_rpc_action("setup", std::bind(&llm_ec_prox::_None, this, std::placeholders::_1, std::placeholders::_2));
+        rpc_ctx_->register_rpc_action("pause", std::bind(&llm_ec_prox::_None, this, std::placeholders::_1, std::placeholders::_2));
+        rpc_ctx_->register_rpc_action("work", std::bind(&llm_ec_prox::_None, this, std::placeholders::_1, std::placeholders::_2));
+        rpc_ctx_->register_rpc_action("exit", std::bind(&llm_ec_prox::_None, this, std::placeholders::_1, std::placeholders::_2));
+        rpc_ctx_->register_rpc_action("link", std::bind(&llm_ec_prox::_None, this, std::placeholders::_1, std::placeholders::_2));
+        rpc_ctx_->register_rpc_action("unlink", std::bind(&llm_ec_prox::_None, this, std::placeholders::_1, std::placeholders::_2));
+        rpc_ctx_->register_rpc_action("taskinfo", std::bind(&llm_ec_prox::_None, this, std::placeholders::_1, std::placeholders::_2));
+        
 #define REGISTER_RPC_ACTION(name, func) \
         rpc_ctx_->register_rpc_action(name, [this](StackFlows::pzmq *_pzmq, const std::shared_ptr<StackFlows::pzmq_data> &data){ \
             std::unique_lock<std::mutex> lock(this->modbus_mtx_); \
@@ -925,6 +937,7 @@ public:
     //     send(std::string("None"), std::string("None"), std::string(""), unit_name_);
     //     return -1;
     // }
+
     void ax650_ec_prox_exit()
     {
         pub_ctx_.reset();
