@@ -1,0 +1,7 @@
+from pathlib import Path
+import os
+env = SConscript(
+    str(Path(os.getcwd())/'..'/'..'/'tools'/'scons'/'project.py'),
+    variant_dir=os.getcwd(),
+    duplicate=0,
+)
