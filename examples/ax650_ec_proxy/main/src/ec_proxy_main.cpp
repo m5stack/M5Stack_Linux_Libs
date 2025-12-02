@@ -57,31 +57,7 @@ private:
 
     static llm_ec_prox *self;
 
-    void loop()
-    {
-        uint8_t butt = 0;
-        while (!main_exit_flage) {
-            {
-                std::unique_lock<std::mutex> lock(this->modbus_mtx_);
-                uint8_t tab_rp_bits[2];
-                int rc = modbus_read_input_bits(modbus_ctx, 4, 1, tab_rp_bits);
-                if (rc == -1) {
-                    fprintf(stderr, "读取失败: %s\n", modbus_strerror(errno));
-                } else {
-                    if (tab_rp_bits[0] != butt) {
-                        if (tab_rp_bits[0]) {
-                            pub_ctx_->send_data(return_success_result("1"));
-                        } else {
-                            pub_ctx_->send_data(return_success_result("0"));
-                        }
-                        butt = tab_rp_bits[0];
-                    }
-                }
-                // std::cout << "butt:" << (int)butt << std::endl;
-            }
-            usleep(20 * 1000);
-        }
-    }
+
 
     std::string board_get_power_info(StackFlows::pzmq *_pzmq, const std::shared_ptr<StackFlows::pzmq_data> &data)
     {
@@ -938,6 +914,33 @@ public:
     //     return -1;
     // }
 
+    void loop()
+    {
+        uint8_t butt = 0;
+        while (!main_exit_flage) {
+            {
+                std::unique_lock<std::mutex> lock(this->modbus_mtx_);
+                uint8_t tab_rp_bits[2];
+                int rc = modbus_read_input_bits(modbus_ctx, 4, 1, tab_rp_bits);
+                if (rc == -1) {
+                    fprintf(stderr, "读取失败: %s\n", modbus_strerror(errno));
+                } else {
+                    if (tab_rp_bits[0] != butt) {
+                        if (tab_rp_bits[0]) {
+                            pub_ctx_->send_data(return_success_result("1"));
+                        } else {
+                            pub_ctx_->send_data(return_success_result("0"));
+                        }
+                        butt = tab_rp_bits[0];
+                    }
+                }
+                // std::cout << "butt:" << (int)butt << std::endl;
+            }
+            usleep(20 * 1000);
+        }
+    }
+
+
     void ax650_ec_prox_exit()
     {
         pub_ctx_.reset();
@@ -970,8 +973,6 @@ int main(int argc, char *argv[])
     signal(SIGINT, __sigint);
     mkdir("/tmp/llm", 0777);
     llm_ec_prox ec_prox;
-    while (!main_exit_flage) {
-        sleep(1);
-    }
+    ec_prox.loop();
     return 0;
 }
