@@ -20,6 +20,7 @@ if 'CONFIG_UTILITIES_ENABLED' in os.environ:
 
     if 'CONFIG_UTILITIES_FMT_ENABLED' in os.environ:
         INCLUDE.append(ADir('party/fmt/include'))
+        SRCS += [AFile('party/fmt/src/format.cc'), AFile('party/fmt/src/os.cc')]
 
     if 'CONFIG_UTILITIES_EASYMSGCPP_ENABLED' in os.environ:
         check_component('EasyMsgCpp')
