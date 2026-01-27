@@ -270,7 +270,7 @@ def setup_environment():
     SConsignFile('build/sconsign.dblite')
     
     # Initialize environment with basic tools
-    env = Environment(tools=['gcc', 'g++', 'gnulink', 'ar', 'gas', 'as'])
+    env = Environment(tools=['gcc', 'g++', 'gnulink', 'ar', 'gas', 'as'], ENV=os.environ)
     
     # Set up basic environment variables
     env['GCCPREFIX'] = ''
