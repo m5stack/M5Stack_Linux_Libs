@@ -15,12 +15,17 @@ if LVGL_COMPONENT_ENABLED
 			bool "enable lvgl9.3"
 			help
 				build by LVGL!
+		config LVGL_9_5_SRC
+			bool "enable lvgl9.5"
+			help
+				build by LVGL!
 		endchoice
 
     endmenu
-
 if LVGL_9_3_SRC
-	osource "${SDK_PATH}/components/lvgl_component/lvgl_9_3/Kconfig"
+osource "${SDK_PATH}/components/lvgl_component/lvgl_9_3/Kconfig"
 endif
-
+if LVGL_9_5_SRC
+osource "${SDK_PATH}/components/lvgl_component/lvgl_9_5/Kconfig"
+endif
 endif
