@@ -108,7 +108,7 @@ def wget_github_commit(url, commit, outpath = False):
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
-    github_url = url.rstrip('.git')
+    github_url = url[:-4] if url.endswith('.git') else url
     down_url = github_url + "/archive/{}.zip".format(commit)
     zip_file_name = '{}-{}.zip'.format(repo[3], commit)
     if not os.path.exists(os.path.join(os.environ['GIT_REPO_PATH'], repo[3])):
