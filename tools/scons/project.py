@@ -105,6 +105,9 @@ def run_kconfig_tool(menuconfig=False, build_type='Debug'):
     
     cmd = [sys.executable, CONFIG_TOOL_FILE, "--kconfig", KCONFIG_FILE]
     cmd.extend(["--defaults", CONFIG_DEFAULT_FILE])
+
+    if os.path.exists(str(Path(BUILD_CONFIG_PATH)/'config_tmp.mk')):
+        cmd.extend(["--defaults", str(Path(BUILD_CONFIG_PATH)/'config_tmp.mk')])
     
     # Environment variables
     cmd.extend([
@@ -350,6 +353,9 @@ def setup_environment():
             os.environ['CONFIG_TOOLCHAIN_PREFIX'].strip('"')
         )
     
+    if os.environ.get('CONFIG_TOOLCHAIN_GCCSUFFIX'):
+        env['GCCSUFFIX'] = os.environ['CONFIG_TOOLCHAIN_GCCSUFFIX'].strip('"')
+
     # Add toolchain flags if specified
     if os.environ.get('CONFIG_TOOLCHAIN_FLAGS'):
         env.MergeFlags(os.environ['CONFIG_TOOLCHAIN_FLAGS'])
@@ -357,14 +363,20 @@ def setup_environment():
     # Add build config path to include paths
     env.Append(CPPPATH=[BUILD_CONFIG_PATH])
     
+    env['ARSUFFIX'] = ''
+    env['ASSUFFIX'] = ''
+    env['STRIPSUFFIX'] = ''
+    env['OBJCOPYSUFFIX'] = ''
+    env['SIZESUFFIX'] = ''
+
     # Set up compiler tools
     env['CC'] = '${_concat(GCCPREFIX, "gcc", GCCSUFFIX, __env__)}'          
     env['CXX'] = '${_concat(GCCPREFIX, "g++", GCCSUFFIX, __env__)}'     
-    env['AR'] = '${_concat(GCCPREFIX, "ar", GCCSUFFIX, __env__)}'      
-    env['AS'] = '${_concat(GCCPREFIX, "as", GCCSUFFIX, __env__)}'        
-    env['STRIP'] = '${_concat(GCCPREFIX, "strip", GCCSUFFIX, __env__)}'  
-    env['OBJCOPY'] = '${_concat(GCCPREFIX, "objcopy", GCCSUFFIX, __env__)}'     
-    env['SIZE'] = '${_concat(GCCPREFIX, "size", GCCSUFFIX, __env__)}'  
+    env['AR'] = '${_concat(GCCPREFIX, "ar", ARSUFFIX, __env__)}'      
+    env['AS'] = '${_concat(GCCPREFIX, "as", ASSUFFIX, __env__)}'        
+    env['STRIP'] = '${_concat(GCCPREFIX, "strip", STRIPSUFFIX, __env__)}'  
+    env['OBJCOPY'] = '${_concat(GCCPREFIX, "objcopy", OBJCOPYSUFFIX, __env__)}'     
+    env['SIZE'] = '${_concat(GCCPREFIX, "size", SIZESUFFIX, __env__)}'  
 
     # Get GCC version and target information
     try:

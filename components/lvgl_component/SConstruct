@@ -56,6 +56,7 @@ if 'CONFIG_LVGL_9_3_SRC' in os.environ:
         os.rename(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl-{}'.format(git_commit)),lvgl_src)
 
     INCLUDE.append(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3'))
+    INCLUDE.append(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl'))
     SRCS += append_srcs_dir([os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl/src'),
                              os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl/demos'),
                              os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_3/lvgl/examples')])
@@ -99,6 +100,7 @@ if 'CONFIG_LVGL_9_5_SRC' in os.environ:
         os.rename(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_5/lvgl-{}'.format(git_commit)),lvgl_src)
 
     INCLUDE.append(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_5'))
+    INCLUDE.append(os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_5/lvgl'))
     SRCS += append_srcs_dir([os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_5/lvgl/src'),
                              os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_5/lvgl/demos'),
                              os.path.join(os.environ['GIT_REPO_PATH'], 'lvgl/lvgl_9_5/lvgl/examples')])

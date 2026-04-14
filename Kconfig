@@ -17,6 +17,10 @@ menu "Toolchain configuration"
 		string "toolchain prefix"
 		default ""
 
+	config TOOLCHAIN_GCCSUFFIX
+		string "toolchain gccsuffix"
+		default ""
+
 	config TOOLCHAIN_FLAGS
 		string "toolchain FLAGS"
 		default ""
