@@ -360,6 +360,7 @@ def setup_environment():
     if os.environ.get('CONFIG_TOOLCHAIN_FLAGS'):
         env.MergeFlags(os.environ['CONFIG_TOOLCHAIN_FLAGS'])
     
+
     # Add build config path to include paths
     env.Append(CPPPATH=[BUILD_CONFIG_PATH])
     
@@ -397,6 +398,20 @@ def setup_environment():
         os.remove('gcc_out.txt')
     except Exception as e:
         logger.warning('Failed to obtain GCC parameters: {}'.format(e))
+
+
+    if os.environ.get('CONFIG_TOOLCHAIN_SYSROOT'):
+        env.Append(
+            CCFLAGS   = [f"--sysroot={os.environ['CONFIG_TOOLCHAIN_SYSROOT']}"],
+            LINKFLAGS = [f"--sysroot={os.environ['CONFIG_TOOLCHAIN_SYSROOT']}"]
+        )
+        if 'GCC_DUMPMACHINE' in env and env['GCC_DUMPMACHINE'] != '':
+            env.Append(
+                LINKFLAGS = [f"-L{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'],'lib', env['GCC_DUMPMACHINE'])}",
+                             f"-L{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib', env['GCC_DUMPMACHINE'])}",
+                             "-lc"]
+            )
+
 
     # Load git repository information
     load_git_repos(env)
