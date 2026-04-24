@@ -199,21 +199,16 @@ def push_fun():
         logger.error("Please create setup.ini!")
         sys.exit(1)
     
-    config = configparser.ConfigParser()
-    config.read(str(Path(PROJECT_PATH)/'setup.ini'))
-    
+    # config = configparser.ConfigParser()
+    # config.read(str(Path(PROJECT_PATH)/'setup.ini'))
+    # print(str(Path(PROJECT_PATH)/'setup.ini'))
     cmd = [
         sys.executable, 
         str(Path(SDK_PATH)/'tools'/'scons'/'push.py'), 
-        config['ssh']['local_file_path'],
-        config['ssh']['remote_file_path'],
-        config['ssh']['remote_host'],
-        config['ssh']['remote_port'],
-        config['ssh']['username'],
-        config['ssh']['password']
+        str(Path(PROJECT_PATH)/'setup.ini')
     ]
     
-    logger.info("Pushing files to {}".format(config['ssh']['remote_host']))
+    # logger.info("Pushing files to {}".format(config['ssh']['remote_host']))
     subprocess.call(cmd)
     sys.exit(0)
 

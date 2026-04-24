@@ -10,6 +10,7 @@ import paramiko
 from scp import SCPClient 
 import sys
 import hashlib
+import configparser
 
 def create_ssh_client(hostname, port, username, password):
     client = paramiko.SSHClient()
@@ -35,8 +36,19 @@ def get_file_md5(file_path):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
-def ssh_push_file(file_group, remote_host, remote_port, username, password):
+def ssh_push_file(file_group, remote_host, remote_port, username, password, after_cmd='', before_cmd=''):
     ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
+
+    if before_cmd != '':
+        try:
+            sys.stdout.flush()
+            print(f'run before_cmd: {before_cmd}')
+            stdin, stdout, stderr = ssh.exec_command(f'''{before_cmd}''')
+            print('before_cmd stdout:',stdout.read().decode('utf-8', errors='ignore')) 
+            print('before_cmd stderr:',stderr.read().decode('utf-8', errors='ignore')) 
+        except Exception as e:
+            print("run before_cmd error", e)
+
     for local_file, remote_file in file_group:
         print("Checking", local_file)
         sys.stdout.flush()
@@ -71,20 +83,36 @@ def ssh_push_file(file_group, remote_host, remote_port, username, password):
                         ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
         else:
             print("No changes detected for", local_file, ", skipping upload.")
-
+    if after_cmd != '':
+        try:
+            sys.stdout.flush()
+            print(f'run after_cmd: {after_cmd}')
+            stdin, stdout, stderr = ssh.exec_command(f'''{after_cmd}''')
+            print('after_cmd stdout:',stdout.read().decode('utf-8', errors='ignore')) 
+            print('after_cmd stderr:',stderr.read().decode('utf-8', errors='ignore')) 
+        except Exception as e:
+            print("run after_cmd error", e)
 
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 6:
-        print("Usage: push.py local_file_path remote_file_path remote_host remote_port username password")
+    if len(sys.argv) < 2:
+        print("Usage: push.py setup.ini")
         exit(1)
-    local_file_path = sys.argv[1]
-    remote_file_path = sys.argv[2]
-    remote_host = sys.argv[3]
-    remote_port = sys.argv[4]
-    username = sys.argv[5]
-    password = sys.argv[6]
+    config = configparser.ConfigParser()
+    config.read(sys.argv[1])
+    local_file_path = config['ssh']['local_file_path']
+    remote_file_path = config['ssh']['remote_file_path']
+    remote_host = config['ssh']['remote_host']
+    remote_port = config['ssh']['remote_port']
+    username = config['ssh']['username']
+    password = config['ssh']['password']
+    after_cmd = ''
+    before_cmd = ''
+    if 'after_cmd' in config['ssh']:
+        after_cmd = config['ssh']['after_cmd'].strip('"').strip("'")
+    if 'before_cmd' in config['ssh']:
+        before_cmd = config['ssh']['before_cmd'].strip('"').strip("'")
 
     file_group = []
     for root, dirs, files in os.walk(local_file_path):
@@ -103,5 +131,5 @@ if __name__ == '__main__':
             # print(remote_file_path, root, file, local_file_path)
             file_group.append([str(Path(root)/file), _remote_file_path])
     if file_group:
-        ssh_push_file(file_group, remote_host, remote_port, username, password)
+        ssh_push_file(file_group, remote_host, remote_port, username, password, after_cmd, before_cmd)
 
