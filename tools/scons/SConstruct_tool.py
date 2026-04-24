@@ -76,7 +76,6 @@ def sample_wget(down_url, file_path):
         
         response = requests.get(down_url, stream=True)
         if response.status_code == 200:
-            # 获取文件总大小
             total_size = int(response.headers.get('content-length', 0))
             
             with open(file_path, 'wb') as file:
