@@ -126,20 +126,18 @@ def wget_github(url, branch = None):
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
-    cwork_dir = os.path.join(os.environ['GIT_REPO_PATH'], repo[3])
-    if os.path.exists(cwork_dir):
-        return cwork_dir
+    cwork = os.path.join(os.environ['GIT_REPO_PATH'], repo[3])
+    if os.path.exists(cwork):
+        return cwork
     github_url = url
     if github_url.endswith('.git'):
         github_url = github_url[:-4]
     down_url = github_url + "/archive/refs/heads/{}.zip".format(branch if branch else "master")
     zip_file_name = '{}-{}.zip'.format(repo[3], branch if branch else "master")
     file_path = wget_zip(down_url, zip_file_name)
-    tmp_dir = os.path.join(file_path, zip_file_name[:-4])
-    if not os.path.exists(tmp_dir):
-        shutil.move(tmp_dir, cwork_dir)
+    shutil.move(os.path.join(file_path, zip_file_name[:-4]), cwork)
     shutil.rmtree(file_path)
-    return cwork_dir
+    return cwork
 
 def wget_github_commit(url, commit):
     import parse
