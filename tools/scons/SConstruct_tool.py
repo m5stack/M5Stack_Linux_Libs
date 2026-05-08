@@ -48,6 +48,27 @@ def register_component(SRCS=[], INCLUDE=[], PRIVATE_INCLUDE=[], REQUIREMENTS=[],
                       }
     env['COMPONENTS'].append(component_info)
 
+def pkg_config_cflags(pkg):
+    import subprocess
+    try:
+        flags = subprocess.check_output(
+            ["pkg-config", "--cflags", pkg], text=True
+        ).strip()
+        return flags.split()
+    except Exception:
+        return []
+
+
+def pkg_config_ldflags(pkg):
+    import subprocess
+    try:
+        libs = subprocess.check_output(
+            ["pkg-config", "--libs", pkg], text=True
+        ).strip()
+        return libs.split()
+    except Exception:
+        return []
+
 def calculate_sha256(file_path):
     import hashlib
     sha256_hash = hashlib.sha256()
