@@ -364,6 +364,7 @@ def setup_environment():
     env['STRIPSUFFIX'] = ''
     env['OBJCOPYSUFFIX'] = ''
     env['SIZESUFFIX'] = ''
+    env['RANLIBSUFFIX'] = ''
 
     # Set up compiler tools
     env['CC'] = '${_concat(GCCPREFIX, "gcc", GCCSUFFIX, __env__)}'          
@@ -373,6 +374,7 @@ def setup_environment():
     env['STRIP'] = '${_concat(GCCPREFIX, "strip", STRIPSUFFIX, __env__)}'  
     env['OBJCOPY'] = '${_concat(GCCPREFIX, "objcopy", OBJCOPYSUFFIX, __env__)}'     
     env['SIZE'] = '${_concat(GCCPREFIX, "size", SIZESUFFIX, __env__)}'  
+    env['RANLIB'] = '${_concat(GCCPREFIX, "ranlib", RANLIBSUFFIX, __env__)}'  
 
     # Get GCC version and target information
     try:
