@@ -396,6 +396,8 @@ def setup_environment():
     except Exception as e:
         logger.warning('Failed to obtain GCC parameters: {}'.format(e))
 
+    if 'CONFIG_GCC_DUMPMACHINE' in os.environ and os.environ.get('CONFIG_GCC_DUMPMACHINE') != '':
+        env['GCC_DUMPMACHINE'] = os.environ.get('CONFIG_GCC_DUMPMACHINE')
 
     if os.environ.get('CONFIG_TOOLCHAIN_SYSROOT'):
         env.Append(
@@ -404,8 +406,20 @@ def setup_environment():
         )
         if 'GCC_DUMPMACHINE' in env and env['GCC_DUMPMACHINE'] != '':
             env.Append(
+                CCFLAGS = [f"-I{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','include')}",
+                           f"-I{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','include', env['GCC_DUMPMACHINE'])}"],
                 LINKFLAGS = [f"-L{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'],'lib', env['GCC_DUMPMACHINE'])}",
                              f"-L{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib', env['GCC_DUMPMACHINE'])}",
+                             "-lc"]
+            )
+        if os.path.exists(f"{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib', env['GCC_DUMPMACHINE'], 'libstdc++.so.6')}"):
+            env.Append(LINKFLAGS = [f"{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib', env['GCC_DUMPMACHINE'], 'libstdc++.so.6')}"])
+        if env['HOST_OS'] == 'darwin':
+            env.Append(
+                LINKFLAGS = [f"-Wl,-rpath-link,{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib')}",
+                             f"-Wl,-rpath-link,{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib', env['GCC_DUMPMACHINE'])}",
+                             f"-B{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib')}",
+                             f"-B{os.path.join(os.environ['CONFIG_TOOLCHAIN_SYSROOT'], 'usr','lib', env['GCC_DUMPMACHINE'])}",
                              "-lc"]
             )
 

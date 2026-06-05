@@ -32,6 +32,10 @@ menu "Toolchain configuration"
 	config TOOLCHAIN_SYSROOT
 		string "toolchain sysroot"
 		default ""
+	
+	config GCC_DUMPMACHINE
+		string "toolchain dumpmachine"
+		default ""
 
 	choice
 		prompt "host system type"

@@ -191,6 +191,7 @@ def check_component(component_name):
                     env.Fatal("Cloning failed.: {}".format(e))
             else:
                 env.Fatal('Please manually download {} to {}.'.format(env['GIT_REPO_LISTS'][component_name]['url'], env['GIT_REPO_LISTS'][component_name]['path']))
+    return env['GIT_REPO_LISTS'][component_name]['path']
 
 def check_wget_down(url, file_name):
     if file_name.endswith('.zip'):
@@ -240,6 +241,32 @@ def check_wget_down(url, file_name):
             if down == 'y':
                 return sample_wget(url, file_path)
         return file_path
+
+def wget_github(url):
+    import parse
+    import shutil
+    repo = parse.parse("{}://{}/{}/{}.git", url)
+    repo_name = repo[3]
+    local_path = os.path.join(os.environ['GIT_REPO_PATH'], repo_name)
+    if not os.path.exists(local_path):
+        github_url = url[:-4] if url.endswith('.git') else url
+        down_url = github_url + "/archive/refs/heads/master.zip"
+        zip_file_name = '{}-master.zip'.format(repo_name)
+        file_path = wget_zip(down_url, zip_file_name)
+        extracted_dir = os.path.join(file_path, '{}-master'.format(repo_name))
+        if os.path.exists(extracted_dir):
+            shutil.move(extracted_dir, local_path)
+            shutil.rmtree(file_path)
+        else:
+            shutil.rmtree(file_path, ignore_errors=True)
+            down_url = github_url + "/archive/refs/heads/main.zip"
+            zip_file_name = '{}-main.zip'.format(repo_name)
+            file_path = wget_zip(down_url, zip_file_name)
+            extracted_dir = os.path.join(file_path, '{}-main'.format(repo_name))
+            if os.path.exists(extracted_dir):
+                shutil.move(extracted_dir, local_path)
+                shutil.rmtree(file_path)
+    return local_path
 
 def CC_cmd_execute(cmd):
     import os
