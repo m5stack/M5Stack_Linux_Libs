@@ -9,12 +9,15 @@ import sys
 import shutil
 import copy
 from SCons.Node.FS import File
+import SCons.Defaults
+import SCons.Tool
 import subprocess
 import parse
 from collections.abc import Iterable
 import configparser
 import uuid
 import logging
+import hashlib
 
 # Setup paths and environment variables
 SDK_PATH = os.path.normpath(os.environ.get('SDK_PATH', str(Path(os.getcwd())/'..'/'..')))
@@ -39,6 +42,24 @@ if 'GIT_REPO_PATH' not in os.environ:
 env = None
 task_lists = {}
 
+def split_path_list(path_list):
+    """Split PATH-like values while preserving Windows drive prefixes."""
+    if os.pathsep in path_list:
+        return [item for item in path_list.split(os.pathsep) if item]
+
+    items = []
+    start = 0
+    for index, char in enumerate(path_list):
+        if char != ':':
+            continue
+        is_drive_colon = index == start + 1 and path_list[start:index].isalpha()
+        if is_drive_colon:
+            continue
+        items.append(path_list[start:index])
+        start = index + 1
+    items.append(path_list[start:])
+    return [item for item in items if item]
+
 def setup_logging():
     """Configure logging for the build system"""
     logging.basicConfig(
@@ -49,22 +70,33 @@ def setup_logging():
 
 logger = setup_logging()
 
+def use_cccom_for_uppercase_s(env):
+    """Make .S objects use the C compiler action on all host platforms."""
+    static_obj, shared_obj = SCons.Tool.createObjBuilders(env)
+
+    static_obj.add_action('.S', SCons.Defaults.CAction)
+    shared_obj.add_action('.S', SCons.Defaults.ShCAction)
+    static_obj.add_emitter('.S', SCons.Defaults.StaticObjectEmitter)
+    shared_obj.add_emitter('.S', SCons.Defaults.SharedObjectEmitter)
+
 def ourspawn(sh, escape, cmd, args, e):
     """Custom spawn function for executing commands with long argument lists"""
     filename = str(uuid.uuid4())
-    newargs = ' '.join(args[1:])
-    cmdline = cmd + " " + newargs
+    raw_args = [str(arg) for arg in args[1:]]
+    cmdline = cmd + " " + ' '.join(raw_args)
+    popen_args = cmdline
     
     # Handle command line length limit by writing arguments to a file
     if (len(cmdline) > 16 * 1024):
         with open(filename, 'w') as f:
-            f.write(' '.join(args[1:]).replace('\\', '/'))
+            f.write(' '.join(arg.replace('\\', '/') for arg in raw_args))
         # Execute with response file
         cmdline = cmd + " @" + filename
+        popen_args = cmdline
     
     # Execute the command
     proc = subprocess.Popen(
-        cmdline, 
+        popen_args,
         stdin=subprocess.PIPE, 
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE, 
@@ -308,6 +340,7 @@ def setup_environment():
     env['LINKCOM'] = '$LINK -o $TARGET $SOURCES $LINKFLAGS $__RPATH $_LIBDIRFLAGS $_LIBFLAGS'
     env['SHLINKCOM'] = '$SHLINK -o $TARGET $SHLINKFLAGS $__SHLIBVERSIONFLAGS $__RPATH $SOURCES $_LIBDIRFLAGS $_LIBFLAGS'
     env['STRIPCOM'] = '$STRIP $SOURCES'
+    use_cccom_for_uppercase_s(env)
 
     # Set up command string display (for less verbose output)
     if 'CONFIG_COMMPILE_DEBUG' not in os.environ:
@@ -439,7 +472,7 @@ def setup_environment():
     
     # Add external component paths if specified
     if 'EXT_COMPONENTS_PATH' in os.environ:
-        for ecp in os.environ['EXT_COMPONENTS_PATH'].split(':'):
+        for ecp in split_path_list(os.environ['EXT_COMPONENTS_PATH']):
             env['COMPONENTS_PATH'].append(ecp)
 
 def load_components():
@@ -483,7 +516,12 @@ def get_object_path(src_file, component_build_dir):
     
     ofile = file
     if os.path.isabs(ofile):
-        ofile = os.path.join(component_build_dir, ofile[1:] + env['OBJSUFFIX'])
+        if env['HOST_OS'].startswith('win'):
+            drive, tail = os.path.splitdrive(ofile)
+            safe_tail = hashlib.sha1(ofile.encode('utf-8')).hexdigest()[:12] + '_' + os.path.basename(tail)
+            ofile = os.path.join(component_build_dir, safe_tail + env['OBJSUFFIX'])
+        else:
+            ofile = os.path.join(component_build_dir, ofile[1:] + env['OBJSUFFIX'])
     else:
         ofile = os.path.join(component_build_dir, ofile + env['OBJSUFFIX'])
     
@@ -650,9 +688,10 @@ def build_project(component, build_env, source_files, object_files, custom_sourc
             action=copy_file
         )
     elif 'CONFIG_TOOLCHAIN_SYSTEM_WIN' in os.environ:
+        program_suffix = '' if 'linux' in env.get('GCC_DUMPMACHINE', '') else '.exe'
         build_env.Command(
-            os.path.join('dist', component['target']) + '.exe', 
-            [str(Path('build')/component['target']/component['target']) + '.exe', 'dist'], 
+            os.path.join('dist', component['target']) + program_suffix, 
+            component['_target'][0], 
             action=copy_file
         )
     
