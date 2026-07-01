@@ -11,11 +11,16 @@ from scp import SCPClient
 import sys
 import hashlib
 import configparser
+import shlex
+
+
+BATCH_SIZE = 100
 
 def create_ssh_client(hostname, port, username, password):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    scpclient = None
     try:
         if password != 'None':
             client.connect(hostname=hostname, port=port, username=username, password=password, timeout=15, compress=True)
@@ -28,6 +33,11 @@ def create_ssh_client(hostname, port, username, password):
         client = None
     return client, scpclient
 
+
+def split_batches(items, batch_size=BATCH_SIZE):
+    for index in range(0, len(items), batch_size):
+        yield items[index:index + batch_size]
+
 def get_file_md5(file_path):
     """Calculate MD5 checksum of a file."""
     hash_md5 = hashlib.md5()
@@ -35,6 +45,35 @@ def get_file_md5(file_path):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def get_remote_md5_group(ssh, remote_files):
+    remote_md5_group = {}
+    if ssh is None:
+        return remote_md5_group
+
+    for batch in split_batches(remote_files):
+        files = ' '.join(shlex.quote(remote_file) for remote_file in batch)
+        try:
+            stdin, stdout, stderr = ssh.exec_command(f'md5sum -- {files} 2>/dev/null || true')
+            for line in stdout.read().decode('utf-8', errors='ignore').splitlines():
+                parts = line.strip().split(None, 1)
+                if len(parts) == 2:
+                    remote_md5_group[parts[1]] = parts[0].lstrip('\\')
+        except Exception as e:
+            print("Could not retrieve remote file checksums:", e)
+
+    return remote_md5_group
+
+
+def ensure_remote_dirs(ssh, remote_dirs):
+    if ssh is None or not remote_dirs:
+        return
+
+    for batch in split_batches(sorted(remote_dirs)):
+        dirs = ' '.join(shlex.quote(remote_dir) for remote_dir in batch)
+        stdin, stdout, stderr = ssh.exec_command(f'mkdir -p -- {dirs}')
+        stdout.channel.recv_exit_status()
 
 def ssh_push_file(file_group, remote_host, remote_port, username, password, after_cmd='', before_cmd=''):
     ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
@@ -49,40 +88,36 @@ def ssh_push_file(file_group, remote_host, remote_port, username, password, afte
         except Exception as e:
             print("run before_cmd error", e)
 
+    remote_md5_group = get_remote_md5_group(ssh, [remote_file for local_file, remote_file in file_group])
+    changed_file_group = []
     for local_file, remote_file in file_group:
         print("Checking", local_file)
         sys.stdout.flush()
-        remote_dir = Path(Path(remote_file).parent).as_posix()
-        
-        try:
-            # Retrieve remote file MD5 checksum if it exists
-            stdin, stdout, stderr = ssh.exec_command(f'md5sum {remote_file} || echo "no_remote_md5"')
-            remote_md5 = stdout.read().strip().split()[0].decode('utf-8')
-        except Exception as e:
-            print("Could not retrieve remote file checksum:", e)
-            remote_md5 = "no_remote_md5"
 
         local_md5 = get_file_md5(local_file)
+        remote_md5 = remote_md5_group.get(remote_file, "no_remote_md5")
         if local_md5 != remote_md5:
-            print("push", local_file, remote_file, '...')
-            sys.stdout.flush()
-            if ssh is not None:
-                for cout in range(3):
-                    try:
-                        stdin, stdout, stderr = ssh.exec_command('[ -d "{}" ] || mkdir -p "{}"'.format(remote_dir, remote_dir))
-                        exit_status = stdout.channel.recv_exit_status()
-                        scpclient.put(local_file, remote_file)
-                        print("push", local_file, remote_file, 'success!')
-                        sys.stdout.flush()
-                        break
-                    except paramiko.SSHException:
-                        if cout != 2:
-                            print("push", local_file, remote_file, 'error, will be retry ...')
-                        else:
-                            print("push", local_file, remote_file, 'error!')
-                        ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
+            changed_file_group.append((local_file, remote_file))
         else:
             print("No changes detected for", local_file, ", skipping upload.")
+
+    ensure_remote_dirs(ssh, {Path(remote_file).parent.as_posix() for local_file, remote_file in changed_file_group})
+    for local_file, remote_file in changed_file_group:
+        print("push", local_file, remote_file, '...')
+        sys.stdout.flush()
+        if ssh is not None:
+            for cout in range(3):
+                try:
+                    scpclient.put(local_file, remote_file)
+                    print("push", local_file, remote_file, 'success!')
+                    sys.stdout.flush()
+                    break
+                except paramiko.SSHException:
+                    if cout != 2:
+                        print("push", local_file, remote_file, 'error, will be retry ...')
+                    else:
+                        print("push", local_file, remote_file, 'error!')
+                    ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
     if after_cmd != '':
         try:
             sys.stdout.flush()
@@ -132,4 +167,3 @@ if __name__ == '__main__':
             file_group.append([str(Path(root)/file), _remote_file_path])
     if file_group:
         ssh_push_file(file_group, remote_host, remote_port, username, password, after_cmd, before_cmd)
-
