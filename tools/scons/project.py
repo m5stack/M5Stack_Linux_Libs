@@ -172,7 +172,21 @@ def copy_file(target, source, env):
     if os.path.isfile(source_path):
         shutil.copy2(source_path, target_path)
     elif os.path.isdir(source_path):
+        if os.path.exists(target_path):
+            shutil.rmtree(target_path)
         shutil.copytree(source_path, target_path)
+
+def static_file_target(file):
+    """Resolve a STATIC_FILES entry to (source, dist-relative install path)."""
+    if isinstance(file, tuple):
+        if len(file) != 2:
+            raise ValueError("STATIC_FILES tuple entries must be (source, install_path)")
+        source, install_path = file
+        install_path = Path(str(install_path))
+        if install_path.is_absolute() or '..' in install_path.parts:
+            raise ValueError("STATIC_FILES install path must be relative and stay inside dist: {}".format(file[1]))
+        return str(source), str(install_path)
+    return str(file), os.path.basename(str(file))
 
 def menuconfig_fun():
     """Run menuconfig and exit"""
@@ -706,11 +720,13 @@ def build_project(component, build_env, source_files, object_files, custom_sourc
     # Copy static files to dist directory if specified
     if 'STATIC_FILES' in component:
         for file in component['STATIC_FILES']:
-            build_env.Command(
-                os.path.join('dist', os.path.basename(str(file))), 
-                str(file), 
+            source_file, install_path = static_file_target(file)
+            static_target = build_env.Command(
+                os.path.join('dist', install_path),
+                source_file,
                 action=copy_file
             )
+            build_env.AlwaysBuild(static_target)
 
 def create_compile_program():
     """Create compilation targets for all components"""
