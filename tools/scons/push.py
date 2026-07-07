@@ -78,10 +78,22 @@ def ensure_remote_dirs(ssh, remote_dirs):
 def ssh_push_file(file_group, remote_host, remote_port, username, password, after_cmd='', before_cmd=''):
     ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
 
+    def ensure_ssh():
+        nonlocal ssh, scpclient
+        if ssh is not None:
+            transport = ssh.get_transport()
+            if transport is not None and transport.is_active():
+                return True
+        ssh, scpclient = create_ssh_client(remote_host, remote_port, username, password)
+        return ssh is not None
+
     if before_cmd != '':
         try:
             sys.stdout.flush()
             print(f'run before_cmd: {before_cmd}')
+            if not ensure_ssh():
+                print("run before_cmd error: SSH connection is not available")
+                return
             stdin, stdout, stderr = ssh.exec_command(f'''{before_cmd}''')
             print('before_cmd stdout:',stdout.read().decode('utf-8', errors='ignore')) 
             print('before_cmd stderr:',stderr.read().decode('utf-8', errors='ignore')) 
@@ -122,6 +134,9 @@ def ssh_push_file(file_group, remote_host, remote_port, username, password, afte
         try:
             sys.stdout.flush()
             print(f'run after_cmd: {after_cmd}')
+            if not ensure_ssh():
+                print("run after_cmd error: SSH connection is not available")
+                return
             stdin, stdout, stderr = ssh.exec_command(f'''{after_cmd}''')
             print('after_cmd stdout:',stdout.read().decode('utf-8', errors='ignore')) 
             print('after_cmd stderr:',stderr.read().decode('utf-8', errors='ignore')) 
