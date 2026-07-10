@@ -258,6 +258,115 @@ def push_fun():
     subprocess.call(cmd)
     sys.exit(0)
 
+def ssh_fun():
+    import pexpect
+
+    setup_file = Path(PROJECT_PATH)/'setup.ini'
+    if not setup_file.exists():
+        setup_file = Path('setup.ini')
+    if not setup_file.exists():
+        logger.error("Please create setup.ini!")
+        sys.exit(1)
+
+    config = configparser.ConfigParser()
+    config.read(str(setup_file))
+    if 'ssh' not in config:
+        logger.error("Missing [ssh] section in {}".format(setup_file))
+        sys.exit(1)
+
+    try:
+        remote_host = config['ssh']['remote_host']
+        remote_port = config['ssh']['remote_port']
+        username = config['ssh']['username']
+    except KeyError as e:
+        logger.error("Missing ssh config item: {}".format(e))
+        sys.exit(1)
+
+    password = config['ssh'].get('password', 'None')
+    command = 'ssh'
+    args = ['-p', str(remote_port), '{}@{}'.format(username, remote_host)]
+    logger.info("Connecting with: {} {}".format(command, ' '.join(args)))
+
+    def remove_known_host():
+        hosts = [remote_host]
+        if str(remote_port) != '22':
+            hosts.append('[{}]:{}'.format(remote_host, remote_port))
+
+        for host in hosts:
+            logger.warning("Removing stale SSH host key for {}".format(host))
+            subprocess.call(['ssh-keygen', '-R', host])
+
+    process = None
+    try:
+        known_host_retry_used = False
+        while True:
+            host_key_removed = False
+            process = pexpect.spawn(command, args, timeout=30, encoding='utf-8')
+            process.logfile_read = sys.stdout
+            password_sent = False
+            while True:
+                index = process.expect([
+                    r'Are you sure you want to continue connecting.*\?',
+                    r'(?i)password:',
+                    r'(?i)passphrase for key',
+                    r'[\$#] ',
+                    r'REMOTE HOST IDENTIFICATION HAS CHANGED|Host key verification failed',
+                    pexpect.EOF,
+                    pexpect.TIMEOUT,
+                ])
+
+                if index == 0:
+                    process.sendline('yes')
+                elif index == 1:
+                    if password and password != 'None' and not password_sent:
+                        process.sendline(password)
+                        password_sent = True
+                        process.logfile_read = None
+                        process.interact()
+                        break
+                    else:
+                        process.logfile_read = None
+                        process.interact()
+                        break
+                elif index == 2:
+                    process.logfile_read = None
+                    process.interact()
+                    break
+                elif index == 3:
+                    process.logfile_read = None
+                    process.interact()
+                    break
+                elif index == 4:
+                    if known_host_retry_used:
+                        logger.error("SSH host key verification failed after refreshing known_hosts")
+                        break
+                    process.close()
+                    remove_known_host()
+                    known_host_retry_used = True
+                    host_key_removed = True
+                    break
+                elif index == 5:
+                    break
+                else:
+                    process.logfile_read = None
+                    process.interact()
+                    break
+
+            if host_key_removed:
+                logger.info("Retrying SSH connection after refreshing known_hosts")
+                continue
+            break
+    except pexpect.exceptions.ExceptionPexpect as e:
+        logger.error("SSH failed: {}".format(e))
+        sys.exit(1)
+
+    if process is None:
+        sys.exit(1)
+    process.close()
+    if process.signalstatus is not None:
+        sys.exit(128 + process.signalstatus)
+    sys.exit(process.exitstatus or 0)
+
 def Fatal(env, message):
     """Fatal error handler for SCons environment"""
     logger.error(message)
@@ -806,7 +915,8 @@ def build_task_init():
         'distclean': distclean_fun, 
         'save': save_fun, 
         'SET_CROSS': set_tools_fun, 
-        'push': push_fun
+        'push': push_fun,
+        'ssh': ssh_fun
     }
     
     for fun_name in fun_list:
