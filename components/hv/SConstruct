@@ -53,8 +53,9 @@ if 'CONFIG_LHV_ENABLED' in os.environ:
     if 'CONFIG_LHV_WITH_MQTT' in os.environ:
         SRCS += AGlob('../../github_source/libhv/mqtt/*.c')
 
-    if 'CONFIG_LHV_WITH_MQTT' in os.environ:
-        pass
+    if 'CONFIG_LHV_WITH_OPENSSL' in os.environ:
+        DEFINITIONS_PRIVATE += ['-DWITH_OPENSSL']
+        REQUIREMENTS += ['ssl', 'crypto']
     else:
         DEFINITIONS_PRIVATE += ['-DHV_WITHOUT_SSL']
 
