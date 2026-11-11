@@ -160,7 +160,7 @@ def wget_github(url, branch = None):
     shutil.rmtree(file_path)
     return cwork
 
-def wget_github_commit(url, commit):
+def wget_github_commit(url, commit, path=False):
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
@@ -172,6 +172,8 @@ def wget_github_commit(url, commit):
     file_path = wget_zip(down_url, zip_file_name)
     shutil.move(os.path.join(file_path, zip_file_name[:-4]), os.path.join(os.environ['GIT_REPO_PATH'], repo[3]))
     shutil.rmtree(file_path)
+    if path:
+        return os.path.join(os.environ['GIT_REPO_PATH'], repo[3]) 
     return down_url
 
 def check_component(component_name):
