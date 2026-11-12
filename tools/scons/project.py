@@ -424,6 +424,10 @@ def setup_environment():
     
     # Initialize environment with basic tools
     env = Environment(tools=['gcc', 'g++', 'gnulink', 'ar', 'gas', 'as'])
+
+    # GCC uses this standard variable to make __DATE__/__TIME__ reproducible.
+    if os.environ.get('SOURCE_DATE_EPOCH'):
+        env['ENV']['SOURCE_DATE_EPOCH'] = os.environ['SOURCE_DATE_EPOCH']
     
     # Set up basic environment variables
     env['GCCPREFIX'] = ''
