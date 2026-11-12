@@ -91,6 +91,7 @@ def compare_and_copy(file1, file2):
             f2.write(f1.read())
 
 def sample_wget(down_url, file_path):
+    import os
     if not os.path.exists(file_path):
         import requests
         from tqdm import tqdm
@@ -110,6 +111,7 @@ def sample_wget(down_url, file_path):
     return file_path
 
 def wget_tar_xz(url, file_name):
+    import os
     file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
     path  = file_path[:-7]
     if not os.path.exists(path):
@@ -120,6 +122,7 @@ def wget_tar_xz(url, file_name):
     return path
 
 def wget_tar_gz(url, file_name):
+    import os
     file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
     path  = file_path[:-7]
     if not os.path.exists(path):
@@ -130,6 +133,7 @@ def wget_tar_gz(url, file_name):
     return path
 
 def wget_zip(url, file_name):
+    import os
     file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
     path  = file_path[:-4]
     if not os.path.exists(path):
@@ -144,6 +148,7 @@ def wget_zip(url, file_name):
     return path
 
 def wget_github(url, branch = None):
+    import os
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
@@ -161,6 +166,7 @@ def wget_github(url, branch = None):
     return cwork
 
 def wget_github_commit(url, commit, path=False):
+    import os
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
@@ -177,6 +183,7 @@ def wget_github_commit(url, commit, path=False):
     return down_url
 
 def check_component(component_name):
+    import os
     if component_name in env['GIT_REPO_LISTS']:
         if not os.path.exists(env['GIT_REPO_LISTS'][component_name]['path']):
             if 'CONFIG_REPO_AUTOMATION' in os.environ:
@@ -196,6 +203,7 @@ def check_component(component_name):
     return env['GIT_REPO_LISTS'][component_name]['path']
 
 def check_wget_down(url, file_name):
+    import os
     if file_name.endswith('.zip'):
         file_path = os.path.join(os.environ['GIT_REPO_PATH'], file_name)
         path  = file_path[:-4]
@@ -245,6 +253,7 @@ def check_wget_down(url, file_name):
         return file_path
 
 def wget_github(url):
+    import os
     import parse
     import shutil
     repo = parse.parse("{}://{}/{}/{}.git", url)
@@ -269,6 +278,18 @@ def wget_github(url):
                 shutil.move(extracted_dir, local_path)
                 shutil.rmtree(file_path)
     return local_path
+
+def ensure_static_lib_version(down_url, version: str, version_path: Path, file_sha256=None) -> bool:
+    try:
+        if version_path.read_text(encoding="utf-8").strip() == version:
+            return False
+    except:
+        pass
+    import tarfile
+    tarfile.TarFile.extraction_filter = staticmethod(tarfile.fully_trusted_filter)
+    check_wget_down(down_url, f"static_lib_{version}.tar.gz")
+    return True
+
 
 def CC_cmd_execute(cmd):
     import os
